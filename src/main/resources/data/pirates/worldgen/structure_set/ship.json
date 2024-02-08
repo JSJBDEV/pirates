@@ -1,0 +1,15 @@
+{
+  "structures": [
+    {
+      "structure": "pirates:fixed_shipwreck",
+      "weight": 1
+    }
+
+  ],
+  "placement": {
+    "spacing": 34,
+    "separation": 10,
+    "salt": 86875442,
+    "type": "minecraft:random_spread"
+  }
+}

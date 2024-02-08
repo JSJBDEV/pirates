@@ -1,0 +1,37 @@
+{
+	"schemaVersion": 1,
+	"id": "pirates",
+	"version": "${version}",
+	"name": "Valkyrien Pirates",
+	"description": "Pirate ships, but they move, like you'd expect them to",
+	"authors": [
+		"Acrogenous"
+	],
+	"contact": {
+		"homepage": "https://fabricmc.net/",
+		"sources": "https://github.com/FabricMC/fabric-example-mod"
+	},
+	"license": ["MIT"],
+	"icon": "assets/pirates/icon.png",
+	"environment": "*",
+	"entrypoints": {
+		"main": [
+			"ace.actually.pirates.Pirates"
+		],
+		"client": [
+			"ace.actually.pirates.ClientPirates"
+		]
+	},
+	"mixins": [
+		"pirates.mixins.json"
+	],
+	"depends": {
+		"fabricloader": ">=0.15.3",
+		"minecraft": "~1.18.2",
+		"java": ">=17",
+		"fabric-api": "*"
+	},
+	"suggests": {
+		"another-mod": "*"
+	}
+}

@@ -1,0 +1,7 @@
+{
+  "variants": {
+    "": {
+      "model": "pirates:block/motion_invoking_block"
+    }
+  }
+}
