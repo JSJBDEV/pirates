@@ -39,6 +39,11 @@ public class CannonPrimingBlock extends BlockWithEntity {
     }
 
     @Override
+    public BlockRenderType getRenderType(BlockState state) {
+        return BlockRenderType.MODEL;
+    }
+
+    @Override
     protected void appendProperties(StateManager.Builder<Block, BlockState> builder) {
         builder.add(RedstoneLampBlock.LIT);
     }

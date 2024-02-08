@@ -3,7 +3,7 @@
 	"id": "pirates",
 	"version": "${version}",
 	"name": "Valkyrien Pirates",
-	"description": "Pirate ships, but they move, like you'd expect them to",
+	"description": "Pirate ships, but they move, like you'd expect them to, oh, and cannons",
 	"authors": [
 		"Acrogenous"
 	],

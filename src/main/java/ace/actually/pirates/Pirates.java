@@ -24,6 +24,7 @@ import net.minecraft.entity.EntityDimensions;
 import net.minecraft.entity.EntityType;
 import net.minecraft.entity.SpawnGroup;
 import net.minecraft.entity.projectile.ProjectileEntity;
+import net.minecraft.item.BlockItem;
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemGroup;
 import net.minecraft.item.ItemStack;
@@ -53,8 +54,8 @@ public class Pirates implements ModInitializer {
 	public void onInitialize() {
 		registerEntityThings();
 		//entity types do it themselves
-		registerItems();
 		registerBlocks();
+		registerItems();
 		//block entities do it themselves
 		registerDispenserThings();
 		PatternProcessor.setupBasicPatterns();
@@ -72,15 +73,6 @@ public class Pirates implements ModInitializer {
 		FabricDefaultAttributeRegistry.register(PIRATE_ENTITY_TYPE, PirateEntity.attributes());
 	}
 
-	public static final TestingStickItem TESTING_STICK_ITEM = new TestingStickItem(new Item.Settings());
-	public static final RaycastingItem RAYCASTING_ITEM = new RaycastingItem(new Item.Settings());
-	public static final Item CANNONBALL = new Item(new Item.Settings().fireproof().group(ItemGroup.COMBAT));
-	private void registerItems()
-	{
-		Registry.register(Registry.ITEM,new Identifier("pirates","testing_stick"),TESTING_STICK_ITEM);
-		Registry.register(Registry.ITEM,new Identifier("pirates","raycaster"),RAYCASTING_ITEM);
-		Registry.register(Registry.ITEM,new Identifier("pirates","cannonball"),CANNONBALL);
-	}
 
 	public static final MotionInvokingBlock MOTION_INVOKING_BLOCK = new MotionInvokingBlock(AbstractBlock.Settings.of(Material.AGGREGATE));
 	public static final CannonPrimingBlock CANNON_PRIMING_BLOCK = new CannonPrimingBlock(AbstractBlock.Settings.of(Material.AGGREGATE));
@@ -90,6 +82,21 @@ public class Pirates implements ModInitializer {
 		Registry.register(Registry.BLOCK,new Identifier("pirates","motion_invoking_block"),MOTION_INVOKING_BLOCK);
 
 	}
+
+
+	public static final TestingStickItem TESTING_STICK_ITEM = new TestingStickItem(new Item.Settings());
+	public static final RaycastingItem RAYCASTING_ITEM = new RaycastingItem(new Item.Settings());
+	public static final Item CANNONBALL = new Item(new Item.Settings().fireproof().group(ItemGroup.COMBAT));
+	private void registerItems()
+	{
+		Registry.register(Registry.ITEM,new Identifier("pirates","testing_stick"),TESTING_STICK_ITEM);
+		Registry.register(Registry.ITEM,new Identifier("pirates","raycaster"),RAYCASTING_ITEM);
+		Registry.register(Registry.ITEM,new Identifier("pirates","cannonball"),CANNONBALL);
+
+		Registry.register(Registry.ITEM,new Identifier("pirates","cannon_priming_block"),new BlockItem(CANNON_PRIMING_BLOCK,new Item.Settings()));
+	}
+
+
 	private void registerDispenserThings()
 	{
 		DispenserBlock.registerBehavior(Pirates.CANNONBALL, new DispenserBehavior() {
