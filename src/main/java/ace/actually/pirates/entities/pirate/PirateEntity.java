@@ -14,9 +14,11 @@ import net.minecraft.item.ItemStack;
 import net.minecraft.item.Items;
 import net.minecraft.nbt.NbtCompound;
 import net.minecraft.sound.SoundEvents;
+import net.minecraft.util.math.random.Random;
 import net.minecraft.world.LocalDifficulty;
 import net.minecraft.world.ServerWorldAccess;
 import net.minecraft.world.World;
+import net.minecraft.world.WorldAccess;
 
 public class PirateEntity extends HostileEntity implements RangedAttackMob {
     public PirateEntity(World world) {
@@ -34,16 +36,16 @@ public class PirateEntity extends HostileEntity implements RangedAttackMob {
         this.targetSelector.add(3, new ActiveTargetGoal(this, PlayerEntity.class, true));
     }
 
-    protected void initEquipment(LocalDifficulty difficulty) {
-        super.initEquipment(difficulty);
+    @Override
+    protected void initEquipment(Random random, LocalDifficulty localDifficulty) {
+        super.initEquipment(random, localDifficulty);
         this.equipStack(EquipmentSlot.MAINHAND, new ItemStack(Items.BOW));
-
     }
 
     @Override
     public EntityData initialize(ServerWorldAccess world, LocalDifficulty difficulty, SpawnReason spawnReason, EntityData entityData, NbtCompound entityTag) {
         entityData = super.initialize(world, difficulty, spawnReason, entityData, entityTag);
-        initEquipment(difficulty);
+        initEquipment(random,difficulty);
 
         return entityData;
     }
@@ -51,15 +53,15 @@ public class PirateEntity extends HostileEntity implements RangedAttackMob {
     @Override
     public void attack(LivingEntity target, float pullProgress) {
 
-        ItemStack itemStack = this.getArrowType(this.getStackInHand(ProjectileUtil.getHandPossiblyHolding(this, Items.BOW)));
+        ItemStack itemStack = this.getStackInHand(ProjectileUtil.getHandPossiblyHolding(this, Items.BOW));
         PersistentProjectileEntity persistentProjectileEntity = this.createArrowProjectile(itemStack, pullProgress);
         double d = target.getX() - this.getX();
         double e = target.getBodyY(0.3333333333333333) - persistentProjectileEntity.getY();
         double f = target.getZ() - this.getZ();
         double g = Math.sqrt(d * d + f * f);
-        persistentProjectileEntity.setVelocity(d, e + g * 0.20000000298023224, f, 1.6F, (float)(14 - this.world.getDifficulty().getId() * 4));
+        persistentProjectileEntity.setVelocity(d, e + g * 0.20000000298023224, f, 1.6F, (float)(14 - this.getEntityWorld().getDifficulty().getId() * 4));
         this.playSound(SoundEvents.ENTITY_SKELETON_SHOOT, 1.0F, 1.0F / (this.getRandom().nextFloat() * 0.4F + 0.8F));
-        this.world.spawnEntity(persistentProjectileEntity);
+        this.getEntityWorld().spawnEntity(persistentProjectileEntity);
 
         if(random.nextInt(10)==0)
         {
@@ -89,5 +91,14 @@ public class PirateEntity extends HostileEntity implements RangedAttackMob {
     @Override
     public boolean isPersistent() {
         return true;
+    }
+
+    @Override
+    public boolean canSpawn(WorldAccess world, SpawnReason spawnReason) {
+        if(spawnReason==SpawnReason.SPAWNER)
+        {
+            return true;
+        }
+        return super.canSpawn(world, spawnReason);
     }
 }

@@ -44,10 +44,10 @@ public class CannonPrimingBlockEntity extends BlockEntity {
         if(!world.isClient && world.getTimeOfDay()%40==0)
         {
 
-            ServerShipWorld serverShipWorld = (ServerShipWorld) ValkyrienSkiesMod.getVsCore().getHooks().getCurrentShipServerWorld();
-            DimensionIdProvider provider = (DimensionIdProvider) world;
-            if(serverShipWorld.isBlockInShipyard(pos.getX(),pos.getY(),pos.getZ(),provider.getDimensionId()))
-            {
+                ServerShipWorld serverShipWorld = (ServerShipWorld) ValkyrienSkiesMod.getVsCore().getHooks().getCurrentShipServerWorld();
+                DimensionIdProvider provider = (DimensionIdProvider) world;
+                if(serverShipWorld.isBlockInShipyard(pos.getX(),pos.getY(),pos.getZ(),provider.getDimensionId()))
+                {
                 ChunkPos chunkPos = world.getChunk(pos).getPos();
                 LoadedServerShip ship = (LoadedServerShip) ValkyrienSkiesMod.getVsCore().getHooks().getCurrentShipServerWorld().getLoadedShips().getByChunkPos(chunkPos.x,chunkPos.z, provider.getDimensionId());
 

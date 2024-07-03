@@ -5,17 +5,16 @@ import net.minecraft.entity.Entity;
 import net.minecraft.entity.EntityType;
 import net.minecraft.entity.FlyingItemEntity;
 import net.minecraft.entity.LivingEntity;
-import net.minecraft.entity.projectile.thrown.SnowballEntity;
 import net.minecraft.entity.projectile.thrown.ThrownItemEntity;
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
 import net.minecraft.item.Items;
-import net.minecraft.network.Packet;
+import net.minecraft.network.listener.ClientPlayPacketListener;
+import net.minecraft.network.packet.Packet;
 import net.minecraft.network.packet.s2c.play.EntitySpawnS2CPacket;
 import net.minecraft.util.hit.BlockHitResult;
 import net.minecraft.util.hit.EntityHitResult;
 import net.minecraft.world.World;
-import net.minecraft.world.explosion.Explosion;
 
 public class ShotEntity extends ThrownItemEntity implements FlyingItemEntity {
     private LivingEntity in;
@@ -44,9 +43,9 @@ public class ShotEntity extends ThrownItemEntity implements FlyingItemEntity {
     @Override
     protected void onEntityHit(EntityHitResult entityHitResult) {
         super.onEntityHit(entityHitResult);
-        if(!world.isClient)
+        if(!getEntityWorld().isClient)
         {
-            world.createExplosion(this,getX(),getY(),getZ(),damage, Explosion.DestructionType.DESTROY);
+            getEntityWorld().createExplosion(this,getX(),getY(),getZ(),damage, World.ExplosionSourceType.MOB);
         }
         kill();
     }
@@ -54,9 +53,9 @@ public class ShotEntity extends ThrownItemEntity implements FlyingItemEntity {
     @Override
     protected void onBlockHit(BlockHitResult blockHitResult) {
         super.onBlockHit(blockHitResult);
-        if(!world.isClient)
+        if(!getEntityWorld().isClient)
         {
-            world.createExplosion(this,getX(),getY(),getZ(),damage, Explosion.DestructionType.DESTROY);
+            getEntityWorld().createExplosion(this,getX(),getY(),getZ(),damage, World.ExplosionSourceType.MOB);
         }
         kill();
 
@@ -73,7 +72,7 @@ public class ShotEntity extends ThrownItemEntity implements FlyingItemEntity {
         return super.getStack();
     }
 
-    public Packet<?> createSpawnPacket() {
+    public Packet<ClientPlayPacketListener> createSpawnPacket() {
         Entity entity = in;
         return new EntitySpawnS2CPacket(this, entity == null ? 0 : entity.getId());
     }
