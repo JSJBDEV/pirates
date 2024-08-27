@@ -33,6 +33,7 @@ public class MotionInvokingBlock extends BlockWithEntity {
         return VoxelShapes.empty();
     }
 
+
     @Nullable
     @Override
     public BlockEntity createBlockEntity(BlockPos pos, BlockState state) {

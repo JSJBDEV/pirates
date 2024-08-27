@@ -47,7 +47,6 @@ public class MotionInvokingBlockEntity extends BlockEntity {
 
             if (VSGameUtilsKt.isBlockInShipyard(world, pos)) {
 
-
                 ChunkPos chunkPos = world.getChunk(pos).getPos();
                 LoadedServerShip ship = (LoadedServerShip) ValkyrienSkiesMod.getVsCore().getHooks().getCurrentShipServerWorld().getLoadedShips().getByChunkPos(chunkPos.x, chunkPos.z, provider.getDimensionId());
 

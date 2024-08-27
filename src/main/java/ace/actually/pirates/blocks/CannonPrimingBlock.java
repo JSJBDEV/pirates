@@ -9,6 +9,7 @@ import net.minecraft.block.entity.DispenserBlockEntity;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.item.ItemPlacementContext;
 import net.minecraft.state.StateManager;
+import net.minecraft.state.property.Properties;
 import net.minecraft.text.Text;
 import net.minecraft.util.ActionResult;
 import net.minecraft.util.Hand;
@@ -33,10 +34,6 @@ public class CannonPrimingBlock extends BlockWithEntity {
         super(settings);
     }
 
-//    @Override
-//    public VoxelShape getOutlineShape(BlockState state, BlockView world, BlockPos pos, ShapeContext context) {
-//        return Block.createCuboidShape(0,0,0,2,2,2);
-//    }
 
     @Override
     public BlockRenderType getRenderType(BlockState state) {
@@ -45,40 +42,31 @@ public class CannonPrimingBlock extends BlockWithEntity {
 
     @Override
     protected void appendProperties(StateManager.Builder<Block, BlockState> builder) {
-        builder.add(RedstoneLampBlock.LIT);
+        builder.add(RedstoneLampBlock.LIT).add(Properties.FACING);
     }
 
     @Nullable
     @Override
     public BlockState getPlacementState(ItemPlacementContext ctx) {
-        return getDefaultState().with(RedstoneLampBlock.LIT,false);
-    }
-
-    /**
-     *
-     * @param origin a point to "look" from
-     * @param target a point to "look" at
-     * @return the vector that can be used to travel between these points
-     */
-    public Vec3d pointLine(Vec3d origin, Vec3d target)
-    {
-        double d = target.x - origin.x;
-        double e = target.y - origin.y;
-        double f = target.z - origin.z;
-        double g = Math.sqrt(d * d + f * f);
-        float pitch = (MathHelper.wrapDegrees((float)(-(MathHelper.atan2(e, g) * 57.2957763671875))));
-        float yaw = MathHelper.wrapDegrees((float)(MathHelper.atan2(f, d) * 57.2957763671875) - 90.0F);
-        return getRotationVector(pitch,yaw);
-    }
-
-    protected final Vec3d getRotationVector(float pitch, float yaw) {
-        float f = pitch * 0.017453292F;
-        float g = -yaw * 0.017453292F;
-        float h = MathHelper.cos(g);
-        float i = MathHelper.sin(g);
-        float j = MathHelper.cos(f);
-        float k = MathHelper.sin(f);
-        return new Vec3d((double)(i * j), (double)(-k), (double)(h * j));
+        BlockPos pos = ctx.getBlockPos();
+        World world = ctx.getWorld();
+        Direction facing;
+        if (world.getBlockState(pos.north()).isOf(Blocks.DISPENSER)) {
+            facing = Direction.NORTH;
+        } else if (world.getBlockState(pos.east()).isOf(Blocks.DISPENSER)) {
+            facing = Direction.EAST;
+        }  else if (world.getBlockState(pos.south()).isOf(Blocks.DISPENSER)) {
+            facing = Direction.SOUTH;
+        }  else if (world.getBlockState(pos.west()).isOf(Blocks.DISPENSER)) {
+            facing = Direction.WEST;
+        }  else if (world.getBlockState(pos.up()).isOf(Blocks.DISPENSER)) {
+            facing = Direction.UP;
+        }  else if (world.getBlockState(pos.down()).isOf(Blocks.DISPENSER)) {
+            facing = Direction.DOWN;
+        } else {
+            facing = ctx.getPlayerLookDirection();
+        }
+        return getDefaultState().with(RedstoneLampBlock.LIT,false).with(Properties.FACING, facing);
     }
 
     @Nullable
@@ -91,7 +79,7 @@ public class CannonPrimingBlock extends BlockWithEntity {
     @Nullable
     @Override
     public <T extends BlockEntity> BlockEntityTicker<T> getTicker(World world, BlockState state, BlockEntityType<T> type) {
-        return checkType(type, Pirates.CANNON_PRIMING_BLOCK_ENTITY, CannonPrimingBlockEntity::tick);
+        return checkType(type, Pirates.CANNON_PRIMING_BLOCK_ENTITY, (world1, pos, state1, be) -> be.tick(world1, pos, state1, be));
     }
 
     @Override
