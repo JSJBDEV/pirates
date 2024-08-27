@@ -1,0 +1,7 @@
+{
+  "variants": {
+    "": {
+      "model": "pirates:block/cannon_priming_block"
+    }
+  }
+}

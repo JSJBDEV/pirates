@@ -1,0 +1,38 @@
+{
+	"schemaVersion": 1,
+	"id": "pirates",
+	"version": "${version}",
+	"name": "Valkyrien Pirates",
+	"description": "Pirates as they should be",
+	"authors": [
+		"Acrogenous"
+	],
+	"contact": {
+		"homepage": "https://fabricmc.net/",
+		"sources": "https://github.com/FabricMC/fabric-example-mod"
+	},
+	"license": "MIT",
+	"icon": "assets/pirates/icon.png",
+	"environment": "*",
+	"entrypoints": {
+		"main": [
+			{
+				"value": "ace.actually.pirates.Pirates"
+			}
+		],
+		"client": ["ace.actually.pirates.ClientPirates"]
+	},
+	"mixins": [
+		"valkyrienpirates120.mixins.json"
+	],
+	"depends": {
+		"fabricloader": ">=0.15.10",
+		"minecraft": "~1.20.1",
+		"java": ">=17",
+		"fabric-api": "*",
+		"fabric-language-kotlin": ">=1.9.23"
+	},
+	"suggests": {
+		"another-mod": "*"
+	}
+}
