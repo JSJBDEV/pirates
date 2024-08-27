@@ -1,6 +1,23 @@
 {
-	"parent": "block/cube_all",
+	"credit": "Made with Blockbench",
+	"parent": "minecraft:block/block",
 	"textures": {
-		"all": "minecraft:block/furnace_top"
-	}
+		"0": "pirates:block/cannon_priming_back",
+		"1": "block/furnace_top",
+		"particle": "block/furnace_top"
+	},
+	"elements": [
+		{
+			"from": [0, 0, 0],
+			"to": [16, 16, 16],
+			"faces": {
+				"north": {"uv": [0, 0, 16, 16], "texture": "#1"},
+				"east": {"uv": [0, 0, 16, 16], "texture": "#1"},
+				"south": {"uv": [0, 0, 16, 16], "texture": "#0"},
+				"west": {"uv": [0, 0, 16, 16], "texture": "#1"},
+				"up": {"uv": [0, 0, 16, 16], "texture": "#1"},
+				"down": {"uv": [0, 0, 16, 16], "texture": "#1"}
+			}
+		}
+	]
 }

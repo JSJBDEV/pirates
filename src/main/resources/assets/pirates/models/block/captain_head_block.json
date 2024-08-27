@@ -3,8 +3,8 @@
 	"ambientocclusion": false,
 	"texture_size": [32, 32],
 	"textures": {
-		"0": "pirates:block/pillager",
-		"1": "pirates:block/red_hat",
+		"0": "pillager",
+		"1": "red_hat",
 		"particle": "pillager"
 	},
 	"elements": [

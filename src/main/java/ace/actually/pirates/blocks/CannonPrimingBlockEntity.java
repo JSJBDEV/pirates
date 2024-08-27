@@ -30,31 +30,43 @@ import java.util.List;
 public class CannonPrimingBlockEntity extends BlockEntity {
 
     public int cooldown = 0;
+    private int lastCooldown = 40;
 
     public CannonPrimingBlockEntity(BlockPos pos, BlockState state) {
         super(Pirates.CANNON_PRIMING_BLOCK_ENTITY, pos, state);
     }
 
     public void tick(World world, BlockPos pos, BlockState state, CannonPrimingBlockEntity be) {
-        if (state.get(RedstoneLampBlock.LIT)) {
-            world.setBlockState(pos, state.with(RedstoneLampBlock.LIT, false));
-        }
+
 
         if (!world.isClient && cooldown == 0) {
+//            BlockPos dispenserPos = pos.add(state.get(Properties.FACING).getVector());
+//            if (!world.getBlockState(dispenserPos).isOf(Blocks.DISPENSER) && state.get(Properties.ATTACHED)){
+//                world.setBlockState(pos, state.with(Properties.ATTACHED, false));
+//            } else if (world.getBlockState(dispenserPos).isOf(Blocks.DISPENSER) && !state.get(Properties.ATTACHED)) {
+//                world.setBlockState(pos, state.with(Properties.ATTACHED, true));
+//            }
+
             if (checkShouldFire(world, pos, state)){
                 world.setBlockState(pos, state.with(RedstoneLampBlock.LIT, true));
                 cooldown = 40 + (int) (Math.random() * 20);
+                lastCooldown = cooldown;
             } else {
                 cooldown = 3;
             }
         } else {
             cooldown --;
         }
+
+        if (state.get(RedstoneLampBlock.LIT) && lastCooldown - cooldown == 10) {
+            world.setBlockState(pos, state.with(RedstoneLampBlock.LIT, false));
+        }
     }
 
     private static boolean checkShouldFire(World world, BlockPos pos, BlockState state) {
         Vec3i raycastStart = state.get(Properties.FACING).getVector();
-        if (!world.getBlockState(pos.add(raycastStart)).isOf(Blocks.DISPENSER)){
+
+        if(!world.getBlockState(pos.add(raycastStart)).isOf(Blocks.DISPENSER) || world.getBlockState(pos.add(raycastStart)).get(Properties.FACING) != state.get(Properties.FACING)){
             return false;
         }
 

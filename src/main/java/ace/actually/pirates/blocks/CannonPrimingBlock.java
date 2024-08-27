@@ -51,6 +51,7 @@ public class CannonPrimingBlock extends BlockWithEntity {
         BlockPos pos = ctx.getBlockPos();
         World world = ctx.getWorld();
         Direction facing;
+
         if (world.getBlockState(pos.north()).isOf(Blocks.DISPENSER)) {
             facing = Direction.NORTH;
         } else if (world.getBlockState(pos.east()).isOf(Blocks.DISPENSER)) {
@@ -65,6 +66,7 @@ public class CannonPrimingBlock extends BlockWithEntity {
             facing = Direction.DOWN;
         } else {
             facing = ctx.getPlayerLookDirection();
+
         }
         return getDefaultState().with(RedstoneLampBlock.LIT,false).with(Properties.FACING, facing);
     }
