@@ -1,9 +1,11 @@
 package ace.actually.pirates;
 
+import ace.actually.pirates.entities.MotionInvokingBERenderer;
 import ace.actually.pirates.entities.ShotEntityRenderer;
 import ace.actually.pirates.entities.pirate.PirateEntityRenderer;
 import net.fabricmc.api.ClientModInitializer;
 import net.fabricmc.fabric.api.client.rendering.v1.EntityRendererRegistry;
+import net.minecraft.client.render.block.entity.BlockEntityRendererFactories;
 import net.minecraft.client.render.entity.model.EntityModelLayer;
 import net.minecraft.util.Identifier;
 
@@ -17,7 +19,7 @@ public class ClientPirates implements ClientModInitializer {
         EntityRendererRegistry.register(Pirates.PIRATE_ENTITY_TYPE, PirateEntityRenderer::new);
         EntityRendererRegistry.register(Pirates.SHOT_ENTITY_TYPE, (context) -> new ShotEntityRenderer(context, 1,false));
 
-
+        BlockEntityRendererFactories.register(Pirates.MOTION_INVOKING_BLOCK_ENTITY, MotionInvokingBERenderer::new);
 
 
     }

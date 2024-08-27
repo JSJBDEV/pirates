@@ -1,0 +1,24 @@
+{
+    "name": "plightful-piracy:wreck_top",
+    "fallback": "minecraft:empty",
+    "elements": [
+        {
+            "weight": 1,
+            "element": {
+                "element_type": "minecraft:single_pool_element",
+                "location": "plightful-piracy:wreck/wreck_top",
+                "projection": "rigid",
+                "processors": "plightful-piracy:ship"
+            }
+        },
+        {
+            "weight": 1,
+            "element": {
+                "element_type": "minecraft:single_pool_element",
+                "location": "plightful-piracy:wreck/wreck_top_alt",
+                "projection": "rigid",
+                "processors": "plightful-piracy:ship"
+            }
+        }
+    ]
+}

@@ -1,9 +1,6 @@
 package ace.actually.pirates;
 
-import ace.actually.pirates.blocks.CannonPrimingBlock;
-import ace.actually.pirates.blocks.CannonPrimingBlockEntity;
-import ace.actually.pirates.blocks.MotionInvokingBlock;
-import ace.actually.pirates.blocks.MotionInvokingBlockEntity;
+import ace.actually.pirates.blocks.*;
 import ace.actually.pirates.entities.ShotEntity;
 import ace.actually.pirates.entities.pirate.PirateEntity;
 import ace.actually.pirates.items.RaycastingItem;
@@ -13,6 +10,8 @@ import net.fabricmc.fabric.api.object.builder.v1.block.entity.FabricBlockEntityT
 import net.fabricmc.fabric.api.object.builder.v1.entity.FabricDefaultAttributeRegistry;
 import net.fabricmc.fabric.api.object.builder.v1.entity.FabricEntityTypeBuilder;
 import net.minecraft.block.AbstractBlock;
+import net.minecraft.block.Block;
+import net.minecraft.block.Blocks;
 import net.minecraft.block.DispenserBlock;
 import net.minecraft.block.dispenser.DispenserBehavior;
 import net.minecraft.block.dispenser.ProjectileDispenserBehavior;
@@ -27,6 +26,7 @@ import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
 import net.minecraft.registry.Registries;
 import net.minecraft.registry.Registry;
+import net.minecraft.sound.BlockSoundGroup;
 import net.minecraft.util.Identifier;
 import net.minecraft.util.Util;
 import net.minecraft.util.math.BlockPointer;
@@ -72,12 +72,14 @@ public class Pirates implements ModInitializer {
 	}
 
 
-	public static final MotionInvokingBlock MOTION_INVOKING_BLOCK = new MotionInvokingBlock(AbstractBlock.Settings.create());
-	public static final CannonPrimingBlock CANNON_PRIMING_BLOCK = new CannonPrimingBlock(AbstractBlock.Settings.create());
+	public static final MotionInvokingBlock MOTION_INVOKING_BLOCK = new MotionInvokingBlock(AbstractBlock.Settings.copy(Blocks.CRYING_OBSIDIAN).noBlockBreakParticles().noCollision().sounds(BlockSoundGroup.AMETHYST_BLOCK));
+	public static final CannonPrimingBlock CANNON_PRIMING_BLOCK = new CannonPrimingBlock(AbstractBlock.Settings.copy(Blocks.DISPENSER).hardness(5));
+	public static final CaptainHeadBlock CAPTAIN_HEAD_BLOCK = new CaptainHeadBlock(AbstractBlock.Settings.copy(Blocks.STONE));
 	private void registerBlocks()
 	{
 		Registry.register(Registries.BLOCK,new Identifier("pirates","cannon_priming_block"),CANNON_PRIMING_BLOCK);
 		Registry.register(Registries.BLOCK,new Identifier("pirates","motion_invoking_block"),MOTION_INVOKING_BLOCK);
+		Registry.register(Registries.BLOCK,new Identifier("pirates","captain_head_block"),CAPTAIN_HEAD_BLOCK);
 
 	}
 

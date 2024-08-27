@@ -4,7 +4,6 @@ import ace.actually.pirates.PatternProcessor;
 import ace.actually.pirates.Pirates;
 import net.minecraft.block.BlockState;
 import net.minecraft.block.Blocks;
-import net.minecraft.block.FurnaceBlock;
 import net.minecraft.block.entity.BlockEntity;
 import net.minecraft.nbt.NbtCompound;
 import net.minecraft.nbt.NbtList;
@@ -12,14 +11,19 @@ import net.minecraft.registry.tag.BlockTags;
 import net.minecraft.server.world.ServerWorld;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.ChunkPos;
+import net.minecraft.util.math.Direction;
 import net.minecraft.world.World;
 import org.valkyrienskies.core.api.ships.LoadedServerShip;
 import org.valkyrienskies.core.api.ships.ServerShip;
 import org.valkyrienskies.core.api.world.ServerShipWorld;
+import org.valkyrienskies.eureka.EurekaBlocks;
+import org.valkyrienskies.eureka.block.ShipHelmBlock;
 import org.valkyrienskies.eureka.util.ShipAssembler;
 import org.valkyrienskies.mod.api.SeatedControllingPlayer;
 import org.valkyrienskies.mod.common.ValkyrienSkiesMod;
 import org.valkyrienskies.mod.common.util.DimensionIdProvider;
+
+import static net.minecraft.state.property.Properties.HORIZONTAL_FACING;
 
 public class MotionInvokingBlockEntity extends BlockEntity {
 
@@ -31,6 +35,11 @@ public class MotionInvokingBlockEntity extends BlockEntity {
     }
 
     public static void tick(World world, BlockPos pos, BlockState state, MotionInvokingBlockEntity be) {
+        if (!(world.getBlockState(pos.down()).getBlock() instanceof ShipHelmBlock)) {
+            world.breakBlock(pos, false);
+            return;
+        }
+
         if(be.instructions.isEmpty() && Pirates.isLiveWorld)
         {
             be.getPattern("circle.pattern");
@@ -48,19 +57,23 @@ public class MotionInvokingBlockEntity extends BlockEntity {
 
                 //Pirates.LOGGER.info("scaling of ship: "+s.x()+" "+s.y()+" "+s.z());
 
-                SeatedControllingPlayer seatedControllingPlayer = ship.getAttachment(SeatedControllingPlayer.class);
-                if(seatedControllingPlayer==null)
-                {
-                    seatedControllingPlayer = new SeatedControllingPlayer(state.get(FurnaceBlock.FACING));
-                    ship.setAttachment(SeatedControllingPlayer.class,seatedControllingPlayer);
+                if (ship != null) {
+                    SeatedControllingPlayer seatedControllingPlayer = ship.getAttachment(SeatedControllingPlayer.class);
+                    if (seatedControllingPlayer == null) {
+                        if (world.getBlockState(pos.down()).getBlock() instanceof ShipHelmBlock) {
+                            seatedControllingPlayer = new SeatedControllingPlayer(world.getBlockState(pos.down()).get(HORIZONTAL_FACING).getOpposite());
+                        } else {
+                            return;
+                        }
+                        ship.setAttachment(SeatedControllingPlayer.class, seatedControllingPlayer);
+                    }
+
+                    //this is the bit where it does things, theoretically you can derive some AI from this
+                    //good luck tho
+                    //Pirates.LOGGER.info(be.instructions.getString(0));
+                    be.utiliseInternalPattern(seatedControllingPlayer, be);
+
                 }
-
-                //this is the bit where it does things, theoretically you can derive some AI from this
-                //good luck tho
-                //Pirates.LOGGER.info(be.instructions.getString(0));
-                be.utiliseInternalPattern(seatedControllingPlayer,be);
-
-
             }
             else
             {

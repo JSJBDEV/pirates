@@ -33,10 +33,10 @@ public class CannonPrimingBlock extends BlockWithEntity {
         super(settings);
     }
 
-    @Override
-    public VoxelShape getOutlineShape(BlockState state, BlockView world, BlockPos pos, ShapeContext context) {
-        return Block.createCuboidShape(0,0,0,2,2,2);
-    }
+//    @Override
+//    public VoxelShape getOutlineShape(BlockState state, BlockView world, BlockPos pos, ShapeContext context) {
+//        return Block.createCuboidShape(0,0,0,2,2,2);
+//    }
 
     @Override
     public BlockRenderType getRenderType(BlockState state) {
