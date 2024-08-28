@@ -55,7 +55,7 @@ public class Pirates implements ModInitializer {
 		registerBlocks();
 		registerItems();
 		//block entities do it themselves
-		registerDispenserThings();
+		//registerDispenserThings();
 		PatternProcessor.setupBasicPatterns();
 		//ConfigUtils.checkConfigs();
 		LOGGER.info("Let there be motion!");
@@ -75,11 +75,13 @@ public class Pirates implements ModInitializer {
 	public static final MotionInvokingBlock MOTION_INVOKING_BLOCK = new MotionInvokingBlock(AbstractBlock.Settings.copy(Blocks.CRYING_OBSIDIAN).noBlockBreakParticles().noCollision().sounds(BlockSoundGroup.AMETHYST_BLOCK));
 	public static final CannonPrimingBlock CANNON_PRIMING_BLOCK = new CannonPrimingBlock(AbstractBlock.Settings.copy(Blocks.DISPENSER).hardness(5));
 	public static final CaptainHeadBlock CAPTAIN_HEAD_BLOCK = new CaptainHeadBlock(AbstractBlock.Settings.copy(Blocks.STONE));
+	public static final DispenserCannonBlock DISPENSER_CANNON_BLOCK = new DispenserCannonBlock(AbstractBlock.Settings.copy(Blocks.DISPENSER).hardness(5));
 	private void registerBlocks()
 	{
 		Registry.register(Registries.BLOCK,new Identifier("pirates","cannon_priming_block"),CANNON_PRIMING_BLOCK);
 		Registry.register(Registries.BLOCK,new Identifier("pirates","motion_invoking_block"),MOTION_INVOKING_BLOCK);
 		Registry.register(Registries.BLOCK,new Identifier("pirates","captain_head_block"),CAPTAIN_HEAD_BLOCK);
+		Registry.register(Registries.BLOCK,new Identifier("pirates","dispenser_cannon_block"),DISPENSER_CANNON_BLOCK);
 
 	}
 
@@ -96,31 +98,6 @@ public class Pirates implements ModInitializer {
 		Registry.register(Registries.ITEM,new Identifier("pirates","cannon_priming_block"),new BlockItem(CANNON_PRIMING_BLOCK,new Item.Settings()));
 	}
 
-
-	private void registerDispenserThings()
-	{
-		DispenserBlock.registerBehavior(Pirates.CANNONBALL, new DispenserBehavior() {
-			public ItemStack dispense(BlockPointer blockPointer, ItemStack itemStack) {
-				return (new ProjectileDispenserBehavior() {
-					protected ProjectileEntity createProjectile(World world, Position position, ItemStack stack) {
-						ShotEntity qentity = Util.make(new ShotEntity(Pirates.SHOT_ENTITY_TYPE,world,null,Pirates.CANNONBALL,2,""), (entity) -> {
-							entity.setItem(stack);
-						});
-						qentity.setPosition(new Vec3d(position.getX(),position.getY(),position.getZ()));
-						return qentity;
-					}
-
-					protected float getVariation() {
-						return super.getVariation() * 0.5F;
-					}
-
-					protected float getForce() {
-						return super.getForce() * 1.25F;
-					}
-				}).dispense(blockPointer, itemStack);
-			}
-		});
-	}
 
 	//block entities
 	public static final BlockEntityType<MotionInvokingBlockEntity> MOTION_INVOKING_BLOCK_ENTITY = Registry.register(

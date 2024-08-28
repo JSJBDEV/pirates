@@ -2,10 +2,7 @@ package ace.actually.pirates.blocks;
 
 import ace.actually.pirates.ConfigUtils;
 import ace.actually.pirates.Pirates;
-import net.minecraft.block.BlockState;
-import net.minecraft.block.Blocks;
-import net.minecraft.block.DispenserBlock;
-import net.minecraft.block.RedstoneLampBlock;
+import net.minecraft.block.*;
 import net.minecraft.block.entity.BlockEntity;
 import net.minecraft.block.entity.BlockEntityType;
 import net.minecraft.entity.ai.TargetPredicate;
@@ -65,8 +62,7 @@ public class CannonPrimingBlockEntity extends BlockEntity {
 
     private static boolean checkShouldFire(World world, BlockPos pos, BlockState state) {
         Vec3i raycastStart = state.get(Properties.FACING).getVector();
-
-        if(!world.getBlockState(pos.add(raycastStart)).isOf(Blocks.DISPENSER) || world.getBlockState(pos.add(raycastStart)).get(Properties.FACING) != state.get(Properties.FACING)){
+        if(!(world.getBlockState(pos.add(raycastStart)).getBlock() instanceof DispenserBlock)|| world.getBlockState(pos.add(raycastStart)).get(Properties.FACING) != state.get(Properties.FACING)){
             return false;
         }
 

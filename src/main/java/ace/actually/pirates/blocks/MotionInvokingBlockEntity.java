@@ -34,7 +34,6 @@ public class MotionInvokingBlockEntity extends BlockEntity {
 
     public static void tick(World world, BlockPos pos, BlockState state, MotionInvokingBlockEntity be) {
         if (!(world.getBlockState(pos.down()).getBlock() instanceof ShipHelmBlock)) {
-            removeSeatedControllingPlayer(world, pos);
             world.breakBlock(pos, false);
             return;
         }
@@ -74,23 +73,6 @@ public class MotionInvokingBlockEntity extends BlockEntity {
             }
         }
 
-    }
-
-    public static void removeSeatedControllingPlayer(World world, BlockPos pos) {
-        if (VSGameUtilsKt.isBlockInShipyard(world, pos) && !world.isClient) {
-            DimensionIdProvider provider = (DimensionIdProvider) world;
-            ChunkPos chunkPos = world.getChunk(pos).getPos();
-            LoadedServerShip ship = (LoadedServerShip) ValkyrienSkiesMod.getVsCore().getHooks().getCurrentShipServerWorld().getLoadedShips().getByChunkPos(chunkPos.x, chunkPos.z, provider.getDimensionId());
-            if (ship != null) {
-
-                SeatedControllingPlayer seatedControllingPlayer = new SeatedControllingPlayer(Direction.NORTH);
-                ship.setAttachment(SeatedControllingPlayer.class, seatedControllingPlayer);
-                seatedControllingPlayer.setCruise(false);
-                seatedControllingPlayer.setForwardImpulse(0.1f);
-            } else {
-                System.out.println("Ship is null");
-            }
-        }
     }
 
     private void buildShipRec(ServerWorld world, BlockPos pos) {
