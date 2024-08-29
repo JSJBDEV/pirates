@@ -1,28 +1,14 @@
 package ace.actually.pirates.blocks;
 
-import ace.actually.pirates.ConfigUtils;
 import ace.actually.pirates.Pirates;
 import net.minecraft.block.*;
 import net.minecraft.block.entity.BlockEntity;
-import net.minecraft.block.entity.BlockEntityType;
-import net.minecraft.entity.ai.TargetPredicate;
-import net.minecraft.entity.player.PlayerEntity;
-import net.minecraft.entity.projectile.SmallFireballEntity;
 import net.minecraft.state.property.Properties;
-import net.minecraft.util.Hand;
 import net.minecraft.util.hit.BlockHitResult;
 import net.minecraft.util.math.*;
 import net.minecraft.world.RaycastContext;
 import net.minecraft.world.World;
-import org.joml.Vector3d;
-import org.valkyrienskies.core.api.ships.LoadedServerShip;
-import org.valkyrienskies.core.api.ships.Ship;
-import org.valkyrienskies.core.api.world.ServerShipWorld;
 import org.valkyrienskies.mod.common.VSGameUtilsKt;
-import org.valkyrienskies.mod.common.ValkyrienSkiesMod;
-import org.valkyrienskies.mod.common.util.DimensionIdProvider;
-
-import java.util.List;
 
 public class CannonPrimingBlockEntity extends BlockEntity {
 
@@ -37,14 +23,8 @@ public class CannonPrimingBlockEntity extends BlockEntity {
 
 
         if (!world.isClient && cooldown == 0) {
-//            BlockPos dispenserPos = pos.add(state.get(Properties.FACING).getVector());
-//            if (!world.getBlockState(dispenserPos).isOf(Blocks.DISPENSER) && state.get(Properties.ATTACHED)){
-//                world.setBlockState(pos, state.with(Properties.ATTACHED, false));
-//            } else if (world.getBlockState(dispenserPos).isOf(Blocks.DISPENSER) && !state.get(Properties.ATTACHED)) {
-//                world.setBlockState(pos, state.with(Properties.ATTACHED, true));
-//            }
 
-            if (checkShouldFire(world, pos, state)){
+            if (checkShouldFire(world, pos, state) && !state.get(CannonPrimingBlock.DISARMED)){
                 world.setBlockState(pos, state.with(RedstoneLampBlock.LIT, true));
                 cooldown = 40 + (int) (Math.random() * 20);
                 lastCooldown = cooldown;

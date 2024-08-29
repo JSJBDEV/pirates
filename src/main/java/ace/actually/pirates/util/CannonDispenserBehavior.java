@@ -1,4 +1,5 @@
 package ace.actually.pirates.util;
+import ace.actually.pirates.sound.ModSounds;
 import net.minecraft.block.DispenserBlock;
 import net.minecraft.block.dispenser.ItemDispenserBehavior;
 import net.minecraft.entity.projectile.ProjectileEntity;
@@ -23,7 +24,7 @@ public abstract class CannonDispenserBehavior
         Position position = DispenserBlock.getOutputLocation(pointer);
         Direction direction = pointer.getBlockState().get(DispenserBlock.FACING);
         ProjectileEntity projectileEntity = this.createProjectile(world, position, stack);
-        projectileEntity.setVelocity(direction.getOffsetX(), (float)direction.getOffsetY() + 0.2f, direction.getOffsetZ(), this.getForce() + 0.4f, this.getVariation() / 2);
+        projectileEntity.setVelocity(direction.getOffsetX(), (float)direction.getOffsetY() + 0.15f, direction.getOffsetZ(), this.getForce() + 0.6f, this.getVariation() / 2);
         world.spawnEntity(projectileEntity);
         if (!world.isClient) {
             int xmod = 0;
@@ -42,8 +43,8 @@ public abstract class CannonDispenserBehavior
             } else if (direction == Direction.DOWN) {
                 ymod = -1;
             }
-            for(int i = 0; i < 5; ++i) {
-                world.spawnParticles(ParticleTypes.CAMPFIRE_COSY_SMOKE, position.getX() + xmod + world.random.nextDouble() - 0.5, position.getY() + ymod, position.getZ() + zmod + world.random.nextDouble() - 0.5, 1, 0.0, 0.0, 0.0, 0.005);
+            for(int i = 0; i < 40; ++i) {
+                world.spawnParticles(ParticleTypes.CLOUD, position.getX() + xmod + (2 * world.random.nextDouble()) - 1, position.getY() + ymod + (2 * world.random.nextDouble()) - 0.8, position.getZ() + zmod + (2 * world.random.nextDouble()) - 1, 1, 0.0, 0.0, 0.0, 0.005);
             }
         }
         stack.decrement(1);
@@ -52,7 +53,7 @@ public abstract class CannonDispenserBehavior
 
     @Override
     protected void playSound(BlockPointer pointer) {
-        pointer.getWorld().playSound(null, pointer.getPos().getX(), pointer.getPos().getY(), pointer.getPos().getZ(), SoundEvents.BLOCK_BEACON_ACTIVATE, SoundCategory.BLOCKS, 0.5F, 1F);
+        pointer.getWorld().playSound(null, pointer.getPos().getX(), pointer.getPos().getY(), pointer.getPos().getZ(), ModSounds.CANNONBALL_SHOT, SoundCategory.BLOCKS, 0.5F, 1F);
     }
 
 

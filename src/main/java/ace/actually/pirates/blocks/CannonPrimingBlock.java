@@ -5,34 +5,19 @@ import net.minecraft.block.*;
 import net.minecraft.block.entity.BlockEntity;
 import net.minecraft.block.entity.BlockEntityTicker;
 import net.minecraft.block.entity.BlockEntityType;
-import net.minecraft.block.entity.DispenserBlockEntity;
-import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.item.ItemPlacementContext;
 import net.minecraft.state.StateManager;
+import net.minecraft.state.property.BooleanProperty;
 import net.minecraft.state.property.Properties;
-import net.minecraft.text.Text;
-import net.minecraft.util.ActionResult;
-import net.minecraft.util.Hand;
-import net.minecraft.util.hit.BlockHitResult;
 import net.minecraft.util.math.*;
-import net.minecraft.util.shape.VoxelShape;
-import net.minecraft.world.BlockStateRaycastContext;
-import net.minecraft.world.BlockView;
-import net.minecraft.world.RaycastContext;
-import net.minecraft.world.World;
+import net.minecraft.world.*;
 import org.jetbrains.annotations.Nullable;
-import org.joml.Vector3d;
-import org.valkyrienskies.core.api.ships.LoadedServerShip;
-import org.valkyrienskies.core.api.world.ServerShipWorld;
-import org.valkyrienskies.mod.common.VSGameUtilsKt;
-import org.valkyrienskies.mod.common.ValkyrienSkiesMod;
-import org.valkyrienskies.mod.common.util.DimensionIdProvider;
-import org.valkyrienskies.mod.common.world.RaycastUtilsKt;
 
 public class CannonPrimingBlock extends BlockWithEntity {
     public CannonPrimingBlock(Settings settings) {
         super(settings);
     }
+    public static final BooleanProperty DISARMED = Properties.DISARMED;
 
 
     @Override
@@ -42,7 +27,7 @@ public class CannonPrimingBlock extends BlockWithEntity {
 
     @Override
     protected void appendProperties(StateManager.Builder<Block, BlockState> builder) {
-        builder.add(RedstoneLampBlock.LIT).add(Properties.FACING);
+        builder.add(RedstoneLampBlock.LIT).add(Properties.FACING).add(DISARMED);
     }
 
     @Nullable
@@ -68,7 +53,11 @@ public class CannonPrimingBlock extends BlockWithEntity {
             facing = ctx.getPlayerLookDirection();
 
         }
-        return getDefaultState().with(RedstoneLampBlock.LIT,false).with(Properties.FACING, facing);
+
+        if (world.getBlockState(pos.add(facing.getVector())).isOf(Blocks.DISPENSER) && world.getBlockState(pos.add(facing.getVector())).get(Properties.FACING) == facing) {
+            world.setBlockState(pos.add(facing.getVector()), Pirates.DISPENSER_CANNON_BLOCK.getDefaultState().with(Properties.FACING, facing), 3);
+        }
+        return getDefaultState().with(RedstoneLampBlock.LIT,false).with(Properties.FACING, facing).with(DISARMED, true);
     }
 
     @Nullable
@@ -96,5 +85,14 @@ public class CannonPrimingBlock extends BlockWithEntity {
            return 15;
        }
        return 0;
+    }
+
+    @Override
+    public BlockState getStateForNeighborUpdate(BlockState state, Direction direction, BlockState neighborState, WorldAccess world, BlockPos pos, BlockPos neighborPos) {
+
+        if (world.getBlockState(pos.add(state.get(Properties.FACING).getVector())).isOf(Blocks.DISPENSER) && world.getBlockState(pos.add(state.get(Properties.FACING).getVector())).get(Properties.FACING) == state.get(Properties.FACING)) {
+            world.setBlockState(pos.add(state.get(Properties.FACING).getVector()), Pirates.DISPENSER_CANNON_BLOCK.getDefaultState().with(Properties.FACING, state.get(Properties.FACING)), 3);
+        }
+        return super.getStateForNeighborUpdate(state, direction, neighborState, world, pos, neighborPos);
     }
 }

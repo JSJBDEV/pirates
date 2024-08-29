@@ -5,6 +5,7 @@ import ace.actually.pirates.entities.ShotEntity;
 import ace.actually.pirates.entities.pirate.PirateEntity;
 import ace.actually.pirates.items.RaycastingItem;
 import ace.actually.pirates.items.TestingStickItem;
+import ace.actually.pirates.sound.ModSounds;
 import net.fabricmc.api.ModInitializer;
 import net.fabricmc.fabric.api.object.builder.v1.block.entity.FabricBlockEntityTypeBuilder;
 import net.fabricmc.fabric.api.object.builder.v1.entity.FabricDefaultAttributeRegistry;
@@ -58,6 +59,7 @@ public class Pirates implements ModInitializer {
 		//registerDispenserThings();
 		PatternProcessor.setupBasicPatterns();
 		//ConfigUtils.checkConfigs();
+		ModSounds.registerSounds();
 		LOGGER.info("Let there be motion!");
 
 		//BiomeModifications.addSpawn(BiomeSelectors.categories(Biome.Category.OCEAN), SpawnGroup.WATER_CREATURE, Pirates.SHIP, 3, 1, 1);
