@@ -1,4 +1,5 @@
 package ace.actually.pirates.util;
+import ace.actually.pirates.blocks.CannonPrimingBlockEntity;
 import ace.actually.pirates.sound.ModSounds;
 import net.minecraft.block.DispenserBlock;
 import net.minecraft.block.dispenser.ItemDispenserBehavior;
