@@ -3,17 +3,18 @@ package ace.actually.pirates.blocks;
 import ace.actually.pirates.Pirates;
 import net.minecraft.block.*;
 import net.minecraft.block.entity.BlockEntity;
+import net.minecraft.particle.ParticleTypes;
+import net.minecraft.server.world.ServerWorld;
 import net.minecraft.state.property.Properties;
 import net.minecraft.util.hit.BlockHitResult;
 import net.minecraft.util.math.*;
 import net.minecraft.world.RaycastContext;
 import net.minecraft.world.World;
+import org.joml.Vector3d;
 import org.valkyrienskies.mod.common.VSGameUtilsKt;
+import org.valkyrienskies.mod.common.util.VectorConversionsMCKt;
 
-import java.util.HashMap;
-import java.util.LinkedList;
-import java.util.List;
-import java.util.Objects;
+import java.util.*;
 
 public class CannonPrimingBlockEntity extends BlockEntity {
 
@@ -27,7 +28,6 @@ public class CannonPrimingBlockEntity extends BlockEntity {
     public CannonPrimingBlockEntity(BlockPos pos, BlockState state) {
         super(Pirates.CANNON_PRIMING_BLOCK_ENTITY, pos, state);
         shouldCheckIfShouldAddToList = true;
-
     }
 
     public static void initHashMap() {
@@ -38,10 +38,40 @@ public class CannonPrimingBlockEntity extends BlockEntity {
         primingBlocksDataOnShips.clear();
     }
 
+    public static void disarmNearest(Long shipID, Vec3d worldPos, World world) {
+        List<BlockPos> cannonsShip = primingBlocksDataOnShips.get(shipID);
+        BlockPos closest = null;
+
+        if (cannonsShip == null) return;
+
+        for (BlockPos cannonShip : cannonsShip) {
+            Vector3d cannonWorld = (VSGameUtilsKt.getWorldCoordinates(world, cannonShip, VectorConversionsMCKt.toJOML(cannonShip.toCenterPos())));
+
+            if (closest != null) {
+                Vector3d closestWorld = (VSGameUtilsKt.getWorldCoordinates(world, closest, VectorConversionsMCKt.toJOML(closest.toCenterPos())));
+                if (Vector3d.distance(worldPos.x, worldPos.y, worldPos.z, cannonWorld.x, cannonWorld.y, cannonWorld.z) < Vector3d.distance(worldPos.x, worldPos.y, worldPos.z, closestWorld.x, closestWorld.y, closestWorld.z)){
+                    closest = cannonShip;
+                }
+            } else {
+                closest = cannonShip;
+            }
+        }
+        if (closest != null) {
+            world.setBlockState(closest, world.getBlockState(closest).with(CannonPrimingBlock.DISARMED, true));
+            primingBlocksDataOnShips.get(shipID).remove(closest);
+        }
+    }
+
+
+
 
     public void tick(World world, BlockPos pos, BlockState state, CannonPrimingBlockEntity be) {
-        if (shouldCheckIfShouldAddToList) {
-            addToList(world, pos, state);
+        if (shouldCheckIfShouldAddToList) addToList(world, pos, state);
+
+        if (cooldown % 3 == 0) {
+            if (!world.isClient() && !state.get(Properties.DISARMED)) {
+                ((ServerWorld) world).spawnParticles(ParticleTypes.WITCH, pos.getX() + Math.random(), pos.getY() + Math.random(), pos.getZ() + Math.random(), 1, 0, 0, 0, 0);
+            }
         }
 
         if (!world.isClient && cooldown == 0) {
@@ -83,7 +113,8 @@ public class CannonPrimingBlockEntity extends BlockEntity {
     private void addToList(World world, BlockPos pos, BlockState state) {
         shouldCheckIfShouldAddToList = false;
         if (!world.isClient()) {
-            if (VSGameUtilsKt.isBlockInShipyard(world, pos)) {
+            if (VSGameUtilsKt.isBlockInShipyard(world, pos) && world.getBlockState(pos).isOf(Pirates.CANNON_PRIMING_BLOCK)) {
+                if (world.getBlockState(pos).get(CannonPrimingBlock.DISARMED)) return;
                 Long shipID = Objects.requireNonNull(VSGameUtilsKt.getShipManagingPos(world, pos)).getId();
                 this.shipID = shipID;
                 if (primingBlocksDataOnShips.containsKey(shipID)){

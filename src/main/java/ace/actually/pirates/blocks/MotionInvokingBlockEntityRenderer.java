@@ -1,8 +1,6 @@
-package ace.actually.pirates.entities;
+package ace.actually.pirates.blocks;
 
 import ace.actually.pirates.Pirates;
-import ace.actually.pirates.blocks.MotionInvokingBlockEntity;
-import net.minecraft.block.Blocks;
 import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.render.VertexConsumerProvider;
 import net.minecraft.client.render.block.BlockRenderManager;
@@ -16,9 +14,9 @@ import java.util.Objects;
 import static java.lang.Math.cos;
 import static java.lang.Math.sin;
 
-public class MotionInvokingBERenderer  implements BlockEntityRenderer<MotionInvokingBlockEntity> {
+public class MotionInvokingBlockEntityRenderer implements BlockEntityRenderer<MotionInvokingBlockEntity> {
 
-    public MotionInvokingBERenderer(BlockEntityRendererFactory.Context context){}
+    public MotionInvokingBlockEntityRenderer(BlockEntityRendererFactory.Context context){}
 
 
 

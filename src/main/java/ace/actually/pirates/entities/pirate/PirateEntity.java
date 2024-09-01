@@ -1,6 +1,7 @@
 package ace.actually.pirates.entities.pirate;
 
 import ace.actually.pirates.Pirates;
+import ace.actually.pirates.blocks.CannonPrimingBlockEntity;
 import net.minecraft.entity.*;
 import net.minecraft.entity.ai.RangedAttackMob;
 import net.minecraft.entity.ai.goal.*;
@@ -14,11 +15,12 @@ import net.minecraft.item.ItemStack;
 import net.minecraft.item.Items;
 import net.minecraft.nbt.NbtCompound;
 import net.minecraft.sound.SoundEvents;
+import net.minecraft.util.hit.BlockHitResult;
+import net.minecraft.util.math.BlockPos;
+import net.minecraft.util.math.Vec3d;
 import net.minecraft.util.math.random.Random;
-import net.minecraft.world.LocalDifficulty;
-import net.minecraft.world.ServerWorldAccess;
-import net.minecraft.world.World;
-import net.minecraft.world.WorldAccess;
+import net.minecraft.world.*;
+import org.valkyrienskies.mod.common.VSGameUtilsKt;
 
 public class PirateEntity extends HostileEntity implements RangedAttackMob {
     public PirateEntity(World world) {
@@ -63,18 +65,18 @@ public class PirateEntity extends HostileEntity implements RangedAttackMob {
         this.playSound(SoundEvents.ENTITY_SKELETON_SHOOT, 1.0F, 1.0F / (this.getRandom().nextFloat() * 0.4F + 0.8F));
         this.getEntityWorld().spawnEntity(persistentProjectileEntity);
 
-        if(random.nextInt(10)==0)
-        {
-            //we are basically saying "if the target is on a solid ship" like the VS ones, or a create contraption i guess
-            if(!target.isSubmergedInWater())
-            {
-                this.teleport(target.getX(),target.getY()+0.1,target.getZ());
-            }
-        }
-        if(isSubmergedInWater() && !target.isSubmergedInWater())
-        {
-            this.teleport(target.getX(),target.getY()+0.1,target.getZ());
-        }
+//        if(random.nextInt(10)==0)
+//        {
+//            //we are basically saying "if the target is on a solid ship" like the VS ones, or a create contraption i guess
+//            if(!target.isSubmergedInWater())
+//            {
+//                this.teleport(target.getX(),target.getY()+0.1,target.getZ());
+//            }
+//        }
+//        if(isSubmergedInWater() && !target.isSubmergedInWater())
+//        {
+//            this.teleport(target.getX(),target.getY()+0.1,target.getZ());
+//        }
 
     }
     protected PersistentProjectileEntity createArrowProjectile(ItemStack arrow, float damageModifier) {
@@ -100,5 +102,21 @@ public class PirateEntity extends HostileEntity implements RangedAttackMob {
             return true;
         }
         return super.canSpawn(world, spawnReason);
+    }
+
+    @Override
+    public void remove(RemovalReason reason) {
+        World world = this.getWorld();
+        Vec3d pos = this.getPos();
+
+        if (!world.isClient()) {
+            RaycastContext context = new RaycastContext(pos, pos.add(0, -5, 0), RaycastContext.ShapeType.COLLIDER,
+                    RaycastContext.FluidHandling.NONE, this);
+            BlockHitResult result = world.raycast(context);
+            if (VSGameUtilsKt.isBlockInShipyard(world, result.getBlockPos())) {
+                CannonPrimingBlockEntity.disarmNearest(VSGameUtilsKt.getShipManagingPos(world, result.getBlockPos()).getId(), pos, world);
+            }
+        }
+        super.remove(reason);
     }
 }
