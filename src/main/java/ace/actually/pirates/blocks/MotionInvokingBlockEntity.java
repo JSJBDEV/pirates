@@ -33,8 +33,7 @@ public class MotionInvokingBlockEntity extends BlockEntity {
     }
 
     public static void tick(World world, BlockPos pos, BlockState state, MotionInvokingBlockEntity be) {
-        if (!(world.getBlockState(pos.down()).getBlock() instanceof ShipHelmBlock)) {
-            world.breakBlock(pos, false);
+        if (!(world.getBlockState(pos.up()).getBlock() instanceof ShipHelmBlock)) {
             return;
         }
 
@@ -54,8 +53,8 @@ public class MotionInvokingBlockEntity extends BlockEntity {
                 if (ship != null) {
                     SeatedControllingPlayer seatedControllingPlayer = ship.getAttachment(SeatedControllingPlayer.class);
                     if (seatedControllingPlayer == null) {
-                        if (world.getBlockState(pos.down()).getBlock() instanceof ShipHelmBlock) {
-                            seatedControllingPlayer = new SeatedControllingPlayer(world.getBlockState(pos.down()).get(HORIZONTAL_FACING).getOpposite());
+                        if (world.getBlockState(pos.up()).getBlock() instanceof ShipHelmBlock) {
+                            seatedControllingPlayer = new SeatedControllingPlayer(world.getBlockState(pos.up()).get(HORIZONTAL_FACING).getOpposite());
                         } else {
                             return;
                         }

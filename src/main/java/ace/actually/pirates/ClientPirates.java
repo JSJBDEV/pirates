@@ -1,7 +1,6 @@
 package ace.actually.pirates;
 
 import ace.actually.pirates.blocks.CannonPrimingBlockEntityRenderer;
-import ace.actually.pirates.blocks.MotionInvokingBlockEntityRenderer;
 import ace.actually.pirates.entities.ShotEntityRenderer;
 import ace.actually.pirates.entities.pirate.PirateEntityRenderer;
 import net.fabricmc.api.ClientModInitializer;
@@ -20,7 +19,6 @@ public class ClientPirates implements ClientModInitializer {
         EntityRendererRegistry.register(Pirates.PIRATE_ENTITY_TYPE, PirateEntityRenderer::new);
         EntityRendererRegistry.register(Pirates.SHOT_ENTITY_TYPE, (context) -> new ShotEntityRenderer(context, 1,false));
 
-        BlockEntityRendererFactories.register(Pirates.MOTION_INVOKING_BLOCK_ENTITY, MotionInvokingBlockEntityRenderer::new);
         BlockEntityRendererFactories.register(Pirates.CANNON_PRIMING_BLOCK_ENTITY, CannonPrimingBlockEntityRenderer::new);
 
 

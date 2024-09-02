@@ -83,7 +83,7 @@ public class Pirates implements ModInitializer {
 	}
 
 
-	public static final MotionInvokingBlock MOTION_INVOKING_BLOCK = new MotionInvokingBlock(AbstractBlock.Settings.copy(Blocks.CRYING_OBSIDIAN).noBlockBreakParticles().noCollision().sounds(BlockSoundGroup.AMETHYST_BLOCK));
+	public static final MotionInvokingBlock MOTION_INVOKING_BLOCK = new MotionInvokingBlock(AbstractBlock.Settings.copy(Blocks.BIRCH_WOOD).noBlockBreakParticles().hardness(3));
 	public static final CannonPrimingBlock CANNON_PRIMING_BLOCK = new CannonPrimingBlock(AbstractBlock.Settings.copy(Blocks.DISPENSER).hardness(5));
 	public static final CaptainHeadBlock CAPTAIN_HEAD_BLOCK = new CaptainHeadBlock(AbstractBlock.Settings.copy(Blocks.STONE));
 	public static final DispenserCannonBlock DISPENSER_CANNON_BLOCK = new DispenserCannonBlock(AbstractBlock.Settings.copy(Blocks.DISPENSER).hardness(5));
@@ -107,6 +107,8 @@ public class Pirates implements ModInitializer {
 		Registry.register(Registries.ITEM,new Identifier("pirates","cannonball"),CANNONBALL);
 
 		Registry.register(Registries.ITEM,new Identifier("pirates","cannon_priming_block"),new BlockItem(CANNON_PRIMING_BLOCK,new Item.Settings()));
+		Registry.register(Registries.ITEM,new Identifier("pirates","motion_invoking_block"),new BlockItem(MOTION_INVOKING_BLOCK,new Item.Settings()));
+
 	}
 
 
