@@ -2,6 +2,7 @@ package ace.actually.pirates.blocks;
 
 import ace.actually.pirates.PatternProcessor;
 import ace.actually.pirates.Pirates;
+import ace.actually.pirates.sound.ModSounds;
 import net.minecraft.block.BlockState;
 import net.minecraft.block.Blocks;
 import net.minecraft.block.entity.BlockEntity;
@@ -9,6 +10,8 @@ import net.minecraft.nbt.NbtCompound;
 import net.minecraft.nbt.NbtList;
 import net.minecraft.registry.tag.BlockTags;
 import net.minecraft.server.world.ServerWorld;
+import net.minecraft.sound.SoundCategory;
+import net.minecraft.sound.SoundEvents;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.ChunkPos;
 import net.minecraft.util.math.Direction;
@@ -33,6 +36,7 @@ public class MotionInvokingBlockEntity extends BlockEntity {
     }
 
     public static void tick(World world, BlockPos pos, BlockState state, MotionInvokingBlockEntity be) {
+
         if (!(world.getBlockState(pos.up()).getBlock() instanceof ShipHelmBlock)) {
             return;
         }
@@ -44,6 +48,15 @@ public class MotionInvokingBlockEntity extends BlockEntity {
             DimensionIdProvider provider = (DimensionIdProvider) world;
 
             if (VSGameUtilsKt.isBlockInShipyard(world, pos)) {
+
+                Long shipID = VSGameUtilsKt.getShipManagingPos(world, pos).getId();
+
+                if (CannonPrimingBlockEntity.isShipDisarmed(shipID)) {
+                    world.setBlockState(pos, Blocks.SPRUCE_PLANKS.getDefaultState());
+
+                    world.playSound(null, pos, SoundEvents.BLOCK_BEACON_DEACTIVATE, SoundCategory.BLOCKS, 1F, 0.8F);
+                    return;
+                }
 
                 ChunkPos chunkPos = world.getChunk(pos).getPos();
                 LoadedServerShip ship = (LoadedServerShip) ValkyrienSkiesMod.getVsCore().getHooks().getCurrentShipServerWorld().getLoadedShips().getByChunkPos(chunkPos.x, chunkPos.z, provider.getDimensionId());
