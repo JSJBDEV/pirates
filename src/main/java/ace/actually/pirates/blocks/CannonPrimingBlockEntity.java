@@ -20,6 +20,7 @@ public class CannonPrimingBlockEntity extends BlockEntity {
 
     public int cooldown = 0;
     private int lastCooldown = 40;
+    public final double randomRotation;
     private boolean shouldCheckIfShouldAddToList;
     private static HashMap<Long, List<BlockPos>> primingBlocksDataOnShips;
 
@@ -28,6 +29,7 @@ public class CannonPrimingBlockEntity extends BlockEntity {
     public CannonPrimingBlockEntity(BlockPos pos, BlockState state) {
         super(Pirates.CANNON_PRIMING_BLOCK_ENTITY, pos, state);
         shouldCheckIfShouldAddToList = true;
+        randomRotation = Math.random() * 2.5;
     }
 
     public static void initHashMap() {
@@ -68,11 +70,11 @@ public class CannonPrimingBlockEntity extends BlockEntity {
     public void tick(World world, BlockPos pos, BlockState state, CannonPrimingBlockEntity be) {
         if (shouldCheckIfShouldAddToList) addToList(world, pos, state);
 
-        if (cooldown % 3 == 0) {
-            if (!world.isClient() && !state.get(Properties.DISARMED)) {
-                ((ServerWorld) world).spawnParticles(ParticleTypes.WITCH, pos.getX() + Math.random(), pos.getY() + Math.random(), pos.getZ() + Math.random(), 1, 0, 0, 0, 0);
-            }
-        }
+//        if (cooldown % 3 == 0) {
+//            if (!world.isClient() && !state.get(Properties.DISARMED)) {
+//                ((ServerWorld) world).spawnParticles(ParticleTypes.ANGRY_VILLAGER, pos.getX() + Math.random(), pos.getY() + Math.random() + 0.1, pos.getZ() + Math.random(), 1, 0, 0, 0, 0);
+//            }
+//        }
 
         if (!world.isClient && cooldown == 0) {
 
