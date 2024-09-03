@@ -1,0 +1,14 @@
+{
+    "structures": [
+        {
+            "structure": "pirates:ship1",
+            "weight": 1
+        }
+    ],
+    "placement": {
+        "type": "random_spread",
+        "spacing": 32,
+        "separation": 10,
+        "salt": 36745487
+    }
+}

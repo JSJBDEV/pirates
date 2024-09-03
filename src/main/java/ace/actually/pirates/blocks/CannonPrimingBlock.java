@@ -9,6 +9,8 @@ import net.minecraft.item.ItemPlacementContext;
 import net.minecraft.state.StateManager;
 import net.minecraft.state.property.BooleanProperty;
 import net.minecraft.state.property.Properties;
+import net.minecraft.util.BlockMirror;
+import net.minecraft.util.BlockRotation;
 import net.minecraft.util.math.*;
 import net.minecraft.world.*;
 import org.jetbrains.annotations.Nullable;
@@ -94,5 +96,13 @@ public class CannonPrimingBlock extends BlockWithEntity {
             world.setBlockState(pos.add(state.get(Properties.FACING).getVector()), Pirates.DISPENSER_CANNON_BLOCK.getDefaultState().with(Properties.FACING, state.get(Properties.FACING)), 3);
         }
         return super.getStateForNeighborUpdate(state, direction, neighborState, world, pos, neighborPos);
+    }
+
+    public BlockState rotate(BlockState state, BlockRotation rotation) {
+        return (BlockState)state.with(Properties.FACING, rotation.rotate((Direction)state.get(Properties.FACING)));
+    }
+
+    public BlockState mirror(BlockState state, BlockMirror mirror) {
+        return state.rotate(mirror.getRotation((Direction)state.get(Properties.FACING)));
     }
 }
