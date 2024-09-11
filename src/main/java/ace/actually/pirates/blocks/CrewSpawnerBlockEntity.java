@@ -33,25 +33,30 @@ import static net.minecraft.state.property.Properties.HORIZONTAL_FACING;
 
 public class CrewSpawnerBlockEntity extends BlockEntity {
 
+    public int countdown = 0;
+
     public CrewSpawnerBlockEntity(BlockPos pos, BlockState state) {
         super(Pirates.CREW_SPAWNER_BLOCK_ENTITY, pos, state);
     }
 
     public static void tick(World world, BlockPos pos, BlockState state, CrewSpawnerBlockEntity be) {
 
-        if (!world.isClient() && VSGameUtilsKt.isBlockInShipyard(world, pos)) {
-            Ship ship = VSGameUtilsKt.getShipManagingPos(world, pos);
+        if (!world.isClient() && VSGameUtilsKt.isBlockInShipyard(world, be.getPos())) {
+            Ship ship = VSGameUtilsKt.getShipManagingPos(world, be.getPos());
 
             if (ship == null) return;
 
-            long shipID = ship.getId();
+            if (be.countdown > 100) {
 
-            Entity pirate = new PirateEntity(world, shipID);
-            pirate.equipStack(EquipmentSlot.MAINHAND, new ItemStack(Items.BOW));
-            pirate.setPosition(pos.toCenterPos());
-            world.spawnEntity(pirate);
+                long shipID = ship.getId();
 
-            world.breakBlock(pos, false);
+                Entity pirate = new PirateEntity(world, shipID);
+                pirate.equipStack(EquipmentSlot.MAINHAND, new ItemStack(Items.BOW));
+                pirate.setPosition(be.getPos().toCenterPos());
+                world.spawnEntity(pirate);
+
+                world.breakBlock(be.getPos(), false);
+            } else {be.countdown++;}
         }
     }
 
