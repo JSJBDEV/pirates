@@ -61,7 +61,10 @@ public class CannonPrimingBlockEntity extends BlockEntity {
         List<BlockPos> cannonsShip = primingBlocksDataOnShips.get(shipID);
         BlockPos closest = null;
 
-        if (cannonsShip == null) return;
+        if (cannonsShip == null) {
+            primingBlocksDataOnShips.put(shipID, new ArrayList<>());
+            return;
+        }
 
         for (BlockPos cannonShip : cannonsShip) {
             Vector3d cannonWorld = (VSGameUtilsKt.getWorldCoordinates(world, cannonShip, VectorConversionsMCKt.toJOML(cannonShip.toCenterPos())));
