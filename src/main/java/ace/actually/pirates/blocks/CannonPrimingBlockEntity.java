@@ -49,6 +49,14 @@ public class CannonPrimingBlockEntity extends BlockEntity {
 
     }
 
+    public static int getArmedCannons (Long shipID) {
+        if (primingBlocksDataOnShips.containsKey(shipID)) {
+            return primingBlocksDataOnShips.get(shipID).size();
+        } else {
+            return 0;
+        }
+    }
+
     public static void disarmNearest(Long shipID, Vec3d worldPos, World world) {
         List<BlockPos> cannonsShip = primingBlocksDataOnShips.get(shipID);
         BlockPos closest = null;

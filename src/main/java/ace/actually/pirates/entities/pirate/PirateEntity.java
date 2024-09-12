@@ -8,18 +8,14 @@ import net.minecraft.entity.ai.goal.*;
 import net.minecraft.entity.attribute.DefaultAttributeContainer;
 import net.minecraft.entity.attribute.EntityAttributes;
 import net.minecraft.entity.mob.HostileEntity;
-import net.minecraft.entity.mob.SkeletonEntity;
-import net.minecraft.entity.mob.ZombieEntity;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.entity.projectile.PersistentProjectileEntity;
 import net.minecraft.entity.projectile.ProjectileUtil;
 import net.minecraft.item.ItemStack;
 import net.minecraft.item.Items;
 import net.minecraft.nbt.NbtCompound;
-import net.minecraft.server.world.ServerWorld;
 import net.minecraft.sound.SoundEvents;
 import net.minecraft.util.hit.BlockHitResult;
-import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.Vec3d;
 import net.minecraft.util.math.random.Random;
 import net.minecraft.world.*;
@@ -28,6 +24,7 @@ import org.valkyrienskies.mod.common.VSGameUtilsKt;
 public class PirateEntity extends HostileEntity implements RangedAttackMob {
     private long shipID;
 
+
     public PirateEntity(World world) {
         this(world, -1);
     }
@@ -35,18 +32,19 @@ public class PirateEntity extends HostileEntity implements RangedAttackMob {
     public PirateEntity(World world, long shipID) {
         super(Pirates.PIRATE_ENTITY_TYPE, world);
         this.shipID = shipID;
+
     }
 
 
     @Override
     protected void initGoals() {
         super.initGoals();
-        this.goalSelector.add(5, new WanderAroundFarGoal(this, 1.0D));
+        this.goalSelector.add(5, new PirateWanderArroundFarGoal(this, 1.0D));
         this.goalSelector.add(6, new LookAtEntityGoal(this, PlayerEntity.class, 200.0F));
         this.goalSelector.add(6, new LookAroundGoal(this));
-        this.goalSelector.add(4, new BowAttackGoal(this, 1.0D, 20, 200.0F));
+        this.goalSelector.add(4, new PirateBowAttackGoal<>(this, 1.0D, 20, 20.0F));
         //this.targetSelector.add(1, new RevengeGoal(this, new Class[0]));
-        this.targetSelector.add(3, new ActiveTargetGoal(this, PlayerEntity.class, true));
+        this.targetSelector.add(3, new ActiveTargetGoal<>(this, PlayerEntity.class, true));
     }
 
     @Override
@@ -140,6 +138,9 @@ public class PirateEntity extends HostileEntity implements RangedAttackMob {
                     RaycastContext.FluidHandling.NONE, this);
             BlockHitResult result = world.raycast(context);
             if (VSGameUtilsKt.isBlockInShipyard(world, result.getBlockPos())) {
+
+                if (VSGameUtilsKt.getShipManagingPos(world, pos) == null) return;
+
                 this.shipID = VSGameUtilsKt.getShipManagingPos(world, result.getBlockPos()).getId();
             }
         }
