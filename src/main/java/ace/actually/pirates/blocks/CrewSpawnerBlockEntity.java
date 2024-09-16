@@ -1,35 +1,18 @@
 package ace.actually.pirates.blocks;
 
-import ace.actually.pirates.PatternProcessor;
 import ace.actually.pirates.Pirates;
 import ace.actually.pirates.entities.pirate.PirateEntity;
 import net.minecraft.block.BlockState;
-import net.minecraft.block.Blocks;
 import net.minecraft.block.entity.BlockEntity;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.EquipmentSlot;
 import net.minecraft.item.ItemStack;
 import net.minecraft.item.Items;
-import net.minecraft.nbt.NbtCompound;
-import net.minecraft.nbt.NbtList;
-import net.minecraft.registry.tag.BlockTags;
-import net.minecraft.server.world.ServerWorld;
-import net.minecraft.sound.SoundCategory;
-import net.minecraft.sound.SoundEvents;
+import net.minecraft.state.property.Properties;
 import net.minecraft.util.math.BlockPos;
-import net.minecraft.util.math.ChunkPos;
-import net.minecraft.util.math.Vec3d;
 import net.minecraft.world.World;
-import org.valkyrienskies.core.api.ships.LoadedServerShip;
 import org.valkyrienskies.core.api.ships.Ship;
-import org.valkyrienskies.eureka.block.ShipHelmBlock;
-import org.valkyrienskies.eureka.util.ShipAssembler;
-import org.valkyrienskies.mod.api.SeatedControllingPlayer;
 import org.valkyrienskies.mod.common.VSGameUtilsKt;
-import org.valkyrienskies.mod.common.ValkyrienSkiesMod;
-import org.valkyrienskies.mod.common.util.DimensionIdProvider;
-
-import static net.minecraft.state.property.Properties.HORIZONTAL_FACING;
 
 public class CrewSpawnerBlockEntity extends BlockEntity {
 
@@ -40,7 +23,21 @@ public class CrewSpawnerBlockEntity extends BlockEntity {
     }
 
     public static void tick(World world, BlockPos pos, BlockState state, CrewSpawnerBlockEntity be) {
+        if (Pirates.isLiveWorld) {
 
+
+            if (state.get(Properties.CONDITIONAL)) {
+                spawnCrewIfOnShip(world, be);
+            } else {
+                spawnCrew(world, be);
+            }
+
+
+
+        }
+    }
+
+    private static void spawnCrewIfOnShip(World world, CrewSpawnerBlockEntity be) {
         if (!world.isClient() && VSGameUtilsKt.isBlockInShipyard(world, be.getPos())) {
             Ship ship = VSGameUtilsKt.getShipManagingPos(world, be.getPos());
 
@@ -48,16 +45,56 @@ public class CrewSpawnerBlockEntity extends BlockEntity {
 
             if (be.countdown > 100) {
 
-                long shipID = ship.getId();
+                Entity pirate = new PirateEntity(world, checkForBlocksToCrew(world, be.getPos()));
 
-                Entity pirate = new PirateEntity(world, shipID);
                 pirate.equipStack(EquipmentSlot.MAINHAND, new ItemStack(Items.BOW));
                 pirate.setPosition(be.getPos().toCenterPos());
                 world.spawnEntity(pirate);
 
                 world.breakBlock(be.getPos(), false);
-            } else {be.countdown++;}
+            } else {
+                be.countdown++;
+            }
         }
+    }
+
+    private static void spawnCrew(World world, CrewSpawnerBlockEntity be) {
+        Entity pirate = new PirateEntity(world, checkForBlocksToCrew(world, be.getPos()));
+
+        pirate.equipStack(EquipmentSlot.MAINHAND, new ItemStack(Items.BOW));
+        pirate.setPosition(be.getPos().toCenterPos());
+        world.spawnEntity(pirate);
+
+        world.breakBlock(be.getPos(), false);
+    }
+
+    private static BlockPos checkForBlocksToCrew (World world, BlockPos origin) {
+        BlockPos blockResult = new BlockPos(0,0,0);
+
+        if (world.getBlockState(origin.north()).isOf(Pirates.CANNON_PRIMING_BLOCK)) {
+            blockResult = origin.north();
+        } else if (world.getBlockState(origin.east()).isOf(Pirates.CANNON_PRIMING_BLOCK)) {
+            blockResult = origin.east();
+        } else if (world.getBlockState(origin.south()).isOf(Pirates.CANNON_PRIMING_BLOCK)) {
+            blockResult = origin.south();
+        } else if (world.getBlockState(origin.west()).isOf(Pirates.CANNON_PRIMING_BLOCK)) {
+            blockResult = origin.west();
+        }
+
+        BlockPos origin1 = origin.down();
+
+        if (world.getBlockState(origin1.north()).isOf(Pirates.MOTION_INVOKING_BLOCK) || (world.getBlockState(origin1.north()).isOf(Pirates.CANNON_PRIMING_BLOCK))) {
+            blockResult = origin1.north();
+        } else if (world.getBlockState(origin1.east()).isOf(Pirates.MOTION_INVOKING_BLOCK) || (world.getBlockState(origin1.east()).isOf(Pirates.CANNON_PRIMING_BLOCK))) {
+            blockResult = origin1.east();
+        } else if (world.getBlockState(origin1.south()).isOf(Pirates.MOTION_INVOKING_BLOCK) || (world.getBlockState(origin1.south()).isOf(Pirates.CANNON_PRIMING_BLOCK))) {
+            blockResult = origin1.south();
+        } else if (world.getBlockState(origin1.west()).isOf(Pirates.MOTION_INVOKING_BLOCK) || (world.getBlockState(origin1.west()).isOf(Pirates.CANNON_PRIMING_BLOCK))) {
+            blockResult = origin1.west();
+        }
+
+
+        return blockResult;
     }
 
 }

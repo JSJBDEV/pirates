@@ -6,6 +6,9 @@ import net.minecraft.block.entity.BlockEntity;
 import net.minecraft.block.entity.BlockEntityTicker;
 import net.minecraft.block.entity.BlockEntityType;
 import net.minecraft.item.ItemPlacementContext;
+import net.minecraft.particle.ParticleTypes;
+import net.minecraft.sound.SoundCategory;
+import net.minecraft.sound.SoundEvents;
 import net.minecraft.state.StateManager;
 import net.minecraft.state.property.BooleanProperty;
 import net.minecraft.state.property.Properties;
@@ -14,6 +17,7 @@ import net.minecraft.util.BlockRotation;
 import net.minecraft.util.math.*;
 import net.minecraft.world.*;
 import org.jetbrains.annotations.Nullable;
+import org.valkyrienskies.mod.common.VSGameUtilsKt;
 
 public class CannonPrimingBlock extends BlockWithEntity {
     public CannonPrimingBlock(Settings settings) {
@@ -104,5 +108,14 @@ public class CannonPrimingBlock extends BlockWithEntity {
 
     public BlockState mirror(BlockState state, BlockMirror mirror) {
         return state.rotate(mirror.getRotation((Direction)state.get(Properties.FACING)));
+    }
+
+    public static void disarm(World world, BlockPos pos) {
+        if (world.isClient()) return;
+        BlockState blockState = world.getBlockState(pos);
+        if (!blockState.get(DISARMED)) {
+            world.setBlockState(pos, blockState.with(DISARMED, true));
+            world.playSound(null, pos, SoundEvents.BLOCK_REDSTONE_TORCH_BURNOUT, SoundCategory.BLOCKS, 0.5f, 1.5f);
+        }
     }
 }

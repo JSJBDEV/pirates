@@ -1,7 +1,9 @@
 package ace.actually.pirates.entities.pirate;
 
 import ace.actually.pirates.Pirates;
+import ace.actually.pirates.blocks.CannonPrimingBlock;
 import ace.actually.pirates.blocks.CannonPrimingBlockEntity;
+import ace.actually.pirates.blocks.MotionInvokingBlock;
 import net.minecraft.entity.*;
 import net.minecraft.entity.ai.RangedAttackMob;
 import net.minecraft.entity.ai.goal.*;
@@ -16,23 +18,27 @@ import net.minecraft.item.Items;
 import net.minecraft.nbt.NbtCompound;
 import net.minecraft.sound.SoundEvents;
 import net.minecraft.util.hit.BlockHitResult;
+import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.Vec3d;
 import net.minecraft.util.math.random.Random;
 import net.minecraft.world.*;
+import org.valkyrienskies.core.impl.shadow.B;
 import org.valkyrienskies.mod.common.VSGameUtilsKt;
 
+import java.util.Objects;
+
 public class PirateEntity extends HostileEntity implements RangedAttackMob {
-    private long shipID;
+    private BlockPos blockToDisable;
 
 
     public PirateEntity(World world) {
-        this(world, -1);
+        this(world, new BlockPos(0,0,0));
     }
 
-    public PirateEntity(World world, long shipID) {
+    public PirateEntity(World world, BlockPos blockToDisable) {
         super(Pirates.PIRATE_ENTITY_TYPE, world);
-        this.shipID = shipID;
 
+        this.blockToDisable = blockToDisable;
     }
 
 
@@ -74,24 +80,6 @@ public class PirateEntity extends HostileEntity implements RangedAttackMob {
         this.playSound(SoundEvents.ENTITY_SKELETON_SHOOT, 1.0F, 1.0F / (this.getRandom().nextFloat() * 0.4F + 0.8F));
         this.getEntityWorld().spawnEntity(persistentProjectileEntity);
 
-//        if(random.nextInt(10)==0)
-//        {
-//            //we are basically saying "if the target is on a solid ship" like the VS ones, or a create contraption i guess
-//            if(!target.isSubmergedInWater())
-//            {
-//                this.teleport(target.getX(),target.getY()+0.1,target.getZ());
-//            }
-//        }
-//        if(isSubmergedInWater() && !target.isSubmergedInWater())
-//        {
-//            this.teleport(target.getX(),target.getY()+0.1,target.getZ());
-//        }
-
-
-//        Entity pirate = new PirateEntity(this.getWorld());
-//        pirate.equipStack(EquipmentSlot.MAINHAND, new ItemStack(Items.BOW));
-//        pirate.setPosition(this.getPos());
-//        this.getEntityWorld().spawnEntity(pirate);
     }
 
     protected PersistentProjectileEntity createArrowProjectile(ItemStack arrow, float damageModifier) {
@@ -110,39 +98,46 @@ public class PirateEntity extends HostileEntity implements RangedAttackMob {
         return true;
     }
 
-    @Override
-    public boolean canSpawn(WorldAccess world, SpawnReason spawnReason) {
-        if (spawnReason == SpawnReason.SPAWNER) {
-            return true;
-        }
-        return super.canSpawn(world, spawnReason);
-    }
 
     @Override
     public void remove(RemovalReason reason) {
-        checkShip();
-
-        if (shipID != -1) {
-            CannonPrimingBlockEntity.disarmNearest(shipID, this.getPos(), this.getWorld());
-        }
-
+        disableSavedBlock();
         super.remove(reason);
     }
 
-    public void checkShip() {
-        World world = this.getWorld();
-        Vec3d pos = this.getPos();
-
-        if (!world.isClient()) {
-            RaycastContext context = new RaycastContext(pos, pos.add(0, -5, 0), RaycastContext.ShapeType.COLLIDER,
-                    RaycastContext.FluidHandling.NONE, this);
-            BlockHitResult result = world.raycast(context);
-            if (VSGameUtilsKt.isBlockInShipyard(world, result.getBlockPos())) {
-
-                if (VSGameUtilsKt.getShipManagingPos(world, pos) == null) return;
-
-                this.shipID = VSGameUtilsKt.getShipManagingPos(world, result.getBlockPos()).getId();
+    private void disableSavedBlock() {
+        if (!Objects.equals(blockToDisable, new BlockPos(0, 0, 0))) {
+            if (this.getWorld().getBlockState(blockToDisable).isOf(Pirates.CANNON_PRIMING_BLOCK)) {
+                CannonPrimingBlock.disarm(this.getWorld(), blockToDisable);
+            } else if (this.getWorld().getBlockState(blockToDisable).isOf(Pirates.MOTION_INVOKING_BLOCK)) {
+                MotionInvokingBlock.disarm(this.getWorld(), blockToDisable);
             }
+        }
+    }
+
+    public boolean isOnShip() {
+        return VSGameUtilsKt.getShipManaging(this) != null;
+    }
+
+    @Override
+    public void writeCustomDataToNbt(NbtCompound nbt) {
+        super.writeCustomDataToNbt(nbt);
+        nbt.putInt("BlockToDisableX", this.blockToDisable.getX());
+        nbt.putInt("BlockToDisableY", this.blockToDisable.getY());
+        nbt.putInt("BlockToDisableZ", this.blockToDisable.getZ());
+    }
+
+
+    @Override
+    public void readCustomDataFromNbt(NbtCompound nbt) {
+        super.readCustomDataFromNbt(nbt);
+        int x, y, z;
+        if (nbt.contains("BlockToDisableX") && nbt.contains("BlockToDisableY") && nbt.contains("BlockToDisableZ")) {
+            x = nbt.getInt("BlockToDisableX");
+            y = nbt.getInt("BlockToDisableY");
+            z = nbt.getInt("BlockToDisableZ");
+
+            this.blockToDisable = new BlockPos(x, y, z);
         }
     }
 }

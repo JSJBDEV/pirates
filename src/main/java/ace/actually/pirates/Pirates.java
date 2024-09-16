@@ -53,28 +53,12 @@ public class Pirates implements ModInitializer {
 		ModSounds.registerSounds();
 		LOGGER.info("Let there be motion!");
 
-		CannonPrimingBlockEntity.initHashMap();
-		ServerLifecycleEvents.SERVER_STARTING.register(this::onServerStarting);
-		ServerLifecycleEvents.SERVER_STOPPING.register(this::onServerStopping);
-
 
 		//BiomeModifications.addSpawn(BiomeSelectors.categories(Biome.Category.OCEAN), SpawnGroup.WATER_CREATURE, Pirates.SHIP, 3, 1, 1);
 
 
 	}
 
-	private void onServerStarting(MinecraftServer minecraftServer) {
-		cleanupBlockData();
-	}
-
-	private static void cleanupBlockData() {
-		CannonPrimingBlockEntity.clearHashMap();
-		LOGGER.info("Cleaning up pirates block data");
-	}
-
-	private void onServerStopping(MinecraftServer minecraftServer) {
-		cleanupBlockData();
-	}
 
 	private void registerEntityThings()
 	{

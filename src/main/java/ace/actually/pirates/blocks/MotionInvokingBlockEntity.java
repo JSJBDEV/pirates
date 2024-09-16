@@ -49,14 +49,6 @@ public class MotionInvokingBlockEntity extends BlockEntity {
 
             if (VSGameUtilsKt.isBlockInShipyard(world, pos)) {
 
-                Long shipID = VSGameUtilsKt.getShipManagingPos(world, pos).getId();
-
-                if (CannonPrimingBlockEntity.isShipDisarmed(shipID)) {
-                    world.setBlockState(pos, Blocks.SPRUCE_PLANKS.getDefaultState());
-
-                    world.playSound(null, pos, SoundEvents.BLOCK_BEACON_DEACTIVATE, SoundCategory.BLOCKS, 1F, 0.8F);
-                    return;
-                }
 
                 ChunkPos chunkPos = world.getChunk(pos).getPos();
                 LoadedServerShip ship = (LoadedServerShip) ValkyrienSkiesMod.getVsCore().getHooks().getCurrentShipServerWorld().getLoadedShips().getByChunkPos(chunkPos.x, chunkPos.z, provider.getDimensionId());

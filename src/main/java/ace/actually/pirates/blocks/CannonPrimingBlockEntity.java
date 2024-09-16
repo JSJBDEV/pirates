@@ -21,86 +21,19 @@ public class CannonPrimingBlockEntity extends BlockEntity {
     public int cooldown = 0;
     private int lastCooldown = 40;
     public final double randomRotation;
-    private boolean shouldCheckIfShouldAddToList;
-    private static HashMap<Long, List<BlockPos>> primingBlocksDataOnShips;
 
-    private long shipID = -1;
 
     public CannonPrimingBlockEntity(BlockPos pos, BlockState state) {
         super(Pirates.CANNON_PRIMING_BLOCK_ENTITY, pos, state);
-        shouldCheckIfShouldAddToList = true;
         randomRotation = Math.random() * 2.5;
     }
 
-    public static void initHashMap() {
-        primingBlocksDataOnShips = new HashMap<>();
-    }
-
-    public static void clearHashMap() {
-        primingBlocksDataOnShips.clear();
-    }
-
-    public static boolean isShipDisarmed(Long shipID) {
-        if (primingBlocksDataOnShips.containsKey(shipID)) {
-            return primingBlocksDataOnShips.get(shipID).isEmpty();
-        } else {
-            return false;
-        }
-
-    }
-
-    public static int getArmedCannons (Long shipID) {
-        if (primingBlocksDataOnShips.containsKey(shipID)) {
-            return primingBlocksDataOnShips.get(shipID).size();
-        } else {
-            return 0;
-        }
-    }
-
-    public static void disarmNearest(Long shipID, Vec3d worldPos, World world) {
-        List<BlockPos> cannonsShip = primingBlocksDataOnShips.get(shipID);
-        BlockPos closest = null;
-
-        if (cannonsShip == null) {
-            primingBlocksDataOnShips.put(shipID, new ArrayList<>());
-            return;
-        }
-
-        for (BlockPos cannonShip : cannonsShip) {
-            Vector3d cannonWorld = (VSGameUtilsKt.getWorldCoordinates(world, cannonShip, VectorConversionsMCKt.toJOML(cannonShip.toCenterPos())));
-
-            if (closest != null) {
-                Vector3d closestWorld = (VSGameUtilsKt.getWorldCoordinates(world, closest, VectorConversionsMCKt.toJOML(closest.toCenterPos())));
-                if (Vector3d.distance(worldPos.x, worldPos.y, worldPos.z, cannonWorld.x, cannonWorld.y, cannonWorld.z) < Vector3d.distance(worldPos.x, worldPos.y, worldPos.z, closestWorld.x, closestWorld.y, closestWorld.z)){
-                    closest = cannonShip;
-                }
-            } else {
-                closest = cannonShip;
-            }
-        }
-        if (closest != null) {
-            world.setBlockState(closest, world.getBlockState(closest).with(CannonPrimingBlock.DISARMED, true));
-            primingBlocksDataOnShips.get(shipID).remove(closest);
-        }
-    }
-
-
-
-
     public void tick(World world, BlockPos pos, BlockState state, CannonPrimingBlockEntity be) {
-        if (shouldCheckIfShouldAddToList) addToList(world, pos, state);
 
-//        if (cooldown % 3 == 0) {
-//            if (!world.isClient() && !state.get(Properties.DISARMED)) {
-//                ((ServerWorld) world).spawnParticles(ParticleTypes.ANGRY_VILLAGER, pos.getX() + Math.random(), pos.getY() + Math.random() + 0.1, pos.getZ() + Math.random(), 1, 0, 0, 0, 0);
-//            }
-//        }
 
         if (!world.isClient && cooldown == 0) {
 
             if (checkShouldFire(world, pos, state) && !state.get(CannonPrimingBlock.DISARMED)){
-
-                System.out.println(primingBlocksDataOnShips.toString());
 
 
                 world.setBlockState(pos, state.with(RedstoneLampBlock.LIT, true));
@@ -118,38 +51,6 @@ public class CannonPrimingBlockEntity extends BlockEntity {
         }
     }
 
-    @Override
-    public void markRemoved() {
-        removeFromList();
-        super.markRemoved();
-    }
-
-    private void removeFromList() {
-        if (shipID != -1) {
-            if (primingBlocksDataOnShips.containsKey(shipID)){
-                primingBlocksDataOnShips.get(shipID).remove(pos);
-            }
-        }
-    }
-
-    private void addToList(World world, BlockPos pos, BlockState state) {
-        shouldCheckIfShouldAddToList = false;
-        if (!world.isClient()) {
-            if (VSGameUtilsKt.isBlockInShipyard(world, pos) && world.getBlockState(pos).isOf(Pirates.CANNON_PRIMING_BLOCK)) {
-                if (world.getBlockState(pos).get(CannonPrimingBlock.DISARMED)) return;
-                Long shipID = Objects.requireNonNull(VSGameUtilsKt.getShipManagingPos(world, pos)).getId();
-                this.shipID = shipID;
-                if (primingBlocksDataOnShips.containsKey(shipID)){
-                    if (!primingBlocksDataOnShips.get(shipID).contains(pos)) {
-                        primingBlocksDataOnShips.get(shipID).add(pos);
-                    }
-                } else {
-                    primingBlocksDataOnShips.put(shipID, new LinkedList<>());
-                    primingBlocksDataOnShips.get(shipID).add(pos);
-                }
-            }
-        }
-    }
 
     private static boolean checkShouldFire(World world, BlockPos pos, BlockState state) {
         Vec3i raycastStart = state.get(Properties.FACING).getVector();
@@ -167,8 +68,5 @@ public class CannonPrimingBlockEntity extends BlockEntity {
         BlockHitResult result = world.raycast(context);
         return  (VSGameUtilsKt.isBlockInShipyard(world, result.getBlockPos()));
     }
-
-
-
 
 }
