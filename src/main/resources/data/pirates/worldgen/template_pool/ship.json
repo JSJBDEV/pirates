@@ -7,7 +7,7 @@
       "element": {
         "element_type": "minecraft:single_pool_element",
         "projection": "rigid",
-        "location": "pirates:ship1_hull",
+        "location": "pirates:ship1",
         "processors": "minecraft:empty"
       }
     },
