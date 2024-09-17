@@ -29,6 +29,7 @@ import java.util.Objects;
 
 public class PirateEntity extends HostileEntity implements RangedAttackMob {
     private BlockPos blockToDisable;
+    public final double randomDouble;
 
 
     public PirateEntity(World world) {
@@ -39,6 +40,7 @@ public class PirateEntity extends HostileEntity implements RangedAttackMob {
         super(Pirates.PIRATE_ENTITY_TYPE, world);
 
         this.blockToDisable = blockToDisable;
+        this.randomDouble = Math.random();
     }
 
 
