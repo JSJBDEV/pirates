@@ -99,6 +99,8 @@ public class CannonPrimingBlock extends BlockWithEntity {
         if (world.getBlockState(pos.add(state.get(Properties.FACING).getVector())).isOf(Blocks.DISPENSER) && world.getBlockState(pos.add(state.get(Properties.FACING).getVector())).get(Properties.FACING) == state.get(Properties.FACING)) {
             world.setBlockState(pos.add(state.get(Properties.FACING).getVector()), Pirates.DISPENSER_CANNON_BLOCK.getDefaultState().with(Properties.FACING, state.get(Properties.FACING)), 3);
         }
+
+        if (world.isReceivingRedstonePower(pos) && !world.isClient()) {((CannonPrimingBlockEntity)world.getBlockEntity(pos)).fire((World) world, pos, state, 19);}
         return super.getStateForNeighborUpdate(state, direction, neighborState, world, pos, neighborPos);
     }
 

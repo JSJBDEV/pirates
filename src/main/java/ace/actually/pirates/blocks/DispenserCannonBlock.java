@@ -3,15 +3,15 @@ package ace.actually.pirates.blocks;
 import ace.actually.pirates.Pirates;
 import ace.actually.pirates.entities.ShotEntity;
 import ace.actually.pirates.util.CannonDispenserBehavior;
-import net.minecraft.block.AbstractBlock;
-import net.minecraft.block.BlockState;
-import net.minecraft.block.Blocks;
-import net.minecraft.block.DispenserBlock;
+import net.minecraft.block.*;
 import net.minecraft.block.dispenser.DispenserBehavior;
 import net.minecraft.block.dispenser.ItemDispenserBehavior;
+import net.minecraft.block.entity.BlockEntity;
+import net.minecraft.block.entity.DispenserBlockEntity;
 import net.minecraft.entity.projectile.ProjectileEntity;
 import net.minecraft.item.ItemStack;
 import net.minecraft.state.property.Properties;
+import net.minecraft.text.Text;
 import net.minecraft.util.Util;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.Direction;
@@ -19,6 +19,8 @@ import net.minecraft.util.math.Position;
 import net.minecraft.util.math.Vec3d;
 import net.minecraft.world.World;
 import net.minecraft.world.WorldAccess;
+
+import java.util.Objects;
 
 public class DispenserCannonBlock extends DispenserBlock {
     public DispenserCannonBlock(AbstractBlock.Settings settings) {
@@ -51,5 +53,15 @@ public class DispenserCannonBlock extends DispenserBlock {
 
         return super.getStateForNeighborUpdate(state, direction, neighborState, world, pos, neighborPos);
     }
+
+    @Override
+    public BlockEntity createBlockEntity(BlockPos pos, BlockState state) {
+        DispenserBlockEntity entity = new DispenserBlockEntity(pos, state);
+        entity.setCustomName(Text.of("Cannon"));
+        return entity;
+    }
+
+    @Override
+    public void neighborUpdate(BlockState state, World world, BlockPos pos, Block sourceBlock, BlockPos sourcePos, boolean notify) {}
 
 }

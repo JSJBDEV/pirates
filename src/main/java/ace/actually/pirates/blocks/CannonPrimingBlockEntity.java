@@ -33,12 +33,10 @@ public class CannonPrimingBlockEntity extends BlockEntity {
 
         if (!world.isClient && cooldown == 0) {
 
-            if (checkShouldFire(world, pos, state) && !state.get(CannonPrimingBlock.DISARMED)){
+            if ((checkShouldFire(world, pos, state) && !state.get(CannonPrimingBlock.DISARMED))){
 
 
-                world.setBlockState(pos, state.with(RedstoneLampBlock.LIT, true));
-                cooldown = 40 + (int) (Math.random() * 20);
-                lastCooldown = cooldown;
+                fire(world, pos, state);
             } else {
                 cooldown = 3;
             }
@@ -49,6 +47,22 @@ public class CannonPrimingBlockEntity extends BlockEntity {
         if (state.get(RedstoneLampBlock.LIT) && lastCooldown - cooldown == 10) {
             world.setBlockState(pos, state.with(RedstoneLampBlock.LIT, false));
         }
+    }
+
+    public void fire(World world, BlockPos pos, BlockState state, int cooldown) {
+        if (this.cooldown > 3) return;
+        world.setBlockState(pos, state.with(RedstoneLampBlock.LIT, true));
+        this.cooldown = cooldown;
+        lastCooldown = this.cooldown;
+
+        BlockPos ahead = pos.add(state.get(Properties.FACING).getVector());
+        if (world.getBlockState(ahead).isOf(Pirates.DISPENSER_CANNON_BLOCK)) {
+            world.scheduleBlockTick(ahead, world.getBlockState(ahead).getBlock(), 4);
+        }
+    }
+
+    public void fire(World world, BlockPos pos, BlockState state) {
+        fire(world, pos, state, 40 + (int) (Math.random() * 20));
     }
 
 
