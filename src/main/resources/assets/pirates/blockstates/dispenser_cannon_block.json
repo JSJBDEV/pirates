@@ -1,0 +1,27 @@
+{
+  "variants": {
+    "facing=down": {
+      "model": "pirates:block/dispenser_cannon",
+      "x": 90
+    },
+    "facing=east": {
+      "model": "pirates:block/dispenser_cannon",
+      "y": 90
+    },
+    "facing=north": {
+      "model": "pirates:block/dispenser_cannon"
+    },
+    "facing=south": {
+      "model": "pirates:block/dispenser_cannon",
+      "y": 180
+    },
+    "facing=up": {
+      "model": "pirates:block/dispenser_cannon",
+      "x": 270
+    },
+    "facing=west": {
+      "model": "pirates:block/dispenser_cannon",
+      "y": 270
+    }
+  }
+}

@@ -5,17 +5,11 @@ import net.minecraft.block.*;
 import net.minecraft.block.entity.BlockEntity;
 import net.minecraft.block.entity.BlockEntityTicker;
 import net.minecraft.block.entity.BlockEntityType;
-import net.minecraft.entity.FallingBlockEntity;
-import net.minecraft.item.ItemPlacementContext;
+import net.minecraft.item.ItemStack;
 import net.minecraft.server.world.ServerWorld;
-import net.minecraft.state.StateManager;
-import net.minecraft.util.BlockMirror;
-import net.minecraft.util.BlockRotation;
+import net.minecraft.sound.SoundCategory;
+import net.minecraft.sound.SoundEvents;
 import net.minecraft.util.math.BlockPos;
-import net.minecraft.util.math.random.Random;
-import net.minecraft.util.shape.VoxelShape;
-import net.minecraft.util.shape.VoxelShapes;
-import net.minecraft.world.BlockView;
 import net.minecraft.world.World;
 import org.jetbrains.annotations.Nullable;
 
@@ -27,10 +21,6 @@ public class MotionInvokingBlock extends BlockWithEntity {
 
     }
 
-    @Override
-    public VoxelShape getOutlineShape(BlockState state, BlockView world, BlockPos pos, ShapeContext context) {
-        return VoxelShapes.empty();
-    }
 
     @Nullable
     @Override
@@ -44,10 +34,24 @@ public class MotionInvokingBlock extends BlockWithEntity {
         return checkType(type, Pirates.MOTION_INVOKING_BLOCK_ENTITY, MotionInvokingBlockEntity::tick);
     }
 
+    @Override
+    public void onStacksDropped(BlockState state, ServerWorld world, BlockPos pos, ItemStack tool, boolean dropExperience) {
+        super.onStacksDropped(state, world, pos, tool, dropExperience);
+        int i = 15 + world.random.nextInt(15) + world.random.nextInt(15);
+        this.dropExperience(world, pos, i);
+    }
 
 
     @Override
     public BlockRenderType getRenderType(BlockState state) {
-        return BlockRenderType.INVISIBLE;
+        return BlockRenderType.MODEL;
+    }
+
+    public static void disarm(World world, BlockPos pos) {
+        if (world.isClient()) return;
+
+        world.setBlockState(pos, Blocks.SPRUCE_PLANKS.getDefaultState());
+        world.playSound(null, pos, SoundEvents.BLOCK_BEACON_DEACTIVATE, SoundCategory.BLOCKS, 1, 0.95f);
+
     }
 }

@@ -1,7 +1,50 @@
 {
   "variants": {
-    "": {
-      "model": "pirates:block/cannon_priming_block"
+    "facing=east,lit=false": {
+      "model": "pirates:block/cannon_priming_block_connected",
+      "y": 90
+    },
+    "facing=east,lit=true": {
+      "model": "pirates:block/cannon_priming_block_connected_lit",
+      "y": 90
+    },
+    "facing=north,lit=false": {
+      "model": "pirates:block/cannon_priming_block_connected"
+    },
+    "facing=north,lit=true": {
+      "model": "pirates:block/cannon_priming_block_connected_lit"
+    },
+    "facing=south,lit=false": {
+      "model": "pirates:block/cannon_priming_block_connected",
+      "y": 180
+    },
+    "facing=south,lit=true": {
+      "model": "pirates:block/cannon_priming_block_connected_lit",
+      "y": 180
+    },
+    "facing=west,lit=false": {
+      "model": "pirates:block/cannon_priming_block_connected",
+      "y": 270
+    },
+    "facing=west,lit=true": {
+      "model": "pirates:block/cannon_priming_block_connected_lit",
+      "y": 270
+    },
+    "facing=up,lit=false": {
+      "model": "pirates:block/cannon_priming_block_connected",
+      "x": 270
+    },
+    "facing=up,lit=true": {
+      "model": "pirates:block/cannon_priming_block_connected_lit",
+      "x": 270
+    },
+    "facing=down,lit=false": {
+      "model": "pirates:block/cannon_priming_block_connected",
+      "x": 90
+    },
+    "facing=down,lit=true": {
+      "model": "pirates:block/cannon_priming_block_connected_lit",
+      "x": 90
     }
   }
 }

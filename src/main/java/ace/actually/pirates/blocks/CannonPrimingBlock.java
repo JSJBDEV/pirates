@@ -5,38 +5,26 @@ import net.minecraft.block.*;
 import net.minecraft.block.entity.BlockEntity;
 import net.minecraft.block.entity.BlockEntityTicker;
 import net.minecraft.block.entity.BlockEntityType;
-import net.minecraft.block.entity.DispenserBlockEntity;
-import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.item.ItemPlacementContext;
+import net.minecraft.particle.ParticleTypes;
+import net.minecraft.sound.SoundCategory;
+import net.minecraft.sound.SoundEvents;
 import net.minecraft.state.StateManager;
-import net.minecraft.text.Text;
-import net.minecraft.util.ActionResult;
-import net.minecraft.util.Hand;
-import net.minecraft.util.hit.BlockHitResult;
+import net.minecraft.state.property.BooleanProperty;
+import net.minecraft.state.property.Properties;
+import net.minecraft.util.BlockMirror;
+import net.minecraft.util.BlockRotation;
 import net.minecraft.util.math.*;
-import net.minecraft.util.shape.VoxelShape;
-import net.minecraft.world.BlockStateRaycastContext;
-import net.minecraft.world.BlockView;
-import net.minecraft.world.RaycastContext;
-import net.minecraft.world.World;
+import net.minecraft.world.*;
 import org.jetbrains.annotations.Nullable;
-import org.joml.Vector3d;
-import org.valkyrienskies.core.api.ships.LoadedServerShip;
-import org.valkyrienskies.core.api.world.ServerShipWorld;
 import org.valkyrienskies.mod.common.VSGameUtilsKt;
-import org.valkyrienskies.mod.common.ValkyrienSkiesMod;
-import org.valkyrienskies.mod.common.util.DimensionIdProvider;
-import org.valkyrienskies.mod.common.world.RaycastUtilsKt;
 
 public class CannonPrimingBlock extends BlockWithEntity {
     public CannonPrimingBlock(Settings settings) {
         super(settings);
     }
+    public static final BooleanProperty DISARMED = Properties.DISARMED;
 
-//    @Override
-//    public VoxelShape getOutlineShape(BlockState state, BlockView world, BlockPos pos, ShapeContext context) {
-//        return Block.createCuboidShape(0,0,0,2,2,2);
-//    }
 
     @Override
     public BlockRenderType getRenderType(BlockState state) {
@@ -45,40 +33,37 @@ public class CannonPrimingBlock extends BlockWithEntity {
 
     @Override
     protected void appendProperties(StateManager.Builder<Block, BlockState> builder) {
-        builder.add(RedstoneLampBlock.LIT);
+        builder.add(RedstoneLampBlock.LIT).add(Properties.FACING).add(DISARMED);
     }
 
     @Nullable
     @Override
     public BlockState getPlacementState(ItemPlacementContext ctx) {
-        return getDefaultState().with(RedstoneLampBlock.LIT,false);
-    }
+        BlockPos pos = ctx.getBlockPos();
+        World world = ctx.getWorld();
+        Direction facing;
 
-    /**
-     *
-     * @param origin a point to "look" from
-     * @param target a point to "look" at
-     * @return the vector that can be used to travel between these points
-     */
-    public Vec3d pointLine(Vec3d origin, Vec3d target)
-    {
-        double d = target.x - origin.x;
-        double e = target.y - origin.y;
-        double f = target.z - origin.z;
-        double g = Math.sqrt(d * d + f * f);
-        float pitch = (MathHelper.wrapDegrees((float)(-(MathHelper.atan2(e, g) * 57.2957763671875))));
-        float yaw = MathHelper.wrapDegrees((float)(MathHelper.atan2(f, d) * 57.2957763671875) - 90.0F);
-        return getRotationVector(pitch,yaw);
-    }
+        if (world.getBlockState(pos.north()).isOf(Blocks.DISPENSER)) {
+            facing = Direction.NORTH;
+        } else if (world.getBlockState(pos.east()).isOf(Blocks.DISPENSER)) {
+            facing = Direction.EAST;
+        }  else if (world.getBlockState(pos.south()).isOf(Blocks.DISPENSER)) {
+            facing = Direction.SOUTH;
+        }  else if (world.getBlockState(pos.west()).isOf(Blocks.DISPENSER)) {
+            facing = Direction.WEST;
+        }  else if (world.getBlockState(pos.up()).isOf(Blocks.DISPENSER)) {
+            facing = Direction.UP;
+        }  else if (world.getBlockState(pos.down()).isOf(Blocks.DISPENSER)) {
+            facing = Direction.DOWN;
+        } else {
+            facing = ctx.getPlayerLookDirection();
 
-    protected final Vec3d getRotationVector(float pitch, float yaw) {
-        float f = pitch * 0.017453292F;
-        float g = -yaw * 0.017453292F;
-        float h = MathHelper.cos(g);
-        float i = MathHelper.sin(g);
-        float j = MathHelper.cos(f);
-        float k = MathHelper.sin(f);
-        return new Vec3d((double)(i * j), (double)(-k), (double)(h * j));
+        }
+
+        if (world.getBlockState(pos.add(facing.getVector())).isOf(Blocks.DISPENSER) && world.getBlockState(pos.add(facing.getVector())).get(Properties.FACING) == facing) {
+            world.setBlockState(pos.add(facing.getVector()), Pirates.DISPENSER_CANNON_BLOCK.getDefaultState().with(Properties.FACING, facing), 3);
+        }
+        return getDefaultState().with(RedstoneLampBlock.LIT,false).with(Properties.FACING, facing).with(DISARMED, true);
     }
 
     @Nullable
@@ -91,7 +76,7 @@ public class CannonPrimingBlock extends BlockWithEntity {
     @Nullable
     @Override
     public <T extends BlockEntity> BlockEntityTicker<T> getTicker(World world, BlockState state, BlockEntityType<T> type) {
-        return checkType(type, Pirates.CANNON_PRIMING_BLOCK_ENTITY, CannonPrimingBlockEntity::tick);
+        return checkType(type, Pirates.CANNON_PRIMING_BLOCK_ENTITY, (world1, pos, state1, be) -> be.tick(world1, pos, state1, be));
     }
 
     @Override
@@ -106,5 +91,33 @@ public class CannonPrimingBlock extends BlockWithEntity {
            return 15;
        }
        return 0;
+    }
+
+    @Override
+    public BlockState getStateForNeighborUpdate(BlockState state, Direction direction, BlockState neighborState, WorldAccess world, BlockPos pos, BlockPos neighborPos) {
+
+        if (world.getBlockState(pos.add(state.get(Properties.FACING).getVector())).isOf(Blocks.DISPENSER) && world.getBlockState(pos.add(state.get(Properties.FACING).getVector())).get(Properties.FACING) == state.get(Properties.FACING)) {
+            world.setBlockState(pos.add(state.get(Properties.FACING).getVector()), Pirates.DISPENSER_CANNON_BLOCK.getDefaultState().with(Properties.FACING, state.get(Properties.FACING)), 3);
+        }
+
+        if (world.isReceivingRedstonePower(pos) && !world.isClient()) {((CannonPrimingBlockEntity)world.getBlockEntity(pos)).fire((World) world, pos, state, 19);}
+        return super.getStateForNeighborUpdate(state, direction, neighborState, world, pos, neighborPos);
+    }
+
+    public BlockState rotate(BlockState state, BlockRotation rotation) {
+        return (BlockState)state.with(Properties.FACING, rotation.rotate((Direction)state.get(Properties.FACING)));
+    }
+
+    public BlockState mirror(BlockState state, BlockMirror mirror) {
+        return state.rotate(mirror.getRotation((Direction)state.get(Properties.FACING)));
+    }
+
+    public static void disarm(World world, BlockPos pos) {
+        if (world.isClient()) return;
+        BlockState blockState = world.getBlockState(pos);
+        if (!blockState.get(DISARMED)) {
+            world.setBlockState(pos, blockState.with(DISARMED, true));
+            world.playSound(null, pos, SoundEvents.BLOCK_REDSTONE_TORCH_BURNOUT, SoundCategory.BLOCKS, 0.5f, 1.5f);
+        }
     }
 }

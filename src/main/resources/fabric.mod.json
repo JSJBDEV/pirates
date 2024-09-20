@@ -3,9 +3,10 @@
 	"id": "pirates",
 	"version": "${version}",
 	"name": "Valkyrien Pirates",
-	"description": "Pirates as they should be",
+	"description": "Pirates as they should be - Revamped by G_Mungus",
 	"authors": [
-		"Acrogenous"
+		"Acrogenous",
+		"G_Mungus"
 	],
 	"contact": {
 		"homepage": "https://fabricmc.net/",

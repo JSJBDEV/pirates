@@ -1,0 +1,24 @@
+{
+  "type": "minecraft:crafting_shaped",
+  "category": "redstone",
+  "key": {
+    "#": {
+      "item": "minecraft:cobblestone"
+    },
+    "G": {
+      "item": "minecraft:gunpowder"
+    },
+    "X": {
+      "item": "minecraft:bow"
+    }
+  },
+  "pattern": [
+    "###",
+    "#X#",
+    "#G#"
+  ],
+  "result": {
+    "item": "pirates:cannon_priming_block"
+  },
+  "show_notification": true
+}
