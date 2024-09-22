@@ -36,8 +36,6 @@ public class ShotEntity extends ThrownItemEntity implements FlyingItemEntity {
     public ShotEntity(World world)
     {
         super(Pirates.SHOT_ENTITY_TYPE, world);
-        System.out.println("world");
-        //setNoGravity(false);
     }
 
     @Override

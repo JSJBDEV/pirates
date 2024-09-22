@@ -40,7 +40,11 @@ public class CannonPrimingBlockEntity extends BlockEntity {
             } else {
                 cooldown = 3;
             }
-        } else {
+        } else if (cooldown == 4) {
+            if (!world.isReceivingRedstonePower(pos)) {
+                cooldown --;
+            }
+        } else  {
             cooldown --;
         }
 
