@@ -80,7 +80,7 @@ public class MotionInvokingBlockEntity extends BlockEntity {
     }
 
     private void buildShipRec(ServerWorld world, BlockPos pos) {
-        ShipAssembler.INSTANCE.collectBlocks(world, pos, a -> !a.isAir() && !a.isOf(Blocks.WATER) && !a.isOf(Blocks.KELP) && !a.isOf(Blocks.KELP_PLANT) && !a.isOf(Blocks.SAND) && !a.isIn(BlockTags.ICE));
+        ShipAssembler.INSTANCE.collectBlocks(world, pos, a -> !a.isAir() && !a.isOf(Blocks.WATER) && !a.isOf(Blocks.KELP) && !a.isOf(Blocks.KELP_PLANT) && !a.isOf(Blocks.SAND) && !a.isIn(BlockTags.ICE) && !a.isOf(Blocks.STONE));
     }
 
     @Override
