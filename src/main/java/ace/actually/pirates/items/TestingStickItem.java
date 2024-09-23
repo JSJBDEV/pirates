@@ -55,6 +55,7 @@ public class TestingStickItem extends Item {
         if(!world.isClient && hand==Hand.MAIN_HAND)
         {
             Pirates.isLiveWorld = user.isSneaking();
+            System.out.println("Pirates live world: " + Pirates.isLiveWorld);
         }
         return super.use(world, user, hand);
     }

@@ -12,6 +12,8 @@ import net.minecraft.item.Items;
 import net.minecraft.network.listener.ClientPlayPacketListener;
 import net.minecraft.network.packet.Packet;
 import net.minecraft.network.packet.s2c.play.EntitySpawnS2CPacket;
+import net.minecraft.particle.ParticleTypes;
+import net.minecraft.server.world.ServerWorld;
 import net.minecraft.util.hit.BlockHitResult;
 import net.minecraft.util.hit.EntityHitResult;
 import net.minecraft.world.World;
@@ -34,11 +36,15 @@ public class ShotEntity extends ThrownItemEntity implements FlyingItemEntity {
     public ShotEntity(World world)
     {
         super(Pirates.SHOT_ENTITY_TYPE, world);
-        System.out.println("world");
-        //setNoGravity(false);
     }
 
-
+    @Override
+    public void tick () {
+        if (!getWorld().isClient() && getVelocity().length() > 0.85) {
+            ((ServerWorld)getWorld()).spawnParticles(ParticleTypes.CLOUD, getX(), getY(), getZ(), 1, 0, 0, 0, 0);
+        }
+        super.tick();
+    }
 
     @Override
     protected void onEntityHit(EntityHitResult entityHitResult) {

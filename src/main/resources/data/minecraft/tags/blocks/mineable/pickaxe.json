@@ -1,0 +1,7 @@
+{
+  "replace": false,
+  "values": [
+    "pirates:dispenser_cannon_block",
+    "pirates:cannon_priming_block"
+  ]
+}

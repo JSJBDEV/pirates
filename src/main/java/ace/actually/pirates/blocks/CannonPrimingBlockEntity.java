@@ -1,79 +1,90 @@
 package ace.actually.pirates.blocks;
 
-import ace.actually.pirates.ConfigUtils;
 import ace.actually.pirates.Pirates;
-import net.minecraft.block.BlockState;
-import net.minecraft.block.Blocks;
-import net.minecraft.block.DispenserBlock;
-import net.minecraft.block.RedstoneLampBlock;
+import net.minecraft.block.*;
 import net.minecraft.block.entity.BlockEntity;
-import net.minecraft.block.entity.BlockEntityType;
-import net.minecraft.entity.ai.TargetPredicate;
-import net.minecraft.entity.player.PlayerEntity;
-import net.minecraft.entity.projectile.SmallFireballEntity;
-import net.minecraft.util.Hand;
+import net.minecraft.particle.ParticleTypes;
+import net.minecraft.server.world.ServerWorld;
+import net.minecraft.state.property.Properties;
 import net.minecraft.util.hit.BlockHitResult;
-import net.minecraft.util.math.BlockPos;
-import net.minecraft.util.math.Box;
-import net.minecraft.util.math.ChunkPos;
-import net.minecraft.util.math.Vec3d;
+import net.minecraft.util.math.*;
 import net.minecraft.world.RaycastContext;
 import net.minecraft.world.World;
 import org.joml.Vector3d;
-import org.valkyrienskies.core.api.ships.LoadedServerShip;
-import org.valkyrienskies.core.api.world.ServerShipWorld;
 import org.valkyrienskies.mod.common.VSGameUtilsKt;
-import org.valkyrienskies.mod.common.ValkyrienSkiesMod;
-import org.valkyrienskies.mod.common.util.DimensionIdProvider;
+import org.valkyrienskies.mod.common.util.VectorConversionsMCKt;
 
-import java.util.List;
+import java.util.*;
 
 public class CannonPrimingBlockEntity extends BlockEntity {
 
+    public int cooldown = 0;
+    private int lastCooldown = 40;
+    public final double randomRotation;
+
+
     public CannonPrimingBlockEntity(BlockPos pos, BlockState state) {
         super(Pirates.CANNON_PRIMING_BLOCK_ENTITY, pos, state);
-
+        randomRotation = Math.random() * 2.5;
     }
 
-    public static void tick(World world, BlockPos pos, BlockState state, CannonPrimingBlockEntity be)
-    {
-        if(state.get(RedstoneLampBlock.LIT))
-        {
-            world.setBlockState(pos,state.with(RedstoneLampBlock.LIT,false));
-        }
-        if(!world.isClient && world.getTimeOfDay()%40==0)
-        {
+    public void tick(World world, BlockPos pos, BlockState state, CannonPrimingBlockEntity be) {
 
-                ServerShipWorld serverShipWorld = (ServerShipWorld) ValkyrienSkiesMod.getVsCore().getHooks().getCurrentShipServerWorld();
-                DimensionIdProvider provider = (DimensionIdProvider) world;
-                if(serverShipWorld.isBlockInShipyard(pos.getX(),pos.getY(),pos.getZ(),provider.getDimensionId()))
-                {
-                ChunkPos chunkPos = world.getChunk(pos).getPos();
-                LoadedServerShip ship = (LoadedServerShip) ValkyrienSkiesMod.getVsCore().getHooks().getCurrentShipServerWorld().getLoadedShips().getByChunkPos(chunkPos.x,chunkPos.z, provider.getDimensionId());
 
-                Vec3d middle = VSGameUtilsKt.toWorldCoordinates(ship,Vec3d.ofCenter(pos));
+        if (!world.isClient && cooldown == 0) {
 
-                //Pirates.LOGGER.info("translated: "+middle);
+            if ((checkShouldFire(world, pos, state) && !state.get(CannonPrimingBlock.DISARMED))){
 
-                if(!world.getPlayers().isEmpty())
-                {
-                    List<PlayerEntity> players = world.getEntitiesByClass(PlayerEntity.class,new Box(middle.add(-20,-20,-20),middle.add(20,20,20)),a->!a.isCreative());
-                    if(!players.isEmpty())
-                    {
-                        RaycastContext context = new RaycastContext(middle,players.get(0).getPos(), RaycastContext.ShapeType.COLLIDER, RaycastContext.FluidHandling.NONE,null);
 
-                        BlockHitResult result = world.raycast(context);
-                        if(world.getBlockState(result.getBlockPos()).isOf(Blocks.DISPENSER))
-                        {
-                            world.setBlockState(pos,state.with(RedstoneLampBlock.LIT,true));
-                        }
-
-                        //Pirates.LOGGER.info(world.getBlockState(result.getBlockPos()).toString()+" at "+result.getPos().toString() + " for "+result.getBlockPos());
-
-                    }
-                }
-
+                fire(world, pos, state);
+            } else {
+                cooldown = 3;
             }
+        } else if (cooldown == 4) {
+            if (!world.isReceivingRedstonePower(pos)) {
+                cooldown --;
+            }
+        } else  {
+            cooldown --;
+        }
+
+        if (state.get(RedstoneLampBlock.LIT) && lastCooldown - cooldown == 10) {
+            world.setBlockState(pos, state.with(RedstoneLampBlock.LIT, false));
         }
     }
+
+    public void fire(World world, BlockPos pos, BlockState state, int cooldown) {
+        if (this.cooldown > 3) return;
+        world.setBlockState(pos, state.with(RedstoneLampBlock.LIT, true));
+        this.cooldown = cooldown;
+        lastCooldown = this.cooldown;
+
+        BlockPos ahead = pos.add(state.get(Properties.FACING).getVector());
+        if (world.getBlockState(ahead).isOf(Pirates.DISPENSER_CANNON_BLOCK)) {
+            world.scheduleBlockTick(ahead, world.getBlockState(ahead).getBlock(), 4);
+        }
+    }
+
+    public void fire(World world, BlockPos pos, BlockState state) {
+        fire(world, pos, state, 40 + (int) (Math.random() * 20));
+    }
+
+
+    private static boolean checkShouldFire(World world, BlockPos pos, BlockState state) {
+        Vec3i raycastStart = state.get(Properties.FACING).getVector();
+        if(!(world.getBlockState(pos.add(raycastStart)).getBlock() instanceof DispenserBlock)|| world.getBlockState(pos.add(raycastStart)).get(Properties.FACING) != state.get(Properties.FACING)){
+            return false;
+        }
+
+        RaycastContext context = new RaycastContext(
+                VSGameUtilsKt.toWorldCoordinates(world, Vec3d.ofCenter(pos.add(raycastStart.multiply(2)))),
+                VSGameUtilsKt.toWorldCoordinates(world, Vec3d.ofCenter(pos.add(raycastStart.multiply(32)))),
+                RaycastContext.ShapeType.COLLIDER,
+                RaycastContext.FluidHandling.NONE,
+                null);
+
+        BlockHitResult result = world.raycast(context);
+        return  (VSGameUtilsKt.isBlockInShipyard(world, result.getBlockPos()));
+    }
+
 }

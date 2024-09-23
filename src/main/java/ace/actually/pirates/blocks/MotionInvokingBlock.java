@@ -5,10 +5,10 @@ import net.minecraft.block.*;
 import net.minecraft.block.entity.BlockEntity;
 import net.minecraft.block.entity.BlockEntityTicker;
 import net.minecraft.block.entity.BlockEntityType;
-import net.minecraft.item.ItemPlacementContext;
-import net.minecraft.state.StateManager;
-import net.minecraft.util.BlockMirror;
-import net.minecraft.util.BlockRotation;
+import net.minecraft.item.ItemStack;
+import net.minecraft.server.world.ServerWorld;
+import net.minecraft.sound.SoundCategory;
+import net.minecraft.sound.SoundEvents;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.world.World;
 import org.jetbrains.annotations.Nullable;
@@ -21,16 +21,6 @@ public class MotionInvokingBlock extends BlockWithEntity {
 
     }
 
-    @Override
-    protected void appendProperties(StateManager.Builder<Block, BlockState> builder) {
-        builder.add(FurnaceBlock.FACING);
-    }
-
-    @Nullable
-    @Override
-    public BlockState getPlacementState(ItemPlacementContext ctx) {
-        return this.getDefaultState().with(FurnaceBlock.FACING,ctx.getHorizontalPlayerFacing());
-    }
 
     @Nullable
     @Override
@@ -45,17 +35,23 @@ public class MotionInvokingBlock extends BlockWithEntity {
     }
 
     @Override
-    public BlockState rotate(BlockState state, BlockRotation rotation) {
-        return state.with(FurnaceBlock.FACING, rotation.rotate(state.get(FurnaceBlock.FACING)));
+    public void onStacksDropped(BlockState state, ServerWorld world, BlockPos pos, ItemStack tool, boolean dropExperience) {
+        super.onStacksDropped(state, world, pos, tool, dropExperience);
+        int i = 15 + world.random.nextInt(15) + world.random.nextInt(15);
+        this.dropExperience(world, pos, i);
     }
 
-    @Override
-    public BlockState mirror(BlockState state, BlockMirror mirror) {
-        return state.rotate(mirror.getRotation(state.get(FurnaceBlock.FACING)));
-    }
 
     @Override
     public BlockRenderType getRenderType(BlockState state) {
         return BlockRenderType.MODEL;
+    }
+
+    public static void disarm(World world, BlockPos pos) {
+        if (world.isClient()) return;
+
+        world.setBlockState(pos, Blocks.SPRUCE_PLANKS.getDefaultState());
+        world.playSound(null, pos, SoundEvents.BLOCK_BEACON_DEACTIVATE, SoundCategory.BLOCKS, 1, 0.95f);
+
     }
 }
