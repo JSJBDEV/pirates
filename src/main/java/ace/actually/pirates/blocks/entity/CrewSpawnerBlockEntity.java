@@ -7,9 +7,11 @@ import ace.actually.pirates.util.CrewSpawnType;
 import ace.actually.pirates.util.ModProperties;
 import net.minecraft.block.BlockState;
 import net.minecraft.block.entity.BlockEntity;
+import net.minecraft.enchantment.Enchantments;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.EntityType;
 import net.minecraft.entity.EquipmentSlot;
+import net.minecraft.entity.mob.MobEntity;
 import net.minecraft.entity.passive.VillagerEntity;
 import net.minecraft.item.ItemStack;
 import net.minecraft.item.Items;
@@ -101,8 +103,13 @@ public class CrewSpawnerBlockEntity extends BlockEntity {
         } else if (be.getCachedState().get(ModProperties.CREW_SPAWN_TYPE) == CrewSpawnType.VILLAGER) {
             crew = new VillagerEntity(EntityType.VILLAGER, world, VillagerType.forBiome(world.getBiome(be.getPos())));
         } else if (be.getCachedState().get(ModProperties.CREW_SPAWN_TYPE) == CrewSpawnType.SKELETON_PIRATE) {
-            crew = new SkeletonPirateEntity(world, checkForBlocksToCrew(world, be.getPos()));
-            crew.equipStack(EquipmentSlot.MAINHAND, new ItemStack(Items.BOW));
+            BlockPos blockToCrew = checkForBlocksToCrew(world, be.getPos());
+            crew = new SkeletonPirateEntity(world, blockToCrew);
+            ItemStack itemStack = new ItemStack(Items.BOW);
+            if (world.getBlockState(blockToCrew).isOf(Pirates.MOTION_INVOKING_BLOCK)) {
+                itemStack.addEnchantment(Enchantments.POWER, 2);
+            }
+            crew.equipStack(EquipmentSlot.MAINHAND, itemStack);
         }
 
         //Mixin here to add custom entities

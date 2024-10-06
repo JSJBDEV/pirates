@@ -4,6 +4,8 @@ import ace.actually.pirates.Pirates;
 import ace.actually.pirates.entities.pirate_abstract.AbstractPirateEntity;
 import ace.actually.pirates.entities.pirate_abstract.PirateBowAttackGoal;
 import ace.actually.pirates.entities.pirate_abstract.PirateWanderArroundFarGoal;
+import net.minecraft.enchantment.Enchantment;
+import net.minecraft.enchantment.Enchantments;
 import net.minecraft.entity.*;
 import net.minecraft.entity.ai.RangedAttackMob;
 import net.minecraft.entity.ai.goal.*;
@@ -11,6 +13,7 @@ import net.minecraft.entity.attribute.DefaultAttributeContainer;
 import net.minecraft.entity.attribute.EntityAttributes;
 import net.minecraft.entity.mob.HostileEntity;
 import net.minecraft.entity.player.PlayerEntity;
+import net.minecraft.entity.projectile.ArrowEntity;
 import net.minecraft.entity.projectile.PersistentProjectileEntity;
 import net.minecraft.entity.projectile.ProjectileUtil;
 import net.minecraft.item.ItemStack;
@@ -71,6 +74,7 @@ public class SkeletonPirateEntity extends AbstractPirateEntity implements Ranged
         double g = Math.sqrt(d * d + f * f);
         persistentProjectileEntity.setVelocity(d, e + g * 0.20000000298023224, f, 1.6F, (float) (14 - this.getEntityWorld().getDifficulty().getId() * 4));
         this.playSound(SoundEvents.ENTITY_SKELETON_SHOOT, 1.0F, 1.0F / (this.getRandom().nextFloat() * 0.4F + 0.8F));
+        persistentProjectileEntity.setPierceLevel((byte)2);
         this.getEntityWorld().spawnEntity(persistentProjectileEntity);
 
     }
@@ -83,6 +87,7 @@ public class SkeletonPirateEntity extends AbstractPirateEntity implements Ranged
         return HostileEntity
                 .createHostileAttributes()
                 .add(EntityAttributes.GENERIC_MOVEMENT_SPEED, 0.3D)
+                .add(EntityAttributes.GENERIC_MAX_HEALTH, 24.0D)
                 .add(EntityAttributes.GENERIC_FOLLOW_RANGE, 100.0D);
     }
 
