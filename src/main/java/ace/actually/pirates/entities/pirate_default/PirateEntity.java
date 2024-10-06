@@ -10,6 +10,8 @@ import net.minecraft.entity.ai.goal.*;
 import net.minecraft.entity.attribute.DefaultAttributeContainer;
 import net.minecraft.entity.attribute.EntityAttributes;
 import net.minecraft.entity.mob.HostileEntity;
+import net.minecraft.entity.passive.IronGolemEntity;
+import net.minecraft.entity.passive.MerchantEntity;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.entity.projectile.PersistentProjectileEntity;
 import net.minecraft.entity.projectile.ProjectileUtil;
@@ -38,9 +40,11 @@ public class PirateEntity extends AbstractPirateEntity implements RangedAttackMo
         this.goalSelector.add(5, new PirateWanderArroundFarGoal(this, 1.0D));
         this.goalSelector.add(6, new LookAtEntityGoal(this, PlayerEntity.class, 200.0F));
         this.goalSelector.add(6, new LookAroundGoal(this));
-        this.goalSelector.add(4, new PirateBowAttackGoal<>(this, 1.0D, 20, 20.0F));
+        this.goalSelector.add(3, new PirateBowAttackGoal<>(this, 1.0D, 20, 20.0F));
         //this.targetSelector.add(1, new RevengeGoal(this, new Class[0]));
-        this.targetSelector.add(3, new ActiveTargetGoal<>(this, PlayerEntity.class, true));
+        this.targetSelector.add(1, new ActiveTargetGoal<>(this, PlayerEntity.class, true));
+        this.targetSelector.add(3, new ActiveTargetGoal(this, MerchantEntity.class, false));
+        this.targetSelector.add(3, new ActiveTargetGoal(this, IronGolemEntity.class, true));
     }
 
     @Override

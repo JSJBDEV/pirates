@@ -11,7 +11,10 @@ import net.minecraft.entity.ai.RangedAttackMob;
 import net.minecraft.entity.ai.goal.*;
 import net.minecraft.entity.attribute.DefaultAttributeContainer;
 import net.minecraft.entity.attribute.EntityAttributes;
+import net.minecraft.entity.damage.DamageSource;
 import net.minecraft.entity.mob.HostileEntity;
+import net.minecraft.entity.passive.IronGolemEntity;
+import net.minecraft.entity.passive.MerchantEntity;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.entity.projectile.ArrowEntity;
 import net.minecraft.entity.projectile.PersistentProjectileEntity;
@@ -19,6 +22,7 @@ import net.minecraft.entity.projectile.ProjectileUtil;
 import net.minecraft.item.ItemStack;
 import net.minecraft.item.Items;
 import net.minecraft.server.world.ServerWorld;
+import net.minecraft.sound.SoundEvent;
 import net.minecraft.sound.SoundEvents;
 import net.minecraft.util.TypeFilter;
 import net.minecraft.util.math.BlockPos;
@@ -52,9 +56,11 @@ public class SkeletonPirateEntity extends AbstractPirateEntity implements Ranged
         this.goalSelector.add(5, new PirateWanderArroundFarGoal(this, 1.0D));
         this.goalSelector.add(6, new LookAtEntityGoal(this, PlayerEntity.class, 200.0F));
         this.goalSelector.add(6, new LookAroundGoal(this));
-        this.goalSelector.add(4, new PirateBowAttackGoal<>(this, 1.0D, 20, 20.0F));
+        this.goalSelector.add(3, new PirateBowAttackGoal<>(this, 1.0D, 20, 20.0F));
         //this.targetSelector.add(1, new RevengeGoal(this, new Class[0]));
-        this.targetSelector.add(3, new ActiveTargetGoal<>(this, PlayerEntity.class, true));
+        this.targetSelector.add(1, new ActiveTargetGoal<>(this, PlayerEntity.class, true));
+        this.targetSelector.add(3, new ActiveTargetGoal(this, MerchantEntity.class, false));
+        this.targetSelector.add(3, new ActiveTargetGoal(this, IronGolemEntity.class, true));
     }
 
     @Override
@@ -117,6 +123,21 @@ public class SkeletonPirateEntity extends AbstractPirateEntity implements Ranged
         world.collectEntitiesByType(filter, predicate, pirates, 2);
 
         return pirates.size() > 1;
+    }
+
+    @Override
+    protected SoundEvent getAmbientSound() {
+        return SoundEvents.ENTITY_WITHER_SKELETON_AMBIENT;
+    }
+
+    @Override
+    protected SoundEvent getHurtSound(DamageSource source) {
+        return SoundEvents.ENTITY_WITHER_SKELETON_HURT;
+    }
+
+    @Override
+    protected SoundEvent getDeathSound() {
+        return SoundEvents.ENTITY_WITHER_SKELETON_DEATH;
     }
 
 }
