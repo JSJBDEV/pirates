@@ -3,7 +3,7 @@ package ace.actually.pirates;
 import ace.actually.pirates.blocks.entity.CannonPrimingBlockEntityRenderer;
 import ace.actually.pirates.entities.pirate_skeleton.SkeletonPirateModelLayer;
 import ace.actually.pirates.entities.shot.ShotEntityRenderer;
-import ace.actually.pirates.entities.pirate.PirateEntityRenderer;
+import ace.actually.pirates.entities.pirate_default.PirateEntityRenderer;
 import ace.actually.pirates.entities.pirate_skeleton.SkeletonPirateEntityRenderer;
 import net.fabricmc.api.ClientModInitializer;
 import net.fabricmc.fabric.api.client.rendering.v1.EntityRendererRegistry;

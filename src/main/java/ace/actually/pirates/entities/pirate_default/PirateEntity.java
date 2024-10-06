@@ -1,9 +1,9 @@
-package ace.actually.pirates.entities.pirate;
+package ace.actually.pirates.entities.pirate_default;
 
 import ace.actually.pirates.Pirates;
-import ace.actually.pirates.entities.abstract_pirate.AbstractPirateEntity;
-import ace.actually.pirates.entities.abstract_pirate.PirateBowAttackGoal;
-import ace.actually.pirates.entities.abstract_pirate.PirateWanderArroundFarGoal;
+import ace.actually.pirates.entities.pirate_abstract.AbstractPirateEntity;
+import ace.actually.pirates.entities.pirate_abstract.PirateBowAttackGoal;
+import ace.actually.pirates.entities.pirate_abstract.PirateWanderArroundFarGoal;
 import net.minecraft.entity.*;
 import net.minecraft.entity.ai.RangedAttackMob;
 import net.minecraft.entity.ai.goal.*;

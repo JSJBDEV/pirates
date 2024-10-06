@@ -1,9 +1,9 @@
 package ace.actually.pirates.entities.pirate_skeleton;
 
 import ace.actually.pirates.Pirates;
-import ace.actually.pirates.entities.abstract_pirate.AbstractPirateEntity;
-import ace.actually.pirates.entities.abstract_pirate.PirateBowAttackGoal;
-import ace.actually.pirates.entities.abstract_pirate.PirateWanderArroundFarGoal;
+import ace.actually.pirates.entities.pirate_abstract.AbstractPirateEntity;
+import ace.actually.pirates.entities.pirate_abstract.PirateBowAttackGoal;
+import ace.actually.pirates.entities.pirate_abstract.PirateWanderArroundFarGoal;
 import net.minecraft.entity.*;
 import net.minecraft.entity.ai.RangedAttackMob;
 import net.minecraft.entity.ai.goal.*;
@@ -15,10 +15,16 @@ import net.minecraft.entity.projectile.PersistentProjectileEntity;
 import net.minecraft.entity.projectile.ProjectileUtil;
 import net.minecraft.item.ItemStack;
 import net.minecraft.item.Items;
+import net.minecraft.server.world.ServerWorld;
 import net.minecraft.sound.SoundEvents;
+import net.minecraft.util.TypeFilter;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.random.Random;
 import net.minecraft.world.*;
+
+import java.util.ArrayList;
+import java.util.List;
+import java.util.function.Predicate;
 
 public class SkeletonPirateEntity extends AbstractPirateEntity implements RangedAttackMob {
     protected BlockPos blockToDisable;
@@ -29,6 +35,11 @@ public class SkeletonPirateEntity extends AbstractPirateEntity implements Ranged
 
     public SkeletonPirateEntity(World world, BlockPos blockToDisable) {
         super(Pirates.SKELETON_PIRATE_ENTITY_TYPE, world, blockToDisable);
+        if (world.getBlockState(blockToDisable).isOf(Pirates.MOTION_INVOKING_BLOCK) && !world.isClient()) {
+            ServerWorld serverWorld = (ServerWorld) world;
+            serverWorld.setWeather(0, 6000, true, true);
+            System.out.println("Skeleton ship!! Setting thunder");
+        }
     }
 
 
@@ -76,5 +87,31 @@ public class SkeletonPirateEntity extends AbstractPirateEntity implements Ranged
     }
 
 
+    @Override
+    public void remove(RemovalReason reason) {
+
+        World world = this.getEntityWorld();
+        if (!world.isClient()) {
+            ServerWorld serverWorld = (ServerWorld) world;
+            if(!anySkeletonPiratesLeft(serverWorld)) {
+                serverWorld.setWeather(6000, 0, false, false);
+                System.out.println("clearing the skies");
+            }
+        }
+
+        super.remove(reason);
+    }
+
+    public static boolean anySkeletonPiratesLeft(ServerWorld world) {
+        List<SkeletonPirateEntity> pirates = new ArrayList<>();
+
+        TypeFilter<Entity, SkeletonPirateEntity> filter = TypeFilter.instanceOf(SkeletonPirateEntity.class);
+
+        Predicate<SkeletonPirateEntity> predicate = entity -> true;
+
+        world.collectEntitiesByType(filter, predicate, pirates, 2);
+
+        return pirates.size() > 1;
+    }
 
 }

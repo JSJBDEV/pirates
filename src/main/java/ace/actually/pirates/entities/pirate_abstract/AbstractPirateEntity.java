@@ -1,4 +1,4 @@
-package ace.actually.pirates.entities.abstract_pirate;
+package ace.actually.pirates.entities.pirate_abstract;
 
 import ace.actually.pirates.Pirates;
 import ace.actually.pirates.blocks.CannonPrimingBlock;

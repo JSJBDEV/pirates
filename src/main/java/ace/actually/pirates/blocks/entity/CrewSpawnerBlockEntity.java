@@ -1,7 +1,7 @@
 package ace.actually.pirates.blocks.entity;
 
 import ace.actually.pirates.Pirates;
-import ace.actually.pirates.entities.pirate.PirateEntity;
+import ace.actually.pirates.entities.pirate_default.PirateEntity;
 import ace.actually.pirates.entities.pirate_skeleton.SkeletonPirateEntity;
 import ace.actually.pirates.util.CrewSpawnType;
 import ace.actually.pirates.util.ModProperties;

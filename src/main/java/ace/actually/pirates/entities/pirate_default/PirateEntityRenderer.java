@@ -1,13 +1,10 @@
-package ace.actually.pirates.entities.pirate;
+package ace.actually.pirates.entities.pirate_default;
 
 import net.minecraft.client.render.entity.EntityRendererFactory;
 import net.minecraft.client.render.entity.MobEntityRenderer;
 import net.minecraft.client.render.entity.feature.HeldItemFeatureRenderer;
 import net.minecraft.client.render.entity.model.*;
 import net.minecraft.util.Identifier;
-import net.minecraft.util.math.BlockPos;
-
-import java.util.Objects;
 
 public class PirateEntityRenderer extends MobEntityRenderer<PirateEntity, EntityModel<PirateEntity>> {
     public PirateEntityRenderer(EntityRendererFactory.Context context) {

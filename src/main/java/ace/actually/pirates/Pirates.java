@@ -5,7 +5,7 @@ import ace.actually.pirates.blocks.entity.CannonPrimingBlockEntity;
 import ace.actually.pirates.blocks.entity.CrewSpawnerBlockEntity;
 import ace.actually.pirates.blocks.entity.MotionInvokingBlockEntity;
 import ace.actually.pirates.entities.shot.ShotEntity;
-import ace.actually.pirates.entities.pirate.PirateEntity;
+import ace.actually.pirates.entities.pirate_default.PirateEntity;
 import ace.actually.pirates.entities.pirate_skeleton.SkeletonPirateEntity;
 import ace.actually.pirates.sound.ModSounds;
 import ace.actually.pirates.util.PatternProcessor;
