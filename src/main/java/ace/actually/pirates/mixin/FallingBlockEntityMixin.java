@@ -15,10 +15,12 @@ import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
 import org.spongepowered.asm.mixin.injection.callback.LocalCapture;
 
+/*
+*    VS Crumbles compatibility :)
+*/
+
 @Mixin(value = FallingBlockEntity.class)
 public abstract class FallingBlockEntityMixin{
-
-    FallingBlockEntity fallingBlockEntity;
 
     @Inject(method = "spawnFromBlock", at = @At(value = "INVOKE", target = "Lnet/minecraft/world/World;spawnEntity(Lnet/minecraft/entity/Entity;)Z"), locals = LocalCapture.CAPTURE_FAILSOFT)
     private static void beforeSpawnEntity(World world, BlockPos pos, BlockState state, CallbackInfoReturnable<FallingBlockEntity> cir, FallingBlockEntity fallingBlockEntity) {

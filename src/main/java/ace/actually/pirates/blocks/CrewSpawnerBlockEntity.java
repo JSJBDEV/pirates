@@ -23,7 +23,7 @@ public class CrewSpawnerBlockEntity extends BlockEntity {
     }
 
     public static void tick(World world, BlockPos pos, BlockState state, CrewSpawnerBlockEntity be) {
-        if (Pirates.isLiveWorld) {
+        if (world.getGameRules().getBoolean(Pirates.PIRATES_IS_LIVE_WORLD)) {
 
 
             if (state.get(Properties.CONDITIONAL)) {

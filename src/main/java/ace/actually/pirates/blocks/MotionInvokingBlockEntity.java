@@ -41,10 +41,10 @@ public class MotionInvokingBlockEntity extends BlockEntity {
             return;
         }
 
-        if (be.instructions.isEmpty() && Pirates.isLiveWorld) {
+        if (be.instructions.isEmpty() && world.getGameRules().getBoolean(Pirates.PIRATES_IS_LIVE_WORLD)) {
             be.getPattern("circle.pattern");
         }
-        if (!world.isClient && Pirates.isLiveWorld && world.getTime() >= be.nextInstruction) {
+        if (!world.isClient && world.getGameRules().getBoolean(Pirates.PIRATES_IS_LIVE_WORLD) && world.getTime() >= be.nextInstruction) {
             DimensionIdProvider provider = (DimensionIdProvider) world;
 
             if (VSGameUtilsKt.isBlockInShipyard(world, pos)) {

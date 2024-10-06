@@ -3,11 +3,11 @@ package ace.actually.pirates;
 import ace.actually.pirates.blocks.*;
 import ace.actually.pirates.entities.ShotEntity;
 import ace.actually.pirates.entities.pirate.PirateEntity;
-import ace.actually.pirates.items.RaycastingItem;
-import ace.actually.pirates.items.TestingStickItem;
 import ace.actually.pirates.sound.ModSounds;
 import net.fabricmc.api.ModInitializer;
 import net.fabricmc.fabric.api.event.lifecycle.v1.ServerLifecycleEvents;
+import net.fabricmc.fabric.api.gamerule.v1.GameRuleFactory;
+import net.fabricmc.fabric.api.gamerule.v1.GameRuleRegistry;
 import net.fabricmc.fabric.api.itemgroup.v1.FabricItemGroup;
 import net.fabricmc.fabric.api.itemgroup.v1.ItemGroupEvents;
 import net.fabricmc.fabric.api.object.builder.v1.block.entity.FabricBlockEntityTypeBuilder;
@@ -28,6 +28,7 @@ import net.minecraft.server.MinecraftServer;
 import net.minecraft.sound.BlockSoundGroup;
 import net.minecraft.text.Text;
 import net.minecraft.util.Identifier;
+import net.minecraft.world.GameRules;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -38,7 +39,8 @@ public class Pirates implements ModInitializer {
 	public static final String MOD_ID = "pirates";
     public static final Logger LOGGER = LoggerFactory.getLogger("pirates");
 
-
+	public static final GameRules.Key<GameRules.BooleanRule> PIRATES_IS_LIVE_WORLD =
+			GameRuleRegistry.register("piratesIsLive", GameRules.Category.MISC, GameRuleFactory.createBooleanRule(true));
 
 	public static final RegistryKey<ItemGroup> PIRATES_ITEM_GROUP_KEY = RegistryKey.of(Registries.ITEM_GROUP.getKey(), Identifier.of(MOD_ID, "item_group"));
 	public static final ItemGroup PIRATES_ITEM_GROUP = FabricItemGroup.builder()
@@ -48,8 +50,6 @@ public class Pirates implements ModInitializer {
 
 
 
-
-	public static boolean isLiveWorld = true;
 	@Override
 	public void onInitialize() {
 		registerEntityThings();
@@ -74,7 +74,6 @@ public class Pirates implements ModInitializer {
 
 
 
-		//BiomeModifications.addSpawn(BiomeSelectors.categories(Biome.Category.OCEAN), SpawnGroup.WATER_CREATURE, Pirates.SHIP, 3, 1, 1);
 
 
 	}
@@ -101,16 +100,13 @@ public class Pirates implements ModInitializer {
 	}
 
 
-	public static final TestingStickItem TESTING_STICK_ITEM = new TestingStickItem(new Item.Settings());
-	public static final RaycastingItem RAYCASTING_ITEM = new RaycastingItem(new Item.Settings());
+
 	public static final Item CANNONBALL = new Item(new Item.Settings());
 	public static final Item CANNONBALL_ENT = new Item(new Item.Settings());
 	private void registerItems()
 	{
-		Registry.register(Registries.ITEM,new Identifier("pirates","testing_stick"),TESTING_STICK_ITEM);
-		Registry.register(Registries.ITEM,new Identifier("pirates","raycaster"),RAYCASTING_ITEM);
 		Registry.register(Registries.ITEM,new Identifier("pirates","cannonball"),CANNONBALL);
-		Registry.register(Registries.ITEM,new Identifier("minecraft","p_util"),CANNONBALL_ENT);
+		Registry.register(Registries.ITEM,new Identifier("util_pirates","util_1"),CANNONBALL_ENT);
 
 		Registry.register(Registries.ITEM,new Identifier("pirates","cannon_priming_block"),new BlockItem(CANNON_PRIMING_BLOCK,new Item.Settings()));
 
