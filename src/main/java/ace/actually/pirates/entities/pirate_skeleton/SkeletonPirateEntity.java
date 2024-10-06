@@ -1,4 +1,4 @@
-package ace.actually.pirates.entities.pirate;
+package ace.actually.pirates.entities.pirate_skeleton;
 
 import ace.actually.pirates.Pirates;
 import ace.actually.pirates.entities.abstract_pirate.AbstractPirateEntity;
@@ -20,15 +20,15 @@ import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.random.Random;
 import net.minecraft.world.*;
 
-public class PirateEntity extends AbstractPirateEntity implements RangedAttackMob {
+public class SkeletonPirateEntity extends AbstractPirateEntity implements RangedAttackMob {
     protected BlockPos blockToDisable;
 
-    public PirateEntity(World world) {
+    public SkeletonPirateEntity(World world) {
         this(world, new BlockPos(0,0,0));
     }
 
-    public PirateEntity(World world, BlockPos blockToDisable) {
-        super(Pirates.PIRATE_ENTITY_TYPE, world, blockToDisable);
+    public SkeletonPirateEntity(World world, BlockPos blockToDisable) {
+        super(Pirates.SKELETON_PIRATE_ENTITY_TYPE, world, blockToDisable);
     }
 
 

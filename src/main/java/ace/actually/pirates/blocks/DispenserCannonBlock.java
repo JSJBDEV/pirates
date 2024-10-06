@@ -1,16 +1,13 @@
 package ace.actually.pirates.blocks;
 
 import ace.actually.pirates.Pirates;
-import ace.actually.pirates.entities.ShotEntity;
+import ace.actually.pirates.entities.shot.ShotEntity;
 import ace.actually.pirates.util.CannonDispenserBehavior;
-import net.fabricmc.fabric.api.item.v1.FabricItemSettings;
 import net.minecraft.block.*;
 import net.minecraft.block.dispenser.DispenserBehavior;
-import net.minecraft.block.dispenser.ItemDispenserBehavior;
 import net.minecraft.block.entity.BlockEntity;
 import net.minecraft.block.entity.DispenserBlockEntity;
 import net.minecraft.entity.projectile.ProjectileEntity;
-import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
 import net.minecraft.item.Items;
 import net.minecraft.state.property.Properties;
@@ -23,8 +20,6 @@ import net.minecraft.util.math.Vec3d;
 import net.minecraft.world.BlockView;
 import net.minecraft.world.World;
 import net.minecraft.world.WorldAccess;
-
-import java.util.Objects;
 
 public class DispenserCannonBlock extends DispenserBlock {
     public DispenserCannonBlock(AbstractBlock.Settings settings) {

@@ -17,13 +17,6 @@ public class PirateEntityRenderer extends MobEntityRenderer<PirateEntity, Entity
 
     @Override
     public Identifier getTexture(PirateEntity entity) {
-
-//        if (entity.randomDouble > 0.5) {
-//            return new Identifier("pirates","textures/entity/pirate2.png");
-//        } else {
-//            return new Identifier("pirates","textures/entity/pirate1.png");
-//        }
         return new Identifier("pirates","textures/entity/pirate2.png");
-
     }
 }

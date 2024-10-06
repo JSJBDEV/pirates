@@ -1,11 +1,15 @@
 package ace.actually.pirates;
 
 import ace.actually.pirates.blocks.*;
-import ace.actually.pirates.entities.ShotEntity;
+import ace.actually.pirates.blocks.entity.CannonPrimingBlockEntity;
+import ace.actually.pirates.blocks.entity.CrewSpawnerBlockEntity;
+import ace.actually.pirates.blocks.entity.MotionInvokingBlockEntity;
+import ace.actually.pirates.entities.shot.ShotEntity;
 import ace.actually.pirates.entities.pirate.PirateEntity;
+import ace.actually.pirates.entities.pirate_skeleton.SkeletonPirateEntity;
 import ace.actually.pirates.sound.ModSounds;
+import ace.actually.pirates.util.PatternProcessor;
 import net.fabricmc.api.ModInitializer;
-import net.fabricmc.fabric.api.event.lifecycle.v1.ServerLifecycleEvents;
 import net.fabricmc.fabric.api.gamerule.v1.GameRuleFactory;
 import net.fabricmc.fabric.api.gamerule.v1.GameRuleRegistry;
 import net.fabricmc.fabric.api.itemgroup.v1.FabricItemGroup;
@@ -24,8 +28,6 @@ import net.minecraft.item.*;
 import net.minecraft.registry.Registries;
 import net.minecraft.registry.Registry;
 import net.minecraft.registry.RegistryKey;
-import net.minecraft.server.MinecraftServer;
-import net.minecraft.sound.BlockSoundGroup;
 import net.minecraft.text.Text;
 import net.minecraft.util.Identifier;
 import net.minecraft.world.GameRules;
@@ -80,6 +82,8 @@ public class Pirates implements ModInitializer {
 	{
 
 		FabricDefaultAttributeRegistry.register(PIRATE_ENTITY_TYPE, PirateEntity.attributes());
+		FabricDefaultAttributeRegistry.register(SKELETON_PIRATE_ENTITY_TYPE, SkeletonPirateEntity.attributes());
+
 	}
 
 
@@ -136,9 +140,12 @@ public class Pirates implements ModInitializer {
 
 	public static final EntityType<PirateEntity> PIRATE_ENTITY_TYPE =registerEntity("pirate",SpawnGroup.MISC,EntityDimensions.changing(0.6f,1.9f),((type, world) -> new PirateEntity(world)));
 
+	public static final EntityType<SkeletonPirateEntity> SKELETON_PIRATE_ENTITY_TYPE =registerEntity("skeleton_pirate",SpawnGroup.MISC,EntityDimensions.changing(0.6f,1.9f),((type, world) -> new SkeletonPirateEntity(world)));
+
 
 	public static <T extends Entity> EntityType<T> registerEntity(String name, SpawnGroup category, EntityDimensions size, EntityType.EntityFactory<T> factory) {
 		return Registry.register(Registries.ENTITY_TYPE, new Identifier("pirates", name), FabricEntityTypeBuilder.create(category, factory).dimensions(size).build());
+
 	}
 
 

@@ -1,4 +1,4 @@
-package ace.actually.pirates.entities.pirate;
+package ace.actually.pirates.entities.abstract_pirate;
 import java.util.EnumSet;
 import java.util.Objects;
 

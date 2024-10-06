@@ -1,8 +1,7 @@
-package ace.actually.pirates.blocks;
+package ace.actually.pirates.blocks.entity;
 
-import ace.actually.pirates.PatternProcessor;
+import ace.actually.pirates.util.PatternProcessor;
 import ace.actually.pirates.Pirates;
-import ace.actually.pirates.sound.ModSounds;
 import net.minecraft.block.BlockState;
 import net.minecraft.block.Blocks;
 import net.minecraft.block.entity.BlockEntity;
@@ -10,11 +9,8 @@ import net.minecraft.nbt.NbtCompound;
 import net.minecraft.nbt.NbtList;
 import net.minecraft.registry.tag.BlockTags;
 import net.minecraft.server.world.ServerWorld;
-import net.minecraft.sound.SoundCategory;
-import net.minecraft.sound.SoundEvents;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.ChunkPos;
-import net.minecraft.util.math.Direction;
 import net.minecraft.world.World;
 import org.valkyrienskies.core.api.ships.LoadedServerShip;
 import org.valkyrienskies.eureka.block.ShipHelmBlock;

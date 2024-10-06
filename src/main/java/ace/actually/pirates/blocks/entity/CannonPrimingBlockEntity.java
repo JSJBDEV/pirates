@@ -1,20 +1,15 @@
-package ace.actually.pirates.blocks;
+package ace.actually.pirates.blocks.entity;
 
 import ace.actually.pirates.Pirates;
+import ace.actually.pirates.blocks.CannonPrimingBlock;
 import net.minecraft.block.*;
 import net.minecraft.block.entity.BlockEntity;
-import net.minecraft.particle.ParticleTypes;
-import net.minecraft.server.world.ServerWorld;
 import net.minecraft.state.property.Properties;
 import net.minecraft.util.hit.BlockHitResult;
 import net.minecraft.util.math.*;
 import net.minecraft.world.RaycastContext;
 import net.minecraft.world.World;
-import org.joml.Vector3d;
 import org.valkyrienskies.mod.common.VSGameUtilsKt;
-import org.valkyrienskies.mod.common.util.VectorConversionsMCKt;
-
-import java.util.*;
 
 public class CannonPrimingBlockEntity extends BlockEntity {
 

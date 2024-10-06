@@ -1,4 +1,4 @@
-package ace.actually.pirates.entities.pirate;
+package ace.actually.pirates.entities.abstract_pirate;
 
 import net.minecraft.entity.ai.FuzzyTargeting;
 import net.minecraft.entity.ai.goal.WanderAroundGoal;
