@@ -2,14 +2,20 @@ package ace.actually.pirates.blocks;
 
 import ace.actually.pirates.Pirates;
 import ace.actually.pirates.entities.pirate.PirateEntity;
+import ace.actually.pirates.util.CrewSpawnType;
+import ace.actually.pirates.util.ModProperties;
 import net.minecraft.block.BlockState;
 import net.minecraft.block.entity.BlockEntity;
 import net.minecraft.entity.Entity;
+import net.minecraft.entity.EntityType;
 import net.minecraft.entity.EquipmentSlot;
+import net.minecraft.entity.ai.brain.task.VillagerBreedTask;
+import net.minecraft.entity.passive.VillagerEntity;
 import net.minecraft.item.ItemStack;
 import net.minecraft.item.Items;
 import net.minecraft.state.property.Properties;
 import net.minecraft.util.math.BlockPos;
+import net.minecraft.village.VillagerType;
 import net.minecraft.world.World;
 import org.valkyrienskies.core.api.ships.Ship;
 import org.valkyrienskies.mod.common.VSGameUtilsKt;
@@ -24,16 +30,11 @@ public class CrewSpawnerBlockEntity extends BlockEntity {
 
     public static void tick(World world, BlockPos pos, BlockState state, CrewSpawnerBlockEntity be) {
         if (world.getGameRules().getBoolean(Pirates.PIRATES_IS_LIVE_WORLD)) {
-
-
             if (state.get(Properties.CONDITIONAL)) {
                 spawnCrewIfOnShip(world, be);
             } else {
                 spawnCrew(world, be);
             }
-
-
-
         }
     }
 
@@ -45,13 +46,7 @@ public class CrewSpawnerBlockEntity extends BlockEntity {
 
             if (be.countdown > 100) {
 
-                Entity pirate = new PirateEntity(world, checkForBlocksToCrew(world, be.getPos()));
-
-                pirate.equipStack(EquipmentSlot.MAINHAND, new ItemStack(Items.BOW));
-                pirate.setPosition(be.getPos().toCenterPos());
-                world.spawnEntity(pirate);
-
-                world.breakBlock(be.getPos(), false);
+                spawnCrew(world, be);
             } else {
                 be.countdown++;
             }
@@ -59,11 +54,12 @@ public class CrewSpawnerBlockEntity extends BlockEntity {
     }
 
     private static void spawnCrew(World world, CrewSpawnerBlockEntity be) {
-        Entity pirate = new PirateEntity(world, checkForBlocksToCrew(world, be.getPos()));
+        Entity crew = getEntityFromState(world, be);
 
-        pirate.equipStack(EquipmentSlot.MAINHAND, new ItemStack(Items.BOW));
-        pirate.setPosition(be.getPos().toCenterPos());
-        world.spawnEntity(pirate);
+        if (crew != null) {
+            crew.setPosition(be.getPos().toCenterPos());
+            world.spawnEntity(crew);
+        }
 
         world.breakBlock(be.getPos(), false);
     }
@@ -95,6 +91,22 @@ public class CrewSpawnerBlockEntity extends BlockEntity {
 
 
         return blockResult;
+    }
+
+    private static Entity getEntityFromState(World world, BlockEntity be) {
+        Entity crew = null;
+        if (be.getCachedState().get(ModProperties.CREW_SPAWN_TYPE) == CrewSpawnType.PIRATE) {
+            crew = new PirateEntity(world, checkForBlocksToCrew(world, be.getPos()));
+            crew.equipStack(EquipmentSlot.MAINHAND, new ItemStack(Items.BOW));
+        } else if (be.getCachedState().get(ModProperties.CREW_SPAWN_TYPE) == CrewSpawnType.VILLAGER) {
+            crew = new VillagerEntity(EntityType.VILLAGER, world, VillagerType.forBiome(world.getBiome(be.getPos())));
+        } else if (be.getCachedState().get(ModProperties.CREW_SPAWN_TYPE) == CrewSpawnType.SKELETON_PIRATE) {
+            //skeleton pirate entity
+        }
+
+        //Mixin here to add custom entities
+
+        return crew;
     }
 
 }

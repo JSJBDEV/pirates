@@ -73,9 +73,6 @@ public class Pirates implements ModInitializer {
 		});
 
 
-
-
-
 	}
 
 
