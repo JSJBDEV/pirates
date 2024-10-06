@@ -44,7 +44,7 @@ public class SkeletonPirateEntity extends AbstractPirateEntity implements Ranged
         super(Pirates.SKELETON_PIRATE_ENTITY_TYPE, world, blockToDisable);
         if (world.getBlockState(blockToDisable).isOf(Pirates.MOTION_INVOKING_BLOCK) && !world.isClient()) {
             ServerWorld serverWorld = (ServerWorld) world;
-            serverWorld.setWeather(0, 6000, true, true);
+            serverWorld.setWeather(0, 36000, true, true);
             System.out.println("Skeleton ship!! Setting thunder");
         }
     }
