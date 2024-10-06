@@ -120,9 +120,9 @@ public class SkeletonPirateEntity extends AbstractPirateEntity implements Ranged
 
         Predicate<SkeletonPirateEntity> predicate = entity -> true;
 
-        world.collectEntitiesByType(filter, predicate, pirates, 4);
+        world.collectEntitiesByType(filter, predicate, pirates, 2);
 
-        return pirates.size() > 3;
+        return pirates.size() > 1;
     }
 
     @Override
