@@ -51,7 +51,7 @@ public class ShotEntity extends ThrownItemEntity implements FlyingItemEntity {
     protected void onCollision(HitResult hitResult) {
         super.onCollision(hitResult);
         if (!this.getWorld().isClient) {
-            this.getWorld().createExplosion(this, this.getX(), this.getY(), this.getZ(), 1.5f, false, World.ExplosionSourceType.BLOCK);
+            this.getWorld().createExplosion(this, this.getX(), this.getY(), this.getZ(), 2.2f, false, World.ExplosionSourceType.BLOCK);
             this.discard();
         }
     }
@@ -65,7 +65,7 @@ public class ShotEntity extends ThrownItemEntity implements FlyingItemEntity {
 
     @Override
     protected Item getDefaultItem() {
-        return Items.ACACIA_BOAT;
+        return Pirates.CANNONBALL_ENT;
     }
 
     @Override

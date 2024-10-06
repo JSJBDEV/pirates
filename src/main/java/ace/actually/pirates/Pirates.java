@@ -83,12 +83,14 @@ public class Pirates implements ModInitializer {
 
 	public static final TestingStickItem TESTING_STICK_ITEM = new TestingStickItem(new Item.Settings());
 	public static final RaycastingItem RAYCASTING_ITEM = new RaycastingItem(new Item.Settings());
-	public static final Item CANNONBALL = new Item(new Item.Settings().fireproof());
+	public static final Item CANNONBALL = new Item(new Item.Settings());
+	public static final Item CANNONBALL_ENT = new Item(new Item.Settings());
 	private void registerItems()
 	{
 		Registry.register(Registries.ITEM,new Identifier("pirates","testing_stick"),TESTING_STICK_ITEM);
 		Registry.register(Registries.ITEM,new Identifier("pirates","raycaster"),RAYCASTING_ITEM);
 		Registry.register(Registries.ITEM,new Identifier("pirates","cannonball"),CANNONBALL);
+		Registry.register(Registries.ITEM,new Identifier("minecraft","p_util"),CANNONBALL_ENT);
 
 		Registry.register(Registries.ITEM,new Identifier("pirates","cannon_priming_block"),new BlockItem(CANNON_PRIMING_BLOCK,new Item.Settings()));
 //		Registry.register(Registries.ITEM,new Identifier("pirates","motion_invoking_block"),new BlockItem(MOTION_INVOKING_BLOCK,new Item.Settings()));
