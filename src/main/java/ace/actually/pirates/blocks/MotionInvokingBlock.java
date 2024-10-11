@@ -10,8 +10,13 @@ import net.minecraft.server.world.ServerWorld;
 import net.minecraft.sound.SoundCategory;
 import net.minecraft.sound.SoundEvents;
 import net.minecraft.util.math.BlockPos;
+import net.minecraft.util.math.ChunkPos;
 import net.minecraft.world.World;
 import org.jetbrains.annotations.Nullable;
+import org.valkyrienskies.core.api.ships.LoadedServerShip;
+import org.valkyrienskies.mod.api.SeatedControllingPlayer;
+import org.valkyrienskies.mod.common.ValkyrienSkiesMod;
+import org.valkyrienskies.mod.common.util.DimensionIdProvider;
 
 public class MotionInvokingBlock extends BlockWithEntity {
 
@@ -49,6 +54,16 @@ public class MotionInvokingBlock extends BlockWithEntity {
 
     public static void disarm(World world, BlockPos pos) {
         if (world.isClient()) return;
+
+        DimensionIdProvider provider = (DimensionIdProvider) world;
+        ChunkPos chunkPos = world.getChunk(pos).getPos();
+        LoadedServerShip ship = (LoadedServerShip) ValkyrienSkiesMod.getVsCore().getHooks().getCurrentShipServerWorld().getLoadedShips().getByChunkPos(chunkPos.x, chunkPos.z, provider.getDimensionId());
+        SeatedControllingPlayer seatedControllingPlayer = ship.getAttachment(SeatedControllingPlayer.class);
+        seatedControllingPlayer.setLeftImpulse(0);
+        seatedControllingPlayer.setForwardImpulse(0);
+        seatedControllingPlayer.setCruise(false);
+        seatedControllingPlayer.setUpImpulse(0);
+        ship.setAttachment(SeatedControllingPlayer.class, seatedControllingPlayer);
 
         world.setBlockState(pos, Blocks.SPRUCE_PLANKS.getDefaultState());
         world.playSound(null, pos, SoundEvents.BLOCK_BEACON_DEACTIVATE, SoundCategory.BLOCKS, 1, 0.95f);
