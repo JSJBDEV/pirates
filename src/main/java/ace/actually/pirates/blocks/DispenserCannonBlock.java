@@ -1,15 +1,15 @@
 package ace.actually.pirates.blocks;
 
 import ace.actually.pirates.Pirates;
-import ace.actually.pirates.entities.ShotEntity;
+import ace.actually.pirates.entities.shot.ShotEntity;
 import ace.actually.pirates.util.CannonDispenserBehavior;
 import net.minecraft.block.*;
 import net.minecraft.block.dispenser.DispenserBehavior;
-import net.minecraft.block.dispenser.ItemDispenserBehavior;
 import net.minecraft.block.entity.BlockEntity;
 import net.minecraft.block.entity.DispenserBlockEntity;
 import net.minecraft.entity.projectile.ProjectileEntity;
 import net.minecraft.item.ItemStack;
+import net.minecraft.item.Items;
 import net.minecraft.state.property.Properties;
 import net.minecraft.text.Text;
 import net.minecraft.util.Util;
@@ -17,10 +17,9 @@ import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.Direction;
 import net.minecraft.util.math.Position;
 import net.minecraft.util.math.Vec3d;
+import net.minecraft.world.BlockView;
 import net.minecraft.world.World;
 import net.minecraft.world.WorldAccess;
-
-import java.util.Objects;
 
 public class DispenserCannonBlock extends DispenserBlock {
     public DispenserCannonBlock(AbstractBlock.Settings settings) {
@@ -33,9 +32,7 @@ public class DispenserCannonBlock extends DispenserBlock {
             return new CannonDispenserBehavior() {
                 @Override
                 protected ProjectileEntity createProjectile(World world, Position position, ItemStack stack) {
-                    ShotEntity qentity = Util.make(new ShotEntity(Pirates.SHOT_ENTITY_TYPE,world,null,Pirates.CANNONBALL,2,""), (entity) -> {
-                        entity.setItem(stack);
-                    });
+                    ShotEntity qentity = Util.make(new ShotEntity(Pirates.SHOT_ENTITY_TYPE,world,null,Pirates.CANNONBALL_ENT,2,""), (entity) -> {});
                     qentity.setPosition(new Vec3d(position.getX(),position.getY(),position.getZ()));
                     return qentity;
                 }
@@ -63,5 +60,10 @@ public class DispenserCannonBlock extends DispenserBlock {
 
     @Override
     public void neighborUpdate(BlockState state, World world, BlockPos pos, Block sourceBlock, BlockPos sourcePos, boolean notify) {}
+
+    @Override
+    public ItemStack getPickStack(BlockView world, BlockPos pos, BlockState state) {
+        return new ItemStack(Items.DISPENSER);
+    }
 
 }

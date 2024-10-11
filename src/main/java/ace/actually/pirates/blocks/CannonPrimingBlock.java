@@ -1,12 +1,12 @@
 package ace.actually.pirates.blocks;
 
 import ace.actually.pirates.Pirates;
+import ace.actually.pirates.blocks.entity.CannonPrimingBlockEntity;
 import net.minecraft.block.*;
 import net.minecraft.block.entity.BlockEntity;
 import net.minecraft.block.entity.BlockEntityTicker;
 import net.minecraft.block.entity.BlockEntityType;
 import net.minecraft.item.ItemPlacementContext;
-import net.minecraft.particle.ParticleTypes;
 import net.minecraft.sound.SoundCategory;
 import net.minecraft.sound.SoundEvents;
 import net.minecraft.state.StateManager;
@@ -17,7 +17,6 @@ import net.minecraft.util.BlockRotation;
 import net.minecraft.util.math.*;
 import net.minecraft.world.*;
 import org.jetbrains.annotations.Nullable;
-import org.valkyrienskies.mod.common.VSGameUtilsKt;
 
 public class CannonPrimingBlock extends BlockWithEntity {
     public CannonPrimingBlock(Settings settings) {
