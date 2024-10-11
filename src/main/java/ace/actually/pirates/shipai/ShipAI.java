@@ -1,6 +1,6 @@
 package ace.actually.pirates.shipai;
 
-import ace.actually.pirates.blocks.MotionInvokingBlockEntity;
+import ace.actually.pirates.blocks.entity.MotionInvokingBlockEntity;
 import net.minecraft.block.BlockState;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.world.World;

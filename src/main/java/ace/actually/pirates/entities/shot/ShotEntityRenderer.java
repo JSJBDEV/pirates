@@ -1,4 +1,4 @@
-package ace.actually.pirates.entities;
+package ace.actually.pirates.entities.shot;
 
 import net.minecraft.client.render.entity.EntityRendererFactory;
 import net.minecraft.client.render.entity.FlyingItemEntityRenderer;

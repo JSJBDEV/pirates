@@ -1,5 +1,6 @@
 {
 	"credit": "Made with Blockbench",
+	"parent": "minecraft:block/block",
 	"textures": {
 		"0": "pirates:block/cannon_side",
 		"1": "pirates:block/cannon_top",

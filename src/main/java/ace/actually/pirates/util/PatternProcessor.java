@@ -1,4 +1,4 @@
-package ace.actually.pirates;
+package ace.actually.pirates.util;
 
 import net.fabricmc.loader.api.FabricLoader;
 import net.minecraft.nbt.NbtList;
