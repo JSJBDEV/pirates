@@ -47,6 +47,11 @@ public class MotionInvokingBlock extends BlockWithEntity {
         this.dropExperience(world, pos, i);
     }
 
+    @Override
+    public void onStateReplaced(BlockState state, World world, BlockPos pos, BlockState newState, boolean moved) {
+        super.onStateReplaced(state, world, pos, newState, moved);
+        stopMotion(world,pos);
+    }
 
     @Override
     public BlockRenderType getRenderType(BlockState state) {
@@ -56,6 +61,14 @@ public class MotionInvokingBlock extends BlockWithEntity {
     public static void disarm(World world, BlockPos pos) {
         if (world.isClient()) return;
 
+        stopMotion(world,pos);
+        world.setBlockState(pos, Blocks.SPRUCE_PLANKS.getDefaultState());
+        world.playSound(null, pos, SoundEvents.BLOCK_BEACON_DEACTIVATE, SoundCategory.BLOCKS, 1, 0.95f);
+
+    }
+
+    private static void stopMotion(World world, BlockPos pos)
+    {
         DimensionIdProvider provider = (DimensionIdProvider) world;
         ChunkPos chunkPos = world.getChunk(pos).getPos();
         LoadedServerShip ship = (LoadedServerShip) ValkyrienSkiesMod.getVsCore().getHooks().getCurrentShipServerWorld().getLoadedShips().getByChunkPos(chunkPos.x, chunkPos.z, provider.getDimensionId());
@@ -65,9 +78,5 @@ public class MotionInvokingBlock extends BlockWithEntity {
         seatedControllingPlayer.setCruise(false);
         seatedControllingPlayer.setUpImpulse(0);
         ship.setAttachment(SeatedControllingPlayer.class, seatedControllingPlayer);
-
-        world.setBlockState(pos, Blocks.SPRUCE_PLANKS.getDefaultState());
-        world.playSound(null, pos, SoundEvents.BLOCK_BEACON_DEACTIVATE, SoundCategory.BLOCKS, 1, 0.95f);
-
     }
 }
