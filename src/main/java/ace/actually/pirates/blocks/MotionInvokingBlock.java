@@ -72,11 +72,15 @@ public class MotionInvokingBlock extends BlockWithEntity {
         DimensionIdProvider provider = (DimensionIdProvider) world;
         ChunkPos chunkPos = world.getChunk(pos).getPos();
         LoadedServerShip ship = (LoadedServerShip) ValkyrienSkiesMod.getVsCore().getHooks().getCurrentShipServerWorld().getLoadedShips().getByChunkPos(chunkPos.x, chunkPos.z, provider.getDimensionId());
-        SeatedControllingPlayer seatedControllingPlayer = ship.getAttachment(SeatedControllingPlayer.class);
-        seatedControllingPlayer.setLeftImpulse(0);
-        seatedControllingPlayer.setForwardImpulse(0);
-        seatedControllingPlayer.setCruise(false);
-        seatedControllingPlayer.setUpImpulse(0);
-        ship.setAttachment(SeatedControllingPlayer.class, seatedControllingPlayer);
+        if(ship!=null)
+        {
+            SeatedControllingPlayer seatedControllingPlayer = ship.getAttachment(SeatedControllingPlayer.class);
+            seatedControllingPlayer.setLeftImpulse(0);
+            seatedControllingPlayer.setForwardImpulse(0);
+            seatedControllingPlayer.setCruise(false);
+            seatedControllingPlayer.setUpImpulse(0);
+            ship.setAttachment(SeatedControllingPlayer.class, seatedControllingPlayer);
+        }
+
     }
 }

@@ -2,23 +2,26 @@ package ace.actually.pirates.blocks.entity;
 
 import ace.actually.pirates.util.PatternProcessor;
 import ace.actually.pirates.Pirates;
+import net.minecraft.block.Block;
 import net.minecraft.block.BlockState;
 import net.minecraft.block.Blocks;
 import net.minecraft.block.entity.BlockEntity;
 import net.minecraft.nbt.NbtCompound;
 import net.minecraft.nbt.NbtList;
-import net.minecraft.registry.tag.BlockTags;
 import net.minecraft.server.world.ServerWorld;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.ChunkPos;
 import net.minecraft.world.World;
 import org.valkyrienskies.core.api.ships.LoadedServerShip;
+import org.valkyrienskies.core.util.datastructures.DenseBlockPosSet;
 import org.valkyrienskies.eureka.block.ShipHelmBlock;
-import org.valkyrienskies.eureka.util.ShipAssembler;
 import org.valkyrienskies.mod.api.SeatedControllingPlayer;
 import org.valkyrienskies.mod.common.VSGameUtilsKt;
 import org.valkyrienskies.mod.common.ValkyrienSkiesMod;
+import org.valkyrienskies.mod.common.assembly.ShipAssemblyKt;
 import org.valkyrienskies.mod.common.util.DimensionIdProvider;
+
+import java.util.List;
 
 import static net.minecraft.state.property.Properties.HORIZONTAL_FACING;
 
@@ -38,7 +41,16 @@ public class MotionInvokingBlockEntity extends BlockEntity {
         }
 
         if (be.instructions.isEmpty() && world.getGameRules().getBoolean(Pirates.PIRATES_IS_LIVE_WORLD)) {
-            be.getPattern("circle.pattern");
+
+            if(world.random.nextBoolean())
+            {
+                be.setPattern("circle.pattern");
+            }
+            else
+            {
+                be.setPattern("rcircle.pattern");
+            }
+
         }
         if (!world.isClient && world.getGameRules().getBoolean(Pirates.PIRATES_IS_LIVE_WORLD) && world.getTime() >= be.nextInstruction) {
             DimensionIdProvider provider = (DimensionIdProvider) world;
@@ -76,7 +88,8 @@ public class MotionInvokingBlockEntity extends BlockEntity {
     }
 
     private void buildShipRec(ServerWorld world, BlockPos pos) {
-        ShipAssembler.INSTANCE.collectBlocks(world, pos, a -> !a.isAir() && !a.isOf(Blocks.WATER) && !a.isOf(Blocks.KELP) && !a.isOf(Blocks.KELP_PLANT) && !a.isOf(Blocks.SAND) && !a.isIn(BlockTags.ICE) && !a.isOf(Blocks.STONE));
+        //ShipAssembler.INSTANCE.collectBlocks(world, pos, a -> !a.isAir() && !a.isOf(Blocks.WATER) && !a.isOf(Blocks.KELP) && !a.isOf(Blocks.KELP_PLANT) && !a.isOf(Blocks.SAND) && !a.isIn(BlockTags.ICE) && !a.isOf(Blocks.STONE));
+        collectBlocks(world,pos);
     }
 
     @Override
@@ -94,7 +107,7 @@ public class MotionInvokingBlockEntity extends BlockEntity {
     }
 
 
-    public void getPattern(String loc) {
+    public void setPattern(String loc) {
         instructions = PatternProcessor.loadPattern(loc);
         nextInstruction = world.getTime() + 10;
         markDirty();
@@ -115,4 +128,44 @@ public class MotionInvokingBlockEntity extends BlockEntity {
         be.instructions.add(be.instructions.remove(0));
         be.markDirty();
     }
+
+    public void collectBlocks(ServerWorld world, BlockPos center)
+    {
+        sortDense(world,center);
+        if(SET.size()<5000)
+        {
+            ShipAssemblyKt.createNewShipWithBlocks(center, SET, world);
+        }
+    }
+
+    private static  final List<Block> a = List.of(Blocks.SAND,Blocks.STONE,Blocks.ICE,Blocks.PACKED_ICE,Blocks.BLUE_ICE,Blocks.KELP,Blocks.KELP_PLANT,Blocks.AIR,Blocks.WATER);
+    private static final DenseBlockPosSet SET = new DenseBlockPosSet();
+
+    public void sortDense(ServerWorld world, BlockPos here)
+    {
+        for (int i = -2; i < 3; i++) {
+            for (int j = -2; j < 3; j++) {
+                for (int k = -2; k < 3; k++) {
+                    //this means that we could hit 5000 in this loop, this is considered a false-start
+                    if(SET.getSize()<5000)
+                    {
+                        BlockPos o = here.add(i,j,k);
+                        if(!SET.contains(o.getX(),o.getY(),o.getZ()))
+                        {
+                            if(!a.contains(world.getBlockState(o).getBlock()))
+                            {
+                                SET.add(o.getX(),o.getY(),o.getZ());
+                                //System.out.println(SET.size());
+                                sortDense(world,o);
+                            }
+
+                        }
+                    }
+
+                }
+            }
+        }
+
+    }
+
 }

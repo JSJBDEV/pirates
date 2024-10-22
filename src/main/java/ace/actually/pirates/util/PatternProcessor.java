@@ -48,6 +48,15 @@ public class PatternProcessor {
                 throw new RuntimeException(e);
             }
         }
+        file = new File(FabricLoader.getInstance().getConfigDirectory().getPath() + "/pirates/patterns/rcircle.pattern");
+        if(!file.exists())
+        {
+            try {
+                FileUtils.writeLines(file, Arrays.asList("forward 1 1","left 0.05 10"));
+            } catch (IOException e) {
+                throw new RuntimeException(e);
+            }
+        }
     }
 
 }
