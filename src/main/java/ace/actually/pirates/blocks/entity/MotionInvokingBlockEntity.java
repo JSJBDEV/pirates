@@ -1,5 +1,6 @@
 package ace.actually.pirates.blocks.entity;
 
+import ace.actually.pirates.blocks.MotionInvokingBlock;
 import ace.actually.pirates.util.PatternProcessor;
 import ace.actually.pirates.Pirates;
 import net.minecraft.block.Block;
@@ -135,6 +136,10 @@ public class MotionInvokingBlockEntity extends BlockEntity {
         if(SET.size()<5000)
         {
             ShipAssemblyKt.createNewShipWithBlocks(center, SET, world);
+        }
+        else
+        {
+            MotionInvokingBlock.disarm(world,getPos());
         }
     }
 
