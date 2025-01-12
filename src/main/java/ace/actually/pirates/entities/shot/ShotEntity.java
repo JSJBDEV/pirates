@@ -21,7 +21,7 @@ public class ShotEntity extends ThrownItemEntity implements FlyingItemEntity {
     private LivingEntity in;
     private float damage=6;
     private String extra="";
-    private int tickAge;
+    private int tickAge = 0;
 
 
     public ShotEntity(EntityType<? extends ThrownItemEntity> entityType, World world, LivingEntity caster, Item toShow, float damageTo, String special) {
