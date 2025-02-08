@@ -11,6 +11,9 @@ import net.minecraft.util.math.BlockPointer;
 import net.minecraft.util.math.Direction;
 import net.minecraft.util.math.Position;
 import net.minecraft.world.World;
+import org.valkyrienskies.core.api.ships.Ship;
+import org.valkyrienskies.mod.common.VSGameUtilsKt;
+import org.valkyrienskies.mod.common.util.VectorConversionsMCKt;
 
 /**
  * A dispenser behavior that spawns a projectile with velocity in front of the dispenser.
@@ -25,22 +28,24 @@ public abstract class CannonDispenserBehavior
         ProjectileEntity projectileEntity = this.createProjectile(world, position, stack);
         projectileEntity.setVelocity(direction.getOffsetX(), (float)direction.getOffsetY() + 0.15f, direction.getOffsetZ(), this.getForce() + 0.6f, this.getVariation() / 2);
         world.spawnEntity(projectileEntity);
+
+        Ship ship = VSGameUtilsKt.getShipManagingPos(world, pointer.getPos());
+        if (ship != null) {
+            projectileEntity.addVelocity(VectorConversionsMCKt.toMinecraft(ship.getVelocity()).multiply(1/60.0));
+        }
+
         if (!world.isClient) {
             int xmod = 0;
             int ymod = 0;
             int zmod = 0;
-            if (direction == Direction.NORTH) {
-                zmod = -1;
-            } else if (direction == Direction.EAST) {
-                xmod = 1;
-            } else if (direction == Direction.SOUTH) {
-                zmod = 1;
-            } else if (direction == Direction.WEST) {
-                xmod = -1;
-            } else if (direction == Direction.UP) {
-                ymod = 1;
-            } else if (direction == Direction.DOWN) {
-                ymod = -1;
+
+            switch (direction) {
+                case NORTH -> zmod = -1;
+                case EAST -> xmod = 1;
+                case SOUTH -> zmod = 1;
+                case WEST -> xmod = -1;
+                case UP -> ymod = 1;
+                case DOWN -> ymod = -1;
             }
             for(int i = 0; i < 40; ++i) {
                 world.spawnParticles(ParticleTypes.CLOUD, position.getX() + xmod + (2 * world.random.nextDouble()) - 1, position.getY() + ymod + (2 * world.random.nextDouble()) - 0.8, position.getZ() + zmod + (2 * world.random.nextDouble()) - 1, 1, 0.0, 0.0, 0.0, 0.005);
