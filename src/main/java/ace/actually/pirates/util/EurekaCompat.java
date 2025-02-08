@@ -12,6 +12,7 @@ public class EurekaCompat {
     private static int flipflop = 1;
     public static void moveTowards(MotionInvokingBlockEntity be, SeatedControllingPlayer power, LoadedServerShip ship)
     {
+        if(power==null) return;
         if(be.getTarget().length!=3) return;
         if(be.getTarget()[0]==0 && be.getTarget()[1]==0 && be.getTarget()[2]==0)
         {
