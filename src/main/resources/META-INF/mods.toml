@@ -7,7 +7,7 @@ license = "MIT"
 
 [[mods]]
 modId = "pirates"
-version = "1.4.2"
+version = "1.4.3"
 displayName = "Valkyrien Pirates Forge"
 authors = ["Acrogeneous", "G_Mungus", "Quoissant"]
 description = '''

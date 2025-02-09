@@ -28,7 +28,7 @@ public class ShotEntity extends ThrownItemEntity implements FlyingItemEntity {
         super(entityType, world);
         in=caster;
         setItem(new ItemStack(toShow));
-        damage=damageTo;
+        damage=20;
         extra=special;
     }
 
@@ -72,7 +72,8 @@ public class ShotEntity extends ThrownItemEntity implements FlyingItemEntity {
     }
 
     private void explode() {
-        this.getWorld().createExplosion(this, this.getX(), this.getY(), this.getZ(), 2.2f, extra.contains("fire"), World.ExplosionSourceType.TNT);
+        // original 2.2f power
+        this.getWorld().createExplosion(this, this.getX(), this.getY(), this.getZ(), 1.0f, extra.contains("fire"), World.ExplosionSourceType.TNT);
         this.discard();
     }
 

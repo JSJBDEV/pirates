@@ -2,7 +2,7 @@
 	"schemaVersion": 1,
 	"id": "pirates",
 	"version": "${version}",
-	"name": "Valkyrien Pirates",
+	"name": "My Custom Valkyrien Pirates",
 	"description": "Pirates as they should be.",
 	"authors": [
 		"Acrogenous",

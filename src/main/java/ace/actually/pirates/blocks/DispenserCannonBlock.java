@@ -34,6 +34,8 @@ public class DispenserCannonBlock extends DispenserBlock {
                 protected ProjectileEntity createProjectile(World world, Position position, ItemStack stack) {
                     ShotEntity qentity = Util.make(new ShotEntity(Pirates.SHOT_ENTITY_TYPE,world,null,Pirates.CANNONBALL_ENT,6,""), (entity) -> {});
                     qentity.setPosition(new Vec3d(position.getX(),position.getY(),position.getZ()));
+                    // better particle
+                    world.createExplosion(qentity, position.getX(), position.getY(), position.getZ(), 0.0f, false, World.ExplosionSourceType.TNT);
                     return qentity;
                 }
             };

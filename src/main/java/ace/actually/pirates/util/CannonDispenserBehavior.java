@@ -74,6 +74,6 @@ public abstract class CannonDispenserBehavior
      * {@return the force of a projectile's velocity when spawned}
      */
     protected float getForce() {
-        return 1.1f;
-    }
+        return 2.1f;
+    } // original 1.1f
 }
