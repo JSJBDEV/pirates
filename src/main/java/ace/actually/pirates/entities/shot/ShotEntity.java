@@ -72,7 +72,7 @@ public class ShotEntity extends ThrownItemEntity implements FlyingItemEntity {
     }
 
     private void explode() {
-        this.getWorld().createExplosion(this, this.getX(), this.getY(), this.getZ(), 2.2f, extra.contains("fire"), World.ExplosionSourceType.TNT);
+        this.getWorld().createExplosion(this, this.getX(), this.getY(), this.getZ(), Pirates.baseShotPower, extra.contains("fire"), World.ExplosionSourceType.TNT);
         this.discard();
     }
 

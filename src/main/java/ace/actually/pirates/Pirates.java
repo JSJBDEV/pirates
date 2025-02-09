@@ -57,12 +57,13 @@ public class Pirates implements ModInitializer {
 			.displayName(Text.of("Valkyrien Pirates"))
 			.build();
 
-
+	public static float baseShotPower;
 
 	@Override
 	public void onInitialize() {
 
 		ConfigUtils.checkConfigs();
+		baseShotPower = Float.parseFloat(ConfigUtils.config.getOrDefault("base-shot-power","2.2"));
 		registerEntityThings();
 		//entity types do it themselves
 		registerBlocks();
