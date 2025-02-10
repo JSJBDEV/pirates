@@ -14,6 +14,7 @@ import net.minecraft.world.World;
 import org.valkyrienskies.core.api.ships.Ship;
 import org.valkyrienskies.mod.common.VSGameUtilsKt;
 import org.valkyrienskies.mod.common.util.VectorConversionsMCKt;
+import net.minecraft.particle.DustParticleEffect;
 
 /**
  * A dispenser behavior that spawns a projectile with velocity in front of the dispenser.
@@ -47,9 +48,30 @@ public abstract class CannonDispenserBehavior
                 case UP -> ymod = 1;
                 case DOWN -> ymod = -1;
             }
-            for(int i = 0; i < 40; ++i) {
-                world.spawnParticles(ParticleTypes.CLOUD, position.getX() + xmod + (2 * world.random.nextDouble()) - 1, position.getY() + ymod + (2 * world.random.nextDouble()) - 0.8, position.getZ() + zmod + (2 * world.random.nextDouble()) - 1, 1, 0.0, 0.0, 0.0, 0.005);
+            // DustParticleEffect dustEffect = new DustParticleEffect(new Vec3f(1.0f, 0.0f, 0.0f), 1.0f); // Red dust, size 1.0
+            for (int i = 0; i < 40; ++i) {
+                world.spawnParticles(ParticleTypes.FLAME,
+                        position.getX() + xmod * (0.5 + world.random.nextDouble() * 1.5),  // 🔹 Extend forward 1.5 - 3 blocks
+                        position.getY() + ymod + (world.random.nextDouble() * 1.0) - 0.5,  // 🔹 Small vertical variation (-0.5 to +0.5)
+                        position.getZ() + zmod * (0.5 + world.random.nextDouble() * 1.5),  // 🔹 Extend forward in Z-axis as well
+                        3, (world.random.nextDouble() * 0.3) - 0.15,  // 🔹 Narrow X spread (-0.15 to +0.15)
+                        (world.random.nextDouble() * 0.1) - 0.05,  // 🔹 Keep Y spread small (-0.05 to +0.05)
+                        (world.random.nextDouble() * 0.3) - 0.15,  // 🔹 Narrow Z spread (-0.15 to +0.15)
+                        0.02);
+
+                // 💨 LARGE_SMOKE bounding box is TWICE as large as FLAME
+                double explosionX = position.getX() + xmod * (3.5 + world.random.nextDouble() * 2);  // Move explosion ahead with variation
+                double explosionY = position.getY() + ymod + (world.random.nextDouble() * 3.0) - 1.0;  // Twice the height variation
+                double explosionZ = position.getZ() + zmod * (3.5 + world.random.nextDouble() * 2);  // Move explosion ahead with variation
+
+                world.spawnParticles(ParticleTypes.CLOUD,
+                        explosionX + (4 * world.random.nextDouble()) - 2,  // Twice the X spread
+                        explosionY,
+                        explosionZ + (4 * world.random.nextDouble()) - 2,  // Twice the Z spread
+                        20, 0.0, 0.0, 0.0, 0.0);
             }
+            // better particle, add no damage explosion to reuse the sound
+            world.createExplosion(projectileEntity, position.getX(), position.getY(), position.getZ(), 0.0f, false, World.ExplosionSourceType.TNT);
         }
         stack.decrement(1);
         return stack;

@@ -13,10 +13,7 @@ import net.minecraft.item.Items;
 import net.minecraft.state.property.Properties;
 import net.minecraft.text.Text;
 import net.minecraft.util.Util;
-import net.minecraft.util.math.BlockPos;
-import net.minecraft.util.math.Direction;
-import net.minecraft.util.math.Position;
-import net.minecraft.util.math.Vec3d;
+import net.minecraft.util.math.*;
 import net.minecraft.world.BlockView;
 import net.minecraft.world.World;
 import net.minecraft.world.WorldAccess;
@@ -34,8 +31,6 @@ public class DispenserCannonBlock extends DispenserBlock {
                 protected ProjectileEntity createProjectile(World world, Position position, ItemStack stack) {
                     ShotEntity qentity = Util.make(new ShotEntity(Pirates.SHOT_ENTITY_TYPE,world,null,Pirates.CANNONBALL_ENT,6,""), (entity) -> {});
                     qentity.setPosition(new Vec3d(position.getX(),position.getY(),position.getZ()));
-                    // better particle
-                    world.createExplosion(qentity, position.getX(), position.getY(), position.getZ(), 0.0f, false, World.ExplosionSourceType.TNT);
                     return qentity;
                 }
             };
