@@ -27,5 +27,4 @@ public class ClientPirates implements ClientModInitializer {
         EntityModelLayerRegistry.registerModelLayer(SKELETON_PIRATE, SkeletonPirateModel::getTexturedModelData);
 
     }
-
 }

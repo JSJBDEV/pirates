@@ -72,11 +72,9 @@ public abstract class AbstractPirateEntity  extends HostileEntity {
                 CannonPrimingBlock.disarm(this.getWorld(), blockToDisable);
             } else if (this.getWorld().getBlockState(blockToDisable).isOf(Pirates.MOTION_INVOKING_BLOCK)) {
                 MotionInvokingBlock.disarm(this.getWorld(), blockToDisable);
-
             }
         }
     }
-
     public boolean isOnShip() {
         return VSGameUtilsKt.getShipManaging(this) != null;
     }

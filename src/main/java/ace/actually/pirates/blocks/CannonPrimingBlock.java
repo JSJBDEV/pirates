@@ -119,4 +119,13 @@ public class CannonPrimingBlock extends BlockWithEntity {
             world.playSound(null, pos, SoundEvents.BLOCK_REDSTONE_TORCH_BURNOUT, SoundCategory.BLOCKS, 0.5f, 1.5f);
         }
     }
+    public static void rearmCannon(World world, BlockPos pos) {
+        if (world.isClient()) return;
+        BlockState blockState = world.getBlockState(pos);
+
+        if (blockState.get(DISARMED)) {
+            world.setBlockState(pos, blockState.with(DISARMED, false)); // Reactivate the cannon
+        }
+    }
+
 }
