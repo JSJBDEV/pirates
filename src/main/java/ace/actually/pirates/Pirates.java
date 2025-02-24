@@ -58,12 +58,14 @@ public class Pirates implements ModInitializer {
 			.build();
 
 	public static float baseShotPower;
+	public static int pursuitDistance;
 
 	@Override
 	public void onInitialize() {
 
 		ConfigUtils.checkConfigs();
 		baseShotPower = Float.parseFloat(ConfigUtils.config.getOrDefault("base-shot-power","2.2"));
+		pursuitDistance = Integer.parseInt(ConfigUtils.config.getOrDefault("pursuit-distance","10000"));
 		registerEntityThings();
 		//entity types do it themselves
 		registerBlocks();
@@ -97,7 +99,7 @@ public class Pirates implements ModInitializer {
 	{
 
 		FabricDefaultAttributeRegistry.register(PIRATE_ENTITY_TYPE, PirateEntity.attributes());
-		FabricDefaultAttributeRegistry.register(SKELETON_PIRATE_ENTITY_TYPE, SkeletonPirateEntity.attributes());
+		//FabricDefaultAttributeRegistry.register(SKELETON_PIRATE_ENTITY_TYPE, SkeletonPirateEntity.attributes());
 
 	}
 
@@ -166,7 +168,7 @@ public class Pirates implements ModInitializer {
 
 	public static final EntityType<PirateEntity> PIRATE_ENTITY_TYPE =registerEntity("pirate",SpawnGroup.MISC,EntityDimensions.changing(0.6f,1.9f),((type, world) -> new PirateEntity(world)));
 
-	public static final EntityType<SkeletonPirateEntity> SKELETON_PIRATE_ENTITY_TYPE =registerEntity("skeleton_pirate",SpawnGroup.MISC,EntityDimensions.changing(0.6f,1.9f),((type, world) -> new SkeletonPirateEntity(world)));
+	public static final EntityType<SkeletonPirateEntity> SKELETON_PIRATE_ENTITY_TYPE = null; //=registerEntity("skeleton_pirate",SpawnGroup.MISC,EntityDimensions.changing(0.6f,1.9f),((type, world) -> new SkeletonPirateEntity(world)));
 
 
 

@@ -101,7 +101,7 @@ public class MotionInvokingBlockEntity extends BlockEntity {
                             if(a.getId()==ship.getId()) return false;
                             Vector3dc f1 = ship.getTransform().getPositionInWorld();
                             Vector3dc f2 = a.getTransform().getPositionInWorld();
-                            return f1.distanceSquared(f2)<10000;
+                            return f1.distanceSquared(f2)<Pirates.pursuitDistance;
                         }).toList();
                         if(!ships.isEmpty())
                         {

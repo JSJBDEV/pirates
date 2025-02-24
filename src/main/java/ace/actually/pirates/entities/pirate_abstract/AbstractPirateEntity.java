@@ -102,5 +102,4 @@ public abstract class AbstractPirateEntity  extends HostileEntity {
             this.blockToDisable = new BlockPos(x, y, z);
         }
     }
-
 }

@@ -110,7 +110,7 @@ public class CrewSpawnerBlockEntity extends BlockEntity {
             crew = new VillagerEntity(EntityType.VILLAGER, world, VillagerType.forBiome(world.getBiome(be.getPos())));
         } else if (be.getCachedState().get(CrewTypes.CREW_SPAWN_TYPE) == CrewSpawnType.SKELETON_PIRATE) {
             BlockPos blockToCrew = checkForBlocksToCrew(world, be.getPos());
-            crew = new SkeletonPirateEntity(world, blockToCrew);
+            crew = new PirateEntity(world, blockToCrew);
             ItemStack itemStack = new ItemStack(Items.BOW);
             if (world.getBlockState(blockToCrew).isOf(Pirates.MOTION_INVOKING_BLOCK)) {
                 itemStack.addEnchantment(Enchantments.POWER, 2);

@@ -68,6 +68,8 @@ public class ConfigUtils {
         defaults.add("controlled-ship-updates=100");
         defaults.add("#Base power for cannonball shot entity, default=2.2");
         defaults.add("base-shot-power=2.2");
+        defaults.add("#Based squared distance to trigger NPC ship pursuit default=10000");
+        defaults.add("pursuit-distance=10000");
 
         return defaults;
     }
