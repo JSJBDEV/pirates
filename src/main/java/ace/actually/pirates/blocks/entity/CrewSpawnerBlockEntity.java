@@ -3,6 +3,7 @@ package ace.actually.pirates.blocks.entity;
 import ace.actually.pirates.Pirates;
 import ace.actually.pirates.entities.pirate_default.PirateEntity;
 import ace.actually.pirates.entities.pirate_skeleton.SkeletonPirateEntity;
+import ace.actually.pirates.util.ConfigUtils;
 import ace.actually.pirates.util.CrewSpawnType;
 import ace.actually.pirates.util.ModProperties;
 import net.minecraft.block.BlockState;
@@ -12,15 +13,23 @@ import net.minecraft.entity.Entity;
 import net.minecraft.entity.EntityType;
 import net.minecraft.entity.EquipmentSlot;
 import net.minecraft.entity.mob.MobEntity;
+import net.minecraft.entity.passive.AllayEntity;
 import net.minecraft.entity.passive.VillagerEntity;
 import net.minecraft.item.ItemStack;
 import net.minecraft.item.Items;
+import net.minecraft.nbt.NbtCompound;
+import net.minecraft.server.network.EntityTrackerEntry;
 import net.minecraft.state.property.Properties;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.village.VillagerType;
+import net.minecraft.world.EntityList;
 import net.minecraft.world.World;
+import org.apache.http.client.entity.EntityBuilder;
 import org.valkyrienskies.core.api.ships.Ship;
 import org.valkyrienskies.mod.common.VSGameUtilsKt;
+import net.minecraft.world.EntityList;
+
+import java.util.Optional;
 
 public class CrewSpawnerBlockEntity extends BlockEntity {
 
@@ -110,6 +119,30 @@ public class CrewSpawnerBlockEntity extends BlockEntity {
                 itemStack.addEnchantment(Enchantments.POWER, 2);
             }
             crew.equipStack(EquipmentSlot.MAINHAND, itemStack);
+        } else if (be.getCachedState().get(ModProperties.CREW_SPAWN_TYPE) == CrewSpawnType.CUSTOM_0) {
+            String id = (ConfigUtils.config.getOrDefault("custom-crew-entity-0","minecraft:zombie"));
+            EntityType<?> j = null;
+            if (EntityType.get(id).isPresent()) {
+                j = EntityType.get(id).get();
+            }
+            assert j != null;
+            crew = j.create(world);
+        } else if (be.getCachedState().get(ModProperties.CREW_SPAWN_TYPE) == CrewSpawnType.CUSTOM_1) {
+            String id = (ConfigUtils.config.getOrDefault("custom-crew-entity-1","minecraft:skeleton"));
+            EntityType<?> j = null;
+            if (EntityType.get(id).isPresent()) {
+                j = EntityType.get(id).get();
+            }
+            assert j != null;
+            crew = j.create(world);
+        } else if (be.getCachedState().get(ModProperties.CREW_SPAWN_TYPE) == CrewSpawnType.CUSTOM_2) {
+            String id = (ConfigUtils.config.getOrDefault("custom-crew-entity-2","minecraft:creeper"));
+            EntityType<?> j = null;
+            if (EntityType.get(id).isPresent()) {
+                j = EntityType.get(id).get();
+            }
+            assert j != null;
+            crew = j.create(world);
         }
 
         //Mixin here to add custom entities

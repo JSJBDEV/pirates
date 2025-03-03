@@ -65,6 +65,9 @@ public class ConfigUtils {
         defaults.add("cannon-firing-pause=40");
         defaults.add("#The max amount of blocks for the new ship builder, set to -1 to use the Eureka/VS version");
         defaults.add("max-ship-blocks=5000");
+        defaults.add("custom-crew-entity-0=\"minecraft:zombie\"");
+        defaults.add("custom-crew-entity-1=\"minecraft:skeleton\"");
+        defaults.add("custom-crew-entity-2=\"minecraft:creeper\"");
 
         return defaults;
     }
