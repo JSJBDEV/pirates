@@ -75,6 +75,7 @@ public class ConfigUtils {
         defaults.add("custom-crew-entity-0=\"minecraft:zombie\"");
         defaults.add("custom-crew-entity-1=\"minecraft:skeleton\"");
         defaults.add("custom-crew-entity-2=\"minecraft:creeper\"");
+        defaults.add("custom-crew-entity-3=\"minecraft:stray\"");
 
         return defaults;
     }
