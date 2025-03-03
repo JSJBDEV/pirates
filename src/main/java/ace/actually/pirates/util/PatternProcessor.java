@@ -1,14 +1,20 @@
 package ace.actually.pirates.util;
 
+import ace.actually.pirates.blocks.entity.MotionInvokingBlockEntity;
 import net.fabricmc.loader.api.FabricLoader;
 import net.minecraft.nbt.NbtList;
 import net.minecraft.nbt.NbtString;
 import org.apache.commons.io.FileUtils;
+import org.joml.Vector3d;
+import org.valkyrienskies.core.api.ships.LoadedServerShip;
+import org.valkyrienskies.mod.api.SeatedControllingPlayer;
+import org.valkyrienskies.mod.common.util.GameTickForceApplier;
 
 import java.io.File;
 import java.io.IOException;
 import java.util.Arrays;
 import java.util.List;
+import java.util.Objects;
 
 public class PatternProcessor {
 
@@ -57,6 +63,31 @@ public class PatternProcessor {
                 throw new RuntimeException(e);
             }
         }
+    }
+
+
+
+
+    /**
+     * @deprecated ship patterns are planned for removal, will be replaced with proper ship ai
+     **/
+    @Deprecated
+    public static void utiliseInternalPattern(SeatedControllingPlayer seatedControllingPlayer, MotionInvokingBlockEntity be) {
+        String[] instruction = be.getInstructions().getString(0).split(" ");
+
+        if (seatedControllingPlayer == null) return;
+        switch (instruction[0]) {
+            case "forward" -> seatedControllingPlayer.setForwardImpulse(Float.parseFloat(instruction[1]));
+            case "left" -> seatedControllingPlayer.setLeftImpulse(Float.parseFloat(instruction[1]));
+            case "right" -> seatedControllingPlayer.setLeftImpulse(-Float.parseFloat(instruction[1]));
+            case "backwards" -> seatedControllingPlayer.setForwardImpulse(-Float.parseFloat(instruction[1]));
+            case "up" -> seatedControllingPlayer.setUpImpulse(Float.parseFloat(instruction[1]));
+            case "down" -> seatedControllingPlayer.setUpImpulse(-Float.parseFloat(instruction[1]));
+        }
+
+        be.setNextInstruction(Objects.requireNonNull(be.getWorld()).getTime() + Long.parseLong(instruction[2]));
+        be.advanceInstructionList();
+        be.markDirty();
     }
 
 }

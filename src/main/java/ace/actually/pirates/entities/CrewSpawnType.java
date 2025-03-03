@@ -1,4 +1,4 @@
-package ace.actually.pirates.util;
+package ace.actually.pirates.entities;
 
 
 import net.minecraft.util.StringIdentifiable;

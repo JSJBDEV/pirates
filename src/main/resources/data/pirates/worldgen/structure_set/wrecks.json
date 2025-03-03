@@ -1,0 +1,30 @@
+{
+    "structures": [
+        {
+            "structure": "pirates:wreck0",
+            "weight": 1
+        },
+        {
+            "structure": "pirates:wreck1",
+            "weight": 1
+        },
+        {
+            "structure": "pirates:wreck2",
+            "weight": 2
+        },
+        {
+            "structure": "pirates:wreck3",
+            "weight": 1
+        }
+    ],
+    "placement": {
+        "type": "random_spread",
+        "exclusion_zone": {
+            "chunk_count": 8,
+            "other_set": "pirates:ships"
+        },
+        "spacing": 40,
+        "separation": 20,
+        "salt": 3634534
+    }
+}

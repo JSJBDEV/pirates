@@ -1,11 +1,15 @@
 {
-	"required": true,
-	"package": "ace.actually.pirates.mixin",
-	"compatibilityLevel": "JAVA_17",
-	"mixins": [
-		"FallingBlockEntityMixin"
-	],
-	"injectors": {
-		"defaultRequire": 1
+  "required": true,
+  "package": "ace.actually.pirates.mixin",
+  "compatibilityLevel": "JAVA_17",
+  "mixins": [
+    "compat.FallingBlockEntityMixin",
+    "bugfixes.SpeedMixin",
+    "shipPlacement.ServerWorldMixin",
+    "shipPlacement.StructureTemplateManagerMixin",
+    "shipPlacement.StructureTemplateMixin"
+  ],
+  "injectors": {
+    "defaultRequire": 1
 	}
 }

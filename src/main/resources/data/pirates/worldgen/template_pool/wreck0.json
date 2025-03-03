@@ -1,0 +1,15 @@
+{
+  "name": "pirates:wrecks",
+  "fallback": "minecraft:empty",
+  "elements": [
+    {
+      "weight": 2,
+      "element": {
+        "element_type": "minecraft:single_pool_element",
+        "projection": "rigid",
+        "location": "pirates:wrecked-midnight-barracuda",
+        "processors": "minecraft:empty"
+      }
+    }
+  ]
+}

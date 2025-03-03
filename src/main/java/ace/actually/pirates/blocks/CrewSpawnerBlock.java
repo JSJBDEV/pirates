@@ -2,7 +2,7 @@ package ace.actually.pirates.blocks;
 
 import ace.actually.pirates.Pirates;
 import ace.actually.pirates.blocks.entity.CrewSpawnerBlockEntity;
-import ace.actually.pirates.util.ModProperties;
+import ace.actually.pirates.entities.CrewTypes;
 import net.minecraft.block.*;
 import net.minecraft.block.entity.BlockEntity;
 import net.minecraft.block.entity.BlockEntityTicker;
@@ -30,7 +30,7 @@ public class CrewSpawnerBlock extends BlockWithEntity {
 
     @Override
     protected void appendProperties(StateManager.Builder<Block, BlockState> builder) {
-        builder.add(Properties.CONDITIONAL).add(ModProperties.CREW_SPAWN_TYPE);
+        builder.add(Properties.CONDITIONAL).add(CrewTypes.CREW_SPAWN_TYPE);
     }
 
     @Nullable

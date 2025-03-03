@@ -1,0 +1,51 @@
+modLoader = "javafml"
+loaderVersion = "[40,)"
+license = "MIT"
+
+[properties]
+"connector:placeholder"=true
+
+[[mods]]
+modId = "pirates"
+version = "1.4.2"
+displayName = "Valkyrien Pirates Forge"
+authors = ["Acrogeneous", "G_Mungus", "Quoissant"]
+description = '''
+Pirates Forge dependency layer
+'''
+logoFile = "assets/pirates/icon.png"
+
+[[dependencies.pirates]]
+modId = "forge"
+mandatory = true
+versionRange = "[40.2.4,)"
+ordering = "NONE"
+side = "BOTH"
+
+[[dependencies.pirates]]
+modId = "minecraft"
+mandatory = true
+versionRange = "[1.20.1]"
+ordering = "NONE"
+side = "BOTH"
+
+[[dependencies.pirates]]
+modId = "connectormod"
+mandatory = true
+versionRange = "*"
+ordering = "NONE"
+side = "BOTH"
+
+[[dependencies.pirates]]
+modId = "vs_eureka"
+mandatory = true
+versionRange = "*"
+ordering = "NONE"
+side = "BOTH"
+
+[[dependencies.pirates]]
+modId = "valkyrienskies"
+mandatory = true
+versionRange = "[2.1.0,)"
+ordering = "NONE"
+side = "BOTH"

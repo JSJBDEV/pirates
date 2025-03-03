@@ -25,29 +25,24 @@ public class CannonPrimingBlockEntityRenderer implements BlockEntityRenderer<Can
     public void render(CannonPrimingBlockEntity entity, float tickDelta, MatrixStack matrices, VertexConsumerProvider vertexConsumers, int light, int overlay) {
         if (entity.isRemoved()) return;
 
+        BlockState state = Objects.requireNonNull(entity.getWorld()).getBlockState(entity.getPos());
+
+        if (state.get(Properties.DISARMED)) return;
 
         BlockRenderManager blockRenderManager = MinecraftClient.getInstance().getBlockRenderManager();
 
-        BlockState state = Objects.requireNonNull(entity.getWorld()).getBlockState(entity.getPos());
-
-
         matrices.push();
 
-        matrices.translate(0.5, 1.25, 0.5);
-//        matrices.scale(0.8f, 0.8f, 0.8f);
+        matrices.translate(0.5, 1.2501, 0.5);
 
         double rotationValue = (state.get(Properties.FACING).asRotation() * PI / 180) + entity.randomRotation + PI / 8;
         matrices.multiply(new Quaternionf(cos(rotationValue / 2), 0, sin(rotationValue / 2), 0));
-        //matrices.multiply(new Quaternionf(0, 0, 1, 0));
 
         matrices.multiply(new Quaternionf(cos(PI / 4), sin(PI / 4), 0, 0));
-
-
         matrices.translate(-0.5 + 0.1875, -0.25, -0.5);
 
-        if (!state.get(Properties.DISARMED)) {
-            blockRenderManager.renderBlockAsEntity(Blocks.TORCH.getDefaultState(), matrices, vertexConsumers, 255, overlay);
-        }
+        blockRenderManager.renderBlockAsEntity(Blocks.TORCH.getDefaultState(), matrices, vertexConsumers, 255, overlay);
+
 
         matrices.pop();
 

@@ -8,6 +8,7 @@ import net.minecraft.block.entity.BlockEntity;
 import net.minecraft.state.property.Properties;
 import net.minecraft.util.hit.BlockHitResult;
 import net.minecraft.util.math.*;
+import net.minecraft.world.GameRules;
 import net.minecraft.world.RaycastContext;
 import net.minecraft.world.World;
 import org.valkyrienskies.mod.common.VSGameUtilsKt;
@@ -67,7 +68,9 @@ public class CannonPrimingBlockEntity extends BlockEntity {
         {
             cooldownConfig = Integer.parseInt(ConfigUtils.config.getOrDefault("cannon-firing-pause","40"));
         }
-        fire(world, pos, state, cooldownConfig + (int) (Math.random() * 20));
+        if(world.getGameRules().getBoolean(Pirates.PIRATES_IS_LIVE_WORLD)) {
+            fire(world, pos, state, cooldownConfig + (int) (Math.random() * 20));
+        }
     }
 
 

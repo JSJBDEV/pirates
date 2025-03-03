@@ -53,14 +53,7 @@ public class SkeletonPirateEntity extends AbstractPirateEntity implements Ranged
     @Override
     protected void initGoals() {
         super.initGoals();
-        this.goalSelector.add(5, new PirateWanderArroundFarGoal(this, 1.0D));
-        this.goalSelector.add(6, new LookAtEntityGoal(this, PlayerEntity.class, 200.0F));
-        this.goalSelector.add(6, new LookAroundGoal(this));
         this.goalSelector.add(3, new PirateBowAttackGoal<>(this, 1.0D, 20, 20.0F));
-        //this.targetSelector.add(1, new RevengeGoal(this, new Class[0]));
-        this.targetSelector.add(1, new ActiveTargetGoal<>(this, PlayerEntity.class, true));
-        this.targetSelector.add(3, new ActiveTargetGoal(this, MerchantEntity.class, false));
-        this.targetSelector.add(3, new ActiveTargetGoal(this, IronGolemEntity.class, true));
     }
 
     @Override

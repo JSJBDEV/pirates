@@ -3,10 +3,17 @@ package ace.actually.pirates.entities.pirate_abstract;
 import ace.actually.pirates.Pirates;
 import ace.actually.pirates.blocks.CannonPrimingBlock;
 import ace.actually.pirates.blocks.MotionInvokingBlock;
+import ace.actually.pirates.events.IPirateDies;
 import net.minecraft.entity.EntityData;
 import net.minecraft.entity.EntityType;
 import net.minecraft.entity.SpawnReason;
+import net.minecraft.entity.ai.goal.ActiveTargetGoal;
+import net.minecraft.entity.ai.goal.LookAroundGoal;
+import net.minecraft.entity.ai.goal.LookAtEntityGoal;
 import net.minecraft.entity.mob.HostileEntity;
+import net.minecraft.entity.passive.IronGolemEntity;
+import net.minecraft.entity.passive.MerchantEntity;
+import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.nbt.NbtCompound;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.world.LocalDifficulty;
@@ -41,6 +48,18 @@ public abstract class AbstractPirateEntity  extends HostileEntity {
     }
 
     @Override
+    protected void initGoals() {
+        super.initGoals();
+        this.goalSelector.add(5, new PirateWanderArroundFarGoal(this, 1.0D));
+        this.goalSelector.add(6, new LookAtEntityGoal(this, PlayerEntity.class, 200.0F));
+        this.goalSelector.add(6, new LookAroundGoal(this));
+        //this.targetSelector.add(1, new RevengeGoal(this, new Class[0]));
+        this.targetSelector.add(1, new ActiveTargetGoal<>(this, PlayerEntity.class, true));
+        this.targetSelector.add(3, new ActiveTargetGoal(this, MerchantEntity.class, false));
+        this.targetSelector.add(3, new ActiveTargetGoal(this, IronGolemEntity.class, true));
+    }
+
+    @Override
     public void remove(RemovalReason reason) {
         disableSavedBlock();
         super.remove(reason);
@@ -48,10 +67,12 @@ public abstract class AbstractPirateEntity  extends HostileEntity {
 
     private void disableSavedBlock() {
         if (!Objects.equals(blockToDisable, new BlockPos(0, 0, 0))) {
+            IPirateDies.EVENT.invoker().interact(attackingPlayer,this);
             if (this.getWorld().getBlockState(blockToDisable).isOf(Pirates.CANNON_PRIMING_BLOCK)) {
                 CannonPrimingBlock.disarm(this.getWorld(), blockToDisable);
             } else if (this.getWorld().getBlockState(blockToDisable).isOf(Pirates.MOTION_INVOKING_BLOCK)) {
                 MotionInvokingBlock.disarm(this.getWorld(), blockToDisable);
+
             }
         }
     }
@@ -81,5 +102,4 @@ public abstract class AbstractPirateEntity  extends HostileEntity {
             this.blockToDisable = new BlockPos(x, y, z);
         }
     }
-
 }

@@ -1,8 +1,12 @@
 package ace.actually.pirates.blocks.entity;
 
 import ace.actually.pirates.Pirates;
+import ace.actually.pirates.entities.pirate_abstract.AbstractPirateEntity;
 import ace.actually.pirates.entities.pirate_default.PirateEntity;
 import ace.actually.pirates.entities.pirate_skeleton.SkeletonPirateEntity;
+import ace.actually.pirates.events.IPirateSpawns;
+import ace.actually.pirates.entities.CrewSpawnType;
+import ace.actually.pirates.entities.CrewTypes;
 import ace.actually.pirates.util.ConfigUtils;
 import ace.actually.pirates.util.CrewSpawnType;
 import ace.actually.pirates.util.ModProperties;
@@ -12,8 +16,6 @@ import net.minecraft.enchantment.Enchantments;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.EntityType;
 import net.minecraft.entity.EquipmentSlot;
-import net.minecraft.entity.mob.MobEntity;
-import net.minecraft.entity.passive.AllayEntity;
 import net.minecraft.entity.passive.VillagerEntity;
 import net.minecraft.item.ItemStack;
 import net.minecraft.item.Items;
@@ -68,8 +70,13 @@ public class CrewSpawnerBlockEntity extends BlockEntity {
         Entity crew = getEntityFromState(world, be);
 
         if (crew != null) {
-            crew.setPosition(be.getPos().toCenterPos());
+            crew.setPosition(be.getPos().toCenterPos().add(0,-0.5,0));
             world.spawnEntity(crew);
+            if(crew instanceof AbstractPirateEntity ape)
+            {
+                IPirateSpawns.EVENT.invoker().interact(ape);
+            }
+
         }
 
         world.breakBlock(be.getPos(), false);
@@ -106,14 +113,14 @@ public class CrewSpawnerBlockEntity extends BlockEntity {
 
     private static Entity getEntityFromState(World world, BlockEntity be) {
         Entity crew = null;
-        if (be.getCachedState().get(ModProperties.CREW_SPAWN_TYPE) == CrewSpawnType.PIRATE) {
+        if (be.getCachedState().get(CrewTypes.CREW_SPAWN_TYPE) == CrewSpawnType.PIRATE) {
             crew = new PirateEntity(world, checkForBlocksToCrew(world, be.getPos()));
             crew.equipStack(EquipmentSlot.MAINHAND, new ItemStack(Items.BOW));
-        } else if (be.getCachedState().get(ModProperties.CREW_SPAWN_TYPE) == CrewSpawnType.VILLAGER) {
+        } else if (be.getCachedState().get(CrewTypes.CREW_SPAWN_TYPE) == CrewSpawnType.VILLAGER) {
             crew = new VillagerEntity(EntityType.VILLAGER, world, VillagerType.forBiome(world.getBiome(be.getPos())));
-        } else if (be.getCachedState().get(ModProperties.CREW_SPAWN_TYPE) == CrewSpawnType.SKELETON_PIRATE) {
+        } else if (be.getCachedState().get(CrewTypes.CREW_SPAWN_TYPE) == CrewSpawnType.SKELETON_PIRATE) {
             BlockPos blockToCrew = checkForBlocksToCrew(world, be.getPos());
-            crew = new SkeletonPirateEntity(world, blockToCrew);
+            crew = new PirateEntity(world, blockToCrew);
             ItemStack itemStack = new ItemStack(Items.BOW);
             if (world.getBlockState(blockToCrew).isOf(Pirates.MOTION_INVOKING_BLOCK)) {
                 itemStack.addEnchantment(Enchantments.POWER, 2);

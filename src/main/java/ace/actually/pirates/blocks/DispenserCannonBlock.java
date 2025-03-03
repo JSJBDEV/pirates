@@ -32,7 +32,7 @@ public class DispenserCannonBlock extends DispenserBlock {
             return new CannonDispenserBehavior() {
                 @Override
                 protected ProjectileEntity createProjectile(World world, Position position, ItemStack stack) {
-                    ShotEntity qentity = Util.make(new ShotEntity(Pirates.SHOT_ENTITY_TYPE,world,null,Pirates.CANNONBALL_ENT,2,""), (entity) -> {});
+                    ShotEntity qentity = Util.make(new ShotEntity(Pirates.SHOT_ENTITY_TYPE,world,null,Pirates.CANNONBALL_ENT,6,""), (entity) -> {});
                     qentity.setPosition(new Vec3d(position.getX(),position.getY(),position.getZ()));
                     return qentity;
                 }

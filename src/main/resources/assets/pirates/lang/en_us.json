@@ -1,5 +1,6 @@
 {
   "item.pirates.cannonball": "Cannonball",
+  "item.pirates.ship_pointer": "Ship Pointer",
   "block.pirates.cannon_priming_block": "Cannon Activator",
   "block.pirates.motion_invoking_block": "Motion Invoker",
   "block.pirates.crew_spawner_block": "Crew Spawner",

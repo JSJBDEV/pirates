@@ -19,8 +19,9 @@ import net.minecraft.world.World;
 
 public class ShotEntity extends ThrownItemEntity implements FlyingItemEntity {
     private LivingEntity in;
-    private float damage=1;
+    private float damage=6;
     private String extra="";
+    private int tickAge = 0;
 
 
     public ShotEntity(EntityType<? extends ThrownItemEntity> entityType, World world, LivingEntity caster, Item toShow, float damageTo, String special) {
@@ -29,9 +30,8 @@ public class ShotEntity extends ThrownItemEntity implements FlyingItemEntity {
         setItem(new ItemStack(toShow));
         damage=damageTo;
         extra=special;
-        //setNoGravity(false);
-
     }
+
     public ShotEntity(World world)
     {
         super(Pirates.SHOT_ENTITY_TYPE, world);
@@ -39,6 +39,14 @@ public class ShotEntity extends ThrownItemEntity implements FlyingItemEntity {
 
     @Override
     public void tick () {
+        if (this.tickAge > 500) {
+            if (!this.getWorld().isClient()) {
+                explode();
+            }
+        } else {
+            this.tickAge++;
+        }
+
         if (!getWorld().isClient() && getVelocity().length() > 0.85) {
             ((ServerWorld)getWorld()).spawnParticles(ParticleTypes.CLOUD, getX(), getY(), getZ(), 1, 0, 0, 0, 0);
         }
@@ -49,8 +57,7 @@ public class ShotEntity extends ThrownItemEntity implements FlyingItemEntity {
     protected void onCollision(HitResult hitResult) {
         super.onCollision(hitResult);
         if (!this.getWorld().isClient) {
-            this.getWorld().createExplosion(this, this.getX(), this.getY(), this.getZ(), 2.2f, false, World.ExplosionSourceType.BLOCK);
-            this.discard();
+            explode();
         }
     }
 
@@ -58,7 +65,15 @@ public class ShotEntity extends ThrownItemEntity implements FlyingItemEntity {
     protected void onEntityHit(EntityHitResult entityHitResult) {
         super.onEntityHit(entityHitResult);
         Entity entity = entityHitResult.getEntity();
-        entity.damage(this.getDamageSources().explosion(null), 6.0f);
+        entity.damage(this.getDamageSources().explosion(null), damage);
+        if (!this.getWorld().isClient) {
+            explode();
+        }
+    }
+
+    private void explode() {
+        this.getWorld().createExplosion(this, this.getX(), this.getY(), this.getZ(), Pirates.baseShotPower, extra.contains("fire"), World.ExplosionSourceType.TNT);
+        this.discard();
     }
 
     @Override

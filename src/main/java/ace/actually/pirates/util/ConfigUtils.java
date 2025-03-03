@@ -64,6 +64,13 @@ public class ConfigUtils {
         defaults.add("#general config for Valkyrien Pirates");
         defaults.add("cannon-firing-pause=40");
         defaults.add("#The max amount of blocks for the new ship builder, set to -1 to use the Eureka/VS version");
+        defaults.add("max-ship-blocks=-1");
+        defaults.add("#how many ticks should it take for an NPC controlled ship to change its target position, default 50");
+        defaults.add("controlled-ship-updates=100");
+        defaults.add("#Base power for cannonball shot entity, default=2.2");
+        defaults.add("base-shot-power=2.2");
+        defaults.add("#Based squared distance to trigger NPC ship pursuit default=10000");
+        defaults.add("pursuit-distance=10000");
         defaults.add("max-ship-blocks=5000");
         defaults.add("custom-crew-entity-0=\"minecraft:zombie\"");
         defaults.add("custom-crew-entity-1=\"minecraft:skeleton\"");
