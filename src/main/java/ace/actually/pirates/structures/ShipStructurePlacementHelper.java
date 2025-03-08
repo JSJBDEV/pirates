@@ -35,12 +35,24 @@ public class ShipStructurePlacementHelper {
         if (blacklist.contains(blockPos)) return;
         blacklist.add(blockPos);
 
-
-        ServerShip newShip = VSGameUtilsKt.getShipObjectWorld(world).createNewShipAtBlock(
-                VectorConversionsMCKt.toJOML(withOceanYLevel(world, blockPos).up(structureTemplate.getSize().getY()/7)),
-                false,
-                1.0,
-                VSGameUtilsKt.getDimensionId(world));
+        ServerShip newShip;
+        //System.out.println(structureTemplate.getAuthor());
+        if(structureTemplate.getAuthor().contains("dirtyf"))
+        {
+            newShip = VSGameUtilsKt.getShipObjectWorld(world).createNewShipAtBlock(
+                    VectorConversionsMCKt.toJOML(blockPos.up(structureTemplate.getSize().getY()/7)),
+                    false,
+                    1.0,
+                    VSGameUtilsKt.getDimensionId(world));
+        }
+        else
+        {
+            newShip = VSGameUtilsKt.getShipObjectWorld(world).createNewShipAtBlock(
+                    VectorConversionsMCKt.toJOML(withOceanYLevel(world, blockPos).up(structureTemplate.getSize().getY()/7)),
+                    false,
+                    1.0,
+                    VSGameUtilsKt.getDimensionId(world));
+        }
 
         newShip.setStatic(true);
 
@@ -52,7 +64,7 @@ public class ShipStructurePlacementHelper {
 
         Pirates.LOGGER.info("new ship id: {} mass: {}", newShip.getId(), newShip.getInertiaData().getMass());
         Pirates.LOGGER.info("Template claims to have generated successfully? {}", success);
-        if (newShip.getInertiaData().getMass() < 0.1) {
+        if (newShip.getInertiaData().getMass() < 0.1 || (!Pirates.shouldEnableFlyingPirates && structureTemplate.getAuthor().contains("dirtyf"))) {
             System.out.println("deleting ship");
             VSGameUtilsKt.getShipObjectWorld(world).deleteShip(newShip);
         } else {

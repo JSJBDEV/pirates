@@ -111,51 +111,64 @@ public class CrewSpawnerBlockEntity extends BlockEntity {
 
     private static Entity getEntityFromState(World world, BlockEntity be) {
         Entity crew = null;
-        if (be.getCachedState().get(CrewTypes.CREW_SPAWN_TYPE) == CrewSpawnType.PIRATE) {
-            crew = new PirateEntity(world, checkForBlocksToCrew(world, be.getPos()));
-            crew.equipStack(EquipmentSlot.MAINHAND, new ItemStack(Items.BOW));
-        } else if (be.getCachedState().get(CrewTypes.CREW_SPAWN_TYPE) == CrewSpawnType.VILLAGER) {
-            crew = new VillagerEntity(EntityType.VILLAGER, world, VillagerType.forBiome(world.getBiome(be.getPos())));
-        } else if (be.getCachedState().get(CrewTypes.CREW_SPAWN_TYPE) == CrewSpawnType.SKELETON_PIRATE) {
-            BlockPos blockToCrew = checkForBlocksToCrew(world, be.getPos());
-            crew = new PirateEntity(world, blockToCrew);
-            ItemStack itemStack = new ItemStack(Items.BOW);
-            if (world.getBlockState(blockToCrew).isOf(Pirates.MOTION_INVOKING_BLOCK)) {
-                itemStack.addEnchantment(Enchantments.POWER, 2);
+        switch (be.getCachedState().get(CrewTypes.CREW_SPAWN_TYPE))
+        {
+            case PIRATE ->
+            {
+                crew = new PirateEntity(world, checkForBlocksToCrew(world, be.getPos()));
+                crew.equipStack(EquipmentSlot.MAINHAND, new ItemStack(Items.BOW));
             }
-            crew.equipStack(EquipmentSlot.MAINHAND, itemStack);
-        } else if (be.getCachedState().get(CrewTypes.CREW_SPAWN_TYPE) == CrewSpawnType.CUSTOM_0) {
-            String id = (ConfigUtils.config.getOrDefault("custom-crew-entity-0","minecraft:zombie"));
-            EntityType<?> j = null;
-            if (EntityType.get(id).isPresent()) {
-                j = EntityType.get(id).get();
+            case VILLAGER ->  crew = new VillagerEntity(EntityType.VILLAGER, world, VillagerType.forBiome(world.getBiome(be.getPos())));
+            case SKELETON_PIRATE ->
+            {
+                BlockPos blockToCrew = checkForBlocksToCrew(world, be.getPos());
+                crew = new PirateEntity(world, blockToCrew);
+                ItemStack itemStack = new ItemStack(Items.BOW);
+                if (world.getBlockState(blockToCrew).isOf(Pirates.MOTION_INVOKING_BLOCK)) {
+                    itemStack.addEnchantment(Enchantments.POWER, 2);
+                }
+                crew.equipStack(EquipmentSlot.MAINHAND, itemStack);
             }
-            assert j != null;
-            crew = j.create(world);
-        } else if (be.getCachedState().get(CrewTypes.CREW_SPAWN_TYPE) == CrewSpawnType.CUSTOM_1) {
-            String id = (ConfigUtils.config.getOrDefault("custom-crew-entity-1","minecraft:skeleton"));
-            EntityType<?> j = null;
-            if (EntityType.get(id).isPresent()) {
-                j = EntityType.get(id).get();
+            case CUSTOM_0 ->
+            {
+                String id = (ConfigUtils.config.getOrDefault("custom-crew-entity-0","minecraft:zombie"));
+                EntityType<?> j = null;
+                if (EntityType.get(id).isPresent()) {
+                    j = EntityType.get(id).get();
+                }
+                assert j != null;
+                crew = j.create(world);
             }
-            assert j != null;
-            crew = j.create(world);
-        } else if (be.getCachedState().get(CrewTypes.CREW_SPAWN_TYPE) == CrewSpawnType.CUSTOM_2) {
-            String id = (ConfigUtils.config.getOrDefault("custom-crew-entity-2","minecraft:creeper"));
-            EntityType<?> j = null;
-            if (EntityType.get(id).isPresent()) {
-                j = EntityType.get(id).get();
+            case CUSTOM_1 ->
+            {
+                String id = (ConfigUtils.config.getOrDefault("custom-crew-entity-0","minecraft:skeleton"));
+                EntityType<?> j = null;
+                if (EntityType.get(id).isPresent()) {
+                    j = EntityType.get(id).get();
+                }
+                assert j != null;
+                crew = j.create(world);
             }
-            assert j != null;
-            crew = j.create(world);
-        } else if (be.getCachedState().get(CrewTypes.CREW_SPAWN_TYPE) == CrewSpawnType.CUSTOM_3) {
-            String id = (ConfigUtils.config.getOrDefault("custom-crew-entity-3","minecraft:stray"));
-            EntityType<?> j = null;
-            if (EntityType.get(id).isPresent()) {
-                j = EntityType.get(id).get();
+            case CUSTOM_2 ->
+            {
+                String id = (ConfigUtils.config.getOrDefault("custom-crew-entity-0","minecraft:creeper"));
+                EntityType<?> j = null;
+                if (EntityType.get(id).isPresent()) {
+                    j = EntityType.get(id).get();
+                }
+                assert j != null;
+                crew = j.create(world);
             }
-            assert j != null;
-            crew = j.create(world);
+            case CUSTOM_3 ->
+            {
+                String id = (ConfigUtils.config.getOrDefault("custom-crew-entity-0","minecraft:stray"));
+                EntityType<?> j = null;
+                if (EntityType.get(id).isPresent()) {
+                    j = EntityType.get(id).get();
+                }
+                assert j != null;
+                crew = j.create(world);
+            }
         }
 
         //Mixin here to add custom entities

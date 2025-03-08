@@ -26,16 +26,24 @@ public abstract class StructureTemplateMixin {
         try {
             if (VSGameUtilsKt.isBlockInShipyard(world.toServerWorld(), pos)) return;
 
-            if (this.author.equals("pirate-ship")) {
+            if (this.author.contains("pirate-ship")) {
                 ShipStructurePlacementHelper.placeShipTemplate(
                         (StructureTemplate) (Object) this,
                         world.toServerWorld(),
                         pos);
 
-                this.setAuthor("dirty");
+                if(this.author.contains("flying"))
+                {
+                    this.setAuthor("dirtyf");
+                }
+                else
+                {
+                    this.setAuthor("dirty");
+                }
+
                 cir.setReturnValue(true);
                 cir.cancel();
-            } else if (this.author.equals("dirty")) {
+            } else if (this.author.contains("dirty")) {
                 cir.setReturnValue(false);
                 cir.cancel();
             }

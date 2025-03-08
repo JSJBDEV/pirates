@@ -43,7 +43,7 @@ public abstract class AbstractPirateEntity  extends HostileEntity {
     public EntityData initialize(ServerWorldAccess world, LocalDifficulty difficulty, SpawnReason spawnReason, EntityData entityData, NbtCompound entityTag) {
         entityData = super.initialize(world, difficulty, spawnReason, entityData, entityTag);
         initEquipment(random, difficulty);
-
+        setPersistent();
         return entityData;
     }
 

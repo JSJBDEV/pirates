@@ -59,6 +59,7 @@ public class Pirates implements ModInitializer {
 
 	public static float baseShotPower;
 	public static int pursuitDistance;
+	public static boolean shouldEnableFlyingPirates;
 
 	@Override
 	public void onInitialize() {
@@ -66,6 +67,7 @@ public class Pirates implements ModInitializer {
 		ConfigUtils.checkConfigs();
 		baseShotPower = Float.parseFloat(ConfigUtils.config.getOrDefault("base-shot-power","2.2"));
 		pursuitDistance = Integer.parseInt(ConfigUtils.config.getOrDefault("pursuit-distance","10000"));
+		shouldEnableFlyingPirates = ConfigUtils.config.getOrDefault("should-enable-flying-pirates","false").equals("true");
 		registerEntityThings();
 		//entity types do it themselves
 		registerBlocks();

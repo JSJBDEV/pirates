@@ -29,8 +29,17 @@ public abstract class StructureTemplateManagerMixin implements CanRemoveTemplate
 
         Optional<StructureTemplate> template = this.templates.computeIfAbsent(id, this::loadTemplate);
 
-        if (template.isPresent() && !template.get().getAuthor().equals("dirty") && id.getNamespace().equals("pirates") && id.getPath().startsWith("ship/")) {
-            template.get().setAuthor("pirate-ship");
+        if (template.isPresent() && !template.get().getAuthor().contains("dirty") && id.getNamespace().equals("pirates")) {
+            //System.out.println(id);
+            if(id.getPath().startsWith("ship/"))
+            {
+                template.get().setAuthor("pirate-ship");
+            }
+            else if(id.getPath().startsWith("flyingship/"))
+            {
+                template.get().setAuthor("flying-pirate-ship");
+            }
+
         }
 
         cir.setReturnValue(template);
