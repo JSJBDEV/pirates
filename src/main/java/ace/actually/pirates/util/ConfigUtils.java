@@ -74,10 +74,10 @@ public class ConfigUtils {
         defaults.add("#Planned for removal: max size of ship in blocks to spawn as a pirate ship");
         defaults.add("max-ship-blocks=5000");
         defaults.add("#Custom crew from config");
-        defaults.add("custom-crew-entity-0=\"minecraft:zombie\"");
-        defaults.add("custom-crew-entity-1=\"minecraft:skeleton\"");
-        defaults.add("custom-crew-entity-2=\"minecraft:creeper\"");
-        defaults.add("custom-crew-entity-3=\"minecraft:stray\"");
+        defaults.add("custom-crew-entity-0=minecraft:zombie");
+        defaults.add("custom-crew-entity-1=minecraft:skeleton");
+        defaults.add("custom-crew-entity-2=minecraft:creeper");
+        defaults.add("custom-crew-entity-3=minecraft:stray");
         defaults.add("#Whether flying pirates should spawn in the world or not (default true) BETA!");
         defaults.add("should-enable-flying-pirates=false");
 

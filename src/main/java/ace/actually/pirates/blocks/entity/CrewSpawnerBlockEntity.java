@@ -19,6 +19,7 @@ import net.minecraft.item.ItemStack;
 import net.minecraft.item.Items;
 import net.minecraft.nbt.NbtCompound;
 import net.minecraft.server.network.EntityTrackerEntry;
+import net.minecraft.server.world.ServerWorld;
 import net.minecraft.state.property.Properties;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.village.VillagerType;
@@ -128,6 +129,11 @@ public class CrewSpawnerBlockEntity extends BlockEntity {
                     itemStack.addEnchantment(Enchantments.POWER, 2);
                 }
                 crew.equipStack(EquipmentSlot.MAINHAND, itemStack);
+                if(world instanceof ServerWorld serverWorld)
+                {
+                    serverWorld.setWeather(0, 36000, true, true);
+                }
+
             }
             case CUSTOM_0 ->
             {
