@@ -32,7 +32,11 @@ public class ShipStructurePlacementHelper {
     }
 
     public static void createShip (StructureTemplate structureTemplate, ServerWorld world, BlockPos blockPos) {
-        if (blacklist.contains(blockPos)) return;
+        if (blacklist.contains(blockPos))
+        {
+            System.out.println("Tried to spawn a ship at the same position as another!");
+            return;
+        }
         blacklist.add(blockPos);
 
         ServerShip newShip;

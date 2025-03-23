@@ -9,10 +9,10 @@ import ace.actually.pirates.entities.shot.ShotEntity;
 import ace.actually.pirates.entities.pirate_default.PirateEntity;
 import ace.actually.pirates.entities.pirate_skeleton.SkeletonPirateEntity;
 import ace.actually.pirates.events.IPirateDies;
+import ace.actually.pirates.items.ShipPather;
 import ace.actually.pirates.items.ShipPointer;
 import ace.actually.pirates.sound.ModSounds;
 import ace.actually.pirates.util.ConfigUtils;
-import ace.actually.pirates.util.PatternProcessor;
 import net.fabricmc.api.ModInitializer;
 import net.fabricmc.fabric.api.gamerule.v1.GameRuleFactory;
 import net.fabricmc.fabric.api.gamerule.v1.GameRuleRegistry;
@@ -74,7 +74,6 @@ public class Pirates implements ModInitializer {
 		registerItems();
 		//block entities do it themselves
 		//registerDispenserThings();
-		PatternProcessor.setupBasicPatterns();
 		ModSounds.registerSounds();
 		LOGGER.info("Let there be motion!");
 
@@ -85,11 +84,13 @@ public class Pirates implements ModInitializer {
 			itemGroup.add(Pirates.CANNON_PRIMING_BLOCK.asItem());
 			itemGroup.add(Pirates.CREW_SPAWNER_BLOCK.asItem());
 			itemGroup.add(Pirates.MOTION_INVOKING_BLOCK.asItem());
+			itemGroup.add(Pirates.SHIP_POINTER);
+			itemGroup.add(Pirates.SHIP_PATHER);
 		});
 
 		IPirateDies.EVENT.register((player, pirate) ->
 		{
-			System.out.println(pirate.getUuidAsString());
+			//System.out.println(pirate.getUuidAsString());
 			return ActionResult.PASS;
 		});
 
@@ -127,11 +128,13 @@ public class Pirates implements ModInitializer {
 	public static final Item CANNONBALL = new Item(new Item.Settings());
 	public static final Item CANNONBALL_ENT = new Item(new Item.Settings());
 	public static final ShipPointer SHIP_POINTER = new ShipPointer(new Item.Settings());
+	public static final ShipPather SHIP_PATHER = new ShipPather(new Item.Settings());
 	private void registerItems()
 	{
 		Registry.register(Registries.ITEM,new Identifier("pirates","cannonball"),CANNONBALL);
 		Registry.register(Registries.ITEM,new Identifier("util_pirates","util_1"),CANNONBALL_ENT);
 		Registry.register(Registries.ITEM,new Identifier("pirates","ship_pointer"),SHIP_POINTER);
+		Registry.register(Registries.ITEM,new Identifier("pirates","ship_pather"),SHIP_PATHER);
 		Registry.register(Registries.ITEM,new Identifier("pirates","stable_block"),new BlockItem(STABLE_BLOCK,new Item.Settings()));
 
 		Registry.register(Registries.ITEM,new Identifier("pirates","cannon_priming_block"),new BlockItem(CANNON_PRIMING_BLOCK,new Item.Settings()));

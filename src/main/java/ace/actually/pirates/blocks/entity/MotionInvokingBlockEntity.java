@@ -1,15 +1,14 @@
 package ace.actually.pirates.blocks.entity;
 
+import ace.actually.pirates.blocks.MotionInvokingBlock;
 import ace.actually.pirates.util.ConfigUtils;
 import ace.actually.pirates.util.EurekaCompat;
-import ace.actually.pirates.util.PatternProcessor;
 import ace.actually.pirates.Pirates;
-import net.fabricmc.fabric.api.datagen.v1.provider.FabricTagProvider;
 import net.minecraft.block.BlockState;
 import net.minecraft.block.entity.BlockEntity;
 import net.minecraft.nbt.NbtCompound;
+import net.minecraft.nbt.NbtIntArray;
 import net.minecraft.nbt.NbtList;
-import net.minecraft.particle.ParticleTypes;
 import net.minecraft.server.world.ServerWorld;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.ChunkPos;
@@ -18,8 +17,6 @@ import org.joml.Vector3d;
 import org.joml.Vector3dc;
 import org.valkyrienskies.core.api.ships.LoadedServerShip;
 import org.valkyrienskies.core.api.ships.Ship;
-import org.valkyrienskies.eureka.EurekaBlocks;
-import org.valkyrienskies.eureka.fabric.EurekaBlockTagsProvider;
 import org.valkyrienskies.mod.api.SeatedControllingPlayer;
 import org.valkyrienskies.mod.common.VSGameUtilsKt;
 import org.valkyrienskies.mod.common.util.GameTickForceApplier;
@@ -29,7 +26,7 @@ import java.util.List;
 import static net.minecraft.state.property.Properties.HORIZONTAL_FACING;
 
 public class MotionInvokingBlockEntity extends BlockEntity {
-    NbtList instructions = new NbtList();
+    NbtList path = new NbtList();
     long nextInstruction = 0;
     String compat = "Eureka";
 
@@ -38,9 +35,6 @@ public class MotionInvokingBlockEntity extends BlockEntity {
     double ldx = -1; //last distance tracked along the x-axis, from the target
     double ldz = -1; //last distance tracked along the z-axis, from the target
 
-    public NbtList getInstructions() {return instructions;}
-    public void setNextInstruction(long nextInstruction) {this.nextInstruction = nextInstruction;}
-    public void advanceInstructionList() {instructions.add(instructions.remove(0));}
 
     private static int updateTicks = -1;
 
@@ -55,6 +49,8 @@ public class MotionInvokingBlockEntity extends BlockEntity {
 
     public static void tick(World world, BlockPos pos, BlockState state, MotionInvokingBlockEntity be) {
 
+        if(!state.get(MotionInvokingBlock.ARMED)) return;
+
         if (be.compat.equals("Eureka") && EurekaCompat.isHelm(state)) {
             return;
         }
@@ -63,29 +59,15 @@ public class MotionInvokingBlockEntity extends BlockEntity {
             updateTicks = Integer.parseInt(ConfigUtils.config.getOrDefault("controlled-ship-updates","100"));
 
         }
-
-        if (be.instructions.isEmpty() && world.getGameRules().getBoolean(Pirates.PIRATES_IS_LIVE_WORLD)) {
-
-            if(world.random.nextBoolean())
-            {
-                be.setPattern("circle.pattern");
-            }
-            else
-            {
-                be.setPattern("rcircle.pattern");
-            }
-
-        }
         if (!world.isClient && world.getGameRules().getBoolean(Pirates.PIRATES_IS_LIVE_WORLD) && world.getTime() >= be.nextInstruction) {
 
-            if (VSGameUtilsKt.isBlockInShipyard(world, pos)) {
-
-
+            if (VSGameUtilsKt.isBlockInShipyard(world, pos))
+            {
                 ChunkPos chunkPos = world.getChunk(pos).getPos();
                 LoadedServerShip ship = VSGameUtilsKt.getShipObjectManagingPos((ServerWorld) world, chunkPos);
 
-
-                if (ship != null) {
+                if (ship != null)
+                {
                     ship.setStatic(false);
                     SeatedControllingPlayer seatedControllingPlayer = ship.getAttachment(SeatedControllingPlayer.class);
                     if (seatedControllingPlayer == null && be.compat.equals("Eureka") && world.getBlockState(pos.up()).contains(HORIZONTAL_FACING))
@@ -96,18 +78,34 @@ public class MotionInvokingBlockEntity extends BlockEntity {
 
                     if(world.getTimeOfDay()%updateTicks==0)
                     {
-                        List<Ship> ships = VSGameUtilsKt.getAllShips(world).stream().filter(a->
+                        if(be.path.isEmpty())
                         {
-                            if(a.getId()==ship.getId()) return false;
-                            Vector3dc f1 = ship.getTransform().getPositionInWorld();
-                            Vector3dc f2 = a.getTransform().getPositionInWorld();
-                            return f1.distanceSquared(f2)<Pirates.pursuitDistance;
-                        }).toList();
-                        if(!ships.isEmpty())
-                        {
-                            Vector3dc o = ships.get(0).getTransform().getPositionInWorld();
-                            be.setTarget(new int[]{(int) o.x(), (int) o.y(), (int) o.z()});
+                            List<Ship> ships = VSGameUtilsKt.getAllShips(world).stream().filter(a->
+                            {
+                                if(a.getId()==ship.getId()) return false;
+                                Vector3dc f1 = ship.getTransform().getPositionInWorld();
+                                Vector3dc f2 = a.getTransform().getPositionInWorld();
+                                return f1.distanceSquared(f2)<Pirates.pursuitDistance;
+                            }).toList();
+                            if(!ships.isEmpty())
+                            {
+                                Vector3dc o = ships.get(0).getTransform().getPositionInWorld();
+                                be.setTarget(new int[]{(int) o.x(), (int) o.y(), (int) o.z()});
+                            }
                         }
+                        else
+                        {
+                            int[] v = be.path.getIntArray(0);
+                            be.setTarget(v);
+                            Vector3dc f1 = ship.getTransform().getPositionInWorld();
+                            Vector3dc f2 = new Vector3d(v[0],v[1],v[2]);
+                            if(f1.distanceSquared(f2)<100)
+                            {
+                                NbtIntArray nbtInts = (NbtIntArray) be.path.remove(0);
+                                be.path.add(nbtInts);
+                            }
+                        }
+
                     }
 
                     switch (be.compat)
@@ -125,8 +123,8 @@ public class MotionInvokingBlockEntity extends BlockEntity {
 
     @Override
     protected void writeNbt(NbtCompound nbt) {
+        nbt.put("path",path);
         nbt.putLong("nextInstruction", nextInstruction);
-        nbt.put("instructions", instructions);
         nbt.putIntArray("target",target);
         nbt.putString("compat",compat);
         super.writeNbt(nbt);
@@ -135,8 +133,12 @@ public class MotionInvokingBlockEntity extends BlockEntity {
     @Override
     public void readNbt(NbtCompound nbt) {
         super.readNbt(nbt);
-        instructions = (NbtList) nbt.get("instructions");
         nextInstruction = nbt.getLong("nextInstruction");
+        if(nbt.contains("path"))
+        {
+            path = (NbtList) nbt.get("path");
+        }
+
         if(nbt.contains("compat"))
         {
             compat = nbt.getString("compat");
@@ -146,13 +148,6 @@ public class MotionInvokingBlockEntity extends BlockEntity {
             target = nbt.getIntArray("target");
         }
 
-    }
-
-
-    public void setPattern(String loc) {
-        instructions = PatternProcessor.loadPattern(loc);
-        nextInstruction = world.getTime() + 10;
-        markDirty();
     }
 
     public void setTarget(int[] target) {
@@ -184,6 +179,19 @@ public class MotionInvokingBlockEntity extends BlockEntity {
         this.ldz = ldz;
     }
 
+    public NbtList getPath() {
+        return path;
+    }
+
+    public void setPath(NbtList path) {
+        this.path = path;
+        markDirty();
+    }
+    public void addPathNode(BlockPos pos)
+    {
+        this.path.add(new NbtIntArray(new int[]{pos.getX(),pos.getY(),pos.getZ()}));
+        markDirty();
+    }
 
     /**
      * This method uses bases VS things to effectively create circles.
