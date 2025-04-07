@@ -6,6 +6,7 @@ import net.minecraft.server.world.ServerWorld;
 import net.minecraft.structure.StructureTemplate;
 import net.minecraft.util.math.BlockPos;
 import org.spongepowered.asm.mixin.Mixin;
+import org.spongepowered.asm.mixin.Shadow;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
@@ -17,12 +18,15 @@ import static ace.actually.pirates.structures.ShipStructurePlacementHelper.shipQ
 @Mixin(ServerWorld.class)
 public abstract class ServerWorldMixin {
 
+    @Shadow public abstract ServerWorld toServerWorld();
+
     @Inject(method = "tick", at = @At("HEAD"))
     protected void tickMixin(BooleanSupplier shouldKeepTicking, CallbackInfo ci) {
         if (!shipQueue.isEmpty()) {
             Triple<StructureTemplate, ServerWorld, BlockPos> structureData = shipQueue.poll();
             assert structureData != null;
             ShipStructurePlacementHelper.createShip(structureData.getFirst(), structureData.getSecond(), structureData.getThird());
+            //System.out.println(toServerWorld().getSeaLevel());
         }
     }
 }

@@ -36,12 +36,20 @@ public class ShipPather extends Item {
             }
             else
             {
-                NbtCompound compound = context.getStack().getNbt();
-                int[] v = compound.getIntArray("mib");
-                MotionInvokingBlockEntity be = (MotionInvokingBlockEntity) world.getBlockEntity(new BlockPos(v[0],v[1],v[2]));
-                BlockPos pos = context.getBlockPos();
-                be.addPathNode(new BlockPos(pos.getX(),be.getPos().getY(),pos.getZ()));
-                context.getPlayer().sendMessage(Text.translatable("text.pirates.pather.add"));
+                if(context.getStack().hasNbt() && context.getStack().getNbt().contains("mib"))
+                {
+                    NbtCompound compound = context.getStack().getNbt();
+                    int[] v = compound.getIntArray("mib");
+                    MotionInvokingBlockEntity be = (MotionInvokingBlockEntity) world.getBlockEntity(new BlockPos(v[0],v[1],v[2]));
+                    BlockPos pos = context.getBlockPos();
+                    be.addPathNode(new BlockPos(pos.getX(),be.getPos().getY(),pos.getZ()));
+                    context.getPlayer().sendMessage(Text.translatable("text.pirates.pather.add"));
+                }
+                else
+                {
+                    context.getPlayer().sendMessage(Text.translatable("text.pirates.need_mib"));
+                }
+
             }
 
         }
@@ -50,7 +58,7 @@ public class ShipPather extends Item {
 
     @Override
     public TypedActionResult<ItemStack> use(World world, PlayerEntity user, Hand hand) {
-        if(Hand.MAIN_HAND==hand && !world.isClient)
+        if(Hand.MAIN_HAND==hand && !world.isClient && user.getMainHandStack().hasNbt() && user.getMainHandStack().getNbt().contains("mib"))
         {
             NbtCompound compound = user.getMainHandStack().getNbt();
             int[] v = compound.getIntArray("mib");

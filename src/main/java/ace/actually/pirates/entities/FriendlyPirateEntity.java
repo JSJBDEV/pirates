@@ -1,16 +1,16 @@
-package ace.actually.pirates.entities.pirate_abstract;
+package ace.actually.pirates.entities;
 
-import ace.actually.pirates.events.IPirateDies;
+import ace.actually.pirates.entities.pirate_abstract.PirateWanderArroundFarGoal;
 import ace.actually.pirates.util.DisarmUtils;
 import net.minecraft.entity.EntityData;
 import net.minecraft.entity.EntityType;
 import net.minecraft.entity.SpawnReason;
-import net.minecraft.entity.ai.goal.ActiveTargetGoal;
 import net.minecraft.entity.ai.goal.LookAroundGoal;
 import net.minecraft.entity.ai.goal.LookAtEntityGoal;
+import net.minecraft.entity.ai.goal.RevengeGoal;
+import net.minecraft.entity.attribute.DefaultAttributeContainer;
+import net.minecraft.entity.attribute.EntityAttributes;
 import net.minecraft.entity.mob.HostileEntity;
-import net.minecraft.entity.passive.IronGolemEntity;
-import net.minecraft.entity.passive.MerchantEntity;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.nbt.NbtCompound;
 import net.minecraft.util.math.BlockPos;
@@ -19,11 +19,11 @@ import net.minecraft.world.ServerWorldAccess;
 import net.minecraft.world.World;
 import org.valkyrienskies.mod.common.VSGameUtilsKt;
 
-public abstract class AbstractPirateEntity  extends HostileEntity {
+public class FriendlyPirateEntity extends HostileEntity {
 
     protected BlockPos blockToDisable;
 
-    protected AbstractPirateEntity(EntityType<? extends HostileEntity> entityType, World world, BlockPos blockToDisable) {
+    protected FriendlyPirateEntity(EntityType<? extends HostileEntity> entityType, World world, BlockPos blockToDisable) {
         super(entityType, world);
 
         this.blockToDisable = blockToDisable;
@@ -50,20 +50,17 @@ public abstract class AbstractPirateEntity  extends HostileEntity {
         this.goalSelector.add(5, new PirateWanderArroundFarGoal(this, 1.0D));
         this.goalSelector.add(6, new LookAtEntityGoal(this, PlayerEntity.class, 200.0F));
         this.goalSelector.add(6, new LookAroundGoal(this));
-        //this.targetSelector.add(1, new RevengeGoal(this, new Class[0]));
-        this.targetSelector.add(1, new ActiveTargetGoal<>(this, PlayerEntity.class, true));
-        this.targetSelector.add(3, new ActiveTargetGoal(this, MerchantEntity.class, false));
-        this.targetSelector.add(3, new ActiveTargetGoal(this, IronGolemEntity.class, true));
+        this.targetSelector.add(1, new RevengeGoal(this));
+        //this.targetSelector.add(1, new ActiveTargetGoal<>(this, PlayerEntity.class, true));
+        //this.targetSelector.add(3, new ActiveTargetGoal(this, MerchantEntity.class, false));
+        //this.targetSelector.add(3, new ActiveTargetGoal(this, IronGolemEntity.class, true));
     }
 
     @Override
     public void remove(RemovalReason reason) {
         DisarmUtils.disarm(getWorld(),blockToDisable);
-        IPirateDies.EVENT.invoker().interact(attackingPlayer,this);
         super.remove(reason);
     }
-
-
 
     public boolean isOnShip() {
         return VSGameUtilsKt.getShipManaging(this) != null;
@@ -89,5 +86,12 @@ public abstract class AbstractPirateEntity  extends HostileEntity {
 
             this.blockToDisable = new BlockPos(x, y, z);
         }
+    }
+
+    public static DefaultAttributeContainer.Builder attributes() {
+        return HostileEntity
+                .createHostileAttributes()
+                .add(EntityAttributes.GENERIC_MOVEMENT_SPEED, 0.3D)
+                .add(EntityAttributes.GENERIC_FOLLOW_RANGE, 100.0D);
     }
 }

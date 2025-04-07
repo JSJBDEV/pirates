@@ -36,11 +36,19 @@ public class ShipPointer extends Item {
             }
             else
             {
-                NbtCompound compound = context.getStack().getNbt();
-                int[] v = compound.getIntArray("mib");
-                MotionInvokingBlockEntity be = (MotionInvokingBlockEntity) world.getBlockEntity(new BlockPos(v[0],v[1],v[2]));
-                BlockPos pos = context.getBlockPos();
-                be.setTarget(new int[]{pos.getX(),pos.getY(),pos.getZ()});
+
+                if(context.getStack().hasNbt() && context.getStack().getNbt().contains("mib"))
+                {
+                    NbtCompound compound = context.getStack().getNbt();
+                    int[] v = compound.getIntArray("mib");
+                    MotionInvokingBlockEntity be = (MotionInvokingBlockEntity) world.getBlockEntity(new BlockPos(v[0],v[1],v[2]));
+                    BlockPos pos = context.getBlockPos();
+                    be.setTarget(new int[]{pos.getX(),pos.getY(),pos.getZ()});
+                }
+                else
+                {
+                    context.getPlayer().sendMessage(Text.translatable("text.pirates.need_mib"));
+                }
             }
 
         }
