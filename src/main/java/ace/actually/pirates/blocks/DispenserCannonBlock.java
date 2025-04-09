@@ -62,5 +62,4 @@ public class DispenserCannonBlock extends DispenserBlock {
     public ItemStack getPickStack(BlockView world, BlockPos pos, BlockState state) {
         return new ItemStack(Items.DISPENSER);
     }
-
 }
