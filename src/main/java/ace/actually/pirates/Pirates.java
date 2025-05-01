@@ -5,10 +5,12 @@ import ace.actually.pirates.blocks.entity.CannonPrimingBlockEntity;
 import ace.actually.pirates.blocks.entity.CrewSpawnerBlockEntity;
 import ace.actually.pirates.blocks.entity.MotionInvokingBlockEntity;
 import ace.actually.pirates.blocks.entity.StableBlockEntity;
+import ace.actually.pirates.entities.friendly_pirate.FriendlyPirateEntity;
 import ace.actually.pirates.entities.shot.ShotEntity;
 import ace.actually.pirates.entities.pirate_default.PirateEntity;
 import ace.actually.pirates.entities.pirate_skeleton.SkeletonPirateEntity;
 import ace.actually.pirates.events.IPirateDies;
+import ace.actually.pirates.items.CannoneerItem;
 import ace.actually.pirates.items.ShipPather;
 import ace.actually.pirates.items.ShipPointer;
 import ace.actually.pirates.sound.ModSounds;
@@ -102,6 +104,7 @@ public class Pirates implements ModInitializer {
 	{
 
 		FabricDefaultAttributeRegistry.register(PIRATE_ENTITY_TYPE, PirateEntity.attributes());
+		FabricDefaultAttributeRegistry.register(FRIENDLY_PIRATE_TYPE, FriendlyPirateEntity.attributes());
 		//FabricDefaultAttributeRegistry.register(SKELETON_PIRATE_ENTITY_TYPE, SkeletonPirateEntity.attributes());
 
 	}
@@ -129,11 +132,13 @@ public class Pirates implements ModInitializer {
 	public static final Item CANNONBALL_ENT = new Item(new Item.Settings());
 	public static final ShipPointer SHIP_POINTER = new ShipPointer(new Item.Settings());
 	public static final ShipPather SHIP_PATHER = new ShipPather(new Item.Settings());
+	public static final CannoneerItem CANNONEER_ITEM = new CannoneerItem(new Item.Settings());
 	private void registerItems()
 	{
 		Registry.register(Registries.ITEM,new Identifier("pirates","cannonball"),CANNONBALL);
 		Registry.register(Registries.ITEM,new Identifier("util_pirates","util_1"),CANNONBALL_ENT);
 		Registry.register(Registries.ITEM,new Identifier("pirates","ship_pointer"),SHIP_POINTER);
+		Registry.register(Registries.ITEM,new Identifier("pirates","cannoneer"),CANNONEER_ITEM);
 		Registry.register(Registries.ITEM,new Identifier("pirates","ship_pather"),SHIP_PATHER);
 		Registry.register(Registries.ITEM,new Identifier("pirates","stable_block"),new BlockItem(STABLE_BLOCK,new Item.Settings()));
 
@@ -172,6 +177,9 @@ public class Pirates implements ModInitializer {
 	public static final EntityType<ShotEntity> SHOT_ENTITY_TYPE =registerEntity("shot",SpawnGroup.MISC,EntityDimensions.changing(0.5f,0.5f),((type, world) -> new ShotEntity(world)));
 
 	public static final EntityType<PirateEntity> PIRATE_ENTITY_TYPE =registerEntity("pirate",SpawnGroup.MISC,EntityDimensions.changing(0.6f,1.9f),((type, world) -> new PirateEntity(world)));
+
+	public static final EntityType<FriendlyPirateEntity> FRIENDLY_PIRATE_TYPE =registerEntity("friendly_pirate",SpawnGroup.MISC,EntityDimensions.changing(0.6f,1.9f),((type, world) -> new FriendlyPirateEntity(world)));
+
 
 	public static final EntityType<SkeletonPirateEntity> SKELETON_PIRATE_ENTITY_TYPE = null; //=registerEntity("skeleton_pirate",SpawnGroup.MISC,EntityDimensions.changing(0.6f,1.9f),((type, world) -> new SkeletonPirateEntity(world)));
 

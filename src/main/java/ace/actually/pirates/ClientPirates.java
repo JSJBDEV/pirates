@@ -1,6 +1,7 @@
 package ace.actually.pirates;
 
 import ace.actually.pirates.blocks.entity.CannonPrimingBlockEntityRenderer;
+import ace.actually.pirates.entities.friendly_pirate.FriendlyPirateRenderer;
 import ace.actually.pirates.entities.pirate_skeleton.SkeletonPirateModel;
 import ace.actually.pirates.entities.shot.ShotEntityRenderer;
 import ace.actually.pirates.entities.pirate_default.PirateEntityRenderer;
@@ -19,6 +20,7 @@ public class ClientPirates implements ClientModInitializer {
     public void onInitializeClient() {
 
         EntityRendererRegistry.register(Pirates.PIRATE_ENTITY_TYPE, PirateEntityRenderer::new);
+        EntityRendererRegistry.register(Pirates.FRIENDLY_PIRATE_TYPE, FriendlyPirateRenderer::new);
         //EntityRendererRegistry.register(Pirates.SKELETON_PIRATE_ENTITY_TYPE, SkeletonPirateEntityRenderer::new);
         EntityRendererRegistry.register(Pirates.SHOT_ENTITY_TYPE, (context) -> new ShotEntityRenderer(context, 1,false));
 

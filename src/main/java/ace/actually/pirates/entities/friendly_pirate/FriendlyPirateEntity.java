@@ -1,47 +1,62 @@
-package ace.actually.pirates.entities.pirate_default;
+package ace.actually.pirates.entities.friendly_pirate;
 
 import ace.actually.pirates.Pirates;
 import ace.actually.pirates.entities.pirate_abstract.AbstractPirateEntity;
 import ace.actually.pirates.entities.pirate_abstract.PirateBowAttackGoal;
 import ace.actually.pirates.entities.pirate_abstract.PirateWanderArroundFarGoal;
+import ace.actually.pirates.util.DisarmUtils;
 import net.minecraft.entity.*;
 import net.minecraft.entity.ai.RangedAttackMob;
-import net.minecraft.entity.ai.goal.*;
+import net.minecraft.entity.ai.goal.LookAroundGoal;
+import net.minecraft.entity.ai.goal.LookAtEntityGoal;
+import net.minecraft.entity.ai.goal.RevengeGoal;
 import net.minecraft.entity.attribute.DefaultAttributeContainer;
 import net.minecraft.entity.attribute.EntityAttributes;
 import net.minecraft.entity.mob.HostileEntity;
-import net.minecraft.entity.passive.IronGolemEntity;
-import net.minecraft.entity.passive.MerchantEntity;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.entity.projectile.PersistentProjectileEntity;
 import net.minecraft.entity.projectile.ProjectileUtil;
 import net.minecraft.item.ItemStack;
 import net.minecraft.item.Items;
+import net.minecraft.nbt.NbtCompound;
 import net.minecraft.sound.SoundEvents;
+import net.minecraft.text.Text;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.random.Random;
-import net.minecraft.world.*;
+import net.minecraft.world.LocalDifficulty;
+import net.minecraft.world.ServerWorldAccess;
+import net.minecraft.world.World;
+import org.valkyrienskies.mod.common.VSGameUtilsKt;
 
-public class PirateEntity extends AbstractPirateEntity implements RangedAttackMob {
-    protected BlockPos blockToDisable;
+public class FriendlyPirateEntity extends AbstractPirateEntity implements RangedAttackMob {
 
-    public PirateEntity(World world) {
-        this(world, BlockPos.ORIGIN);
+    private static final String[] FIRST = {"Johan","John","Bob","Cali","Dorris","Lopez","Wilhelm"};
+    private static final String[] LAST = {"Diver","Smith","Forest","Maze","Fisherman","Callous","Calculated"};
+    public FriendlyPirateEntity(World world)
+    {
+        super(Pirates.FRIENDLY_PIRATE_TYPE, world, BlockPos.ORIGIN);
     }
 
-    public PirateEntity(World world, BlockPos blockToDisable) {
-        super(Pirates.PIRATE_ENTITY_TYPE, world, blockToDisable);
+    public FriendlyPirateEntity(World world, BlockPos blockToDisable) {
+        super(Pirates.FRIENDLY_PIRATE_TYPE, world, blockToDisable);
+        setCustomName(Text.of(FIRST[world.random.nextInt(FIRST.length)]+" the "+LAST[world.random.nextInt(LAST.length)]));
     }
-
 
     @Override
     protected void initGoals() {
         super.initGoals();
         this.goalSelector.add(3, new PirateBowAttackGoal<>(this, 1.0D, 20, 20.0F));
-        this.targetSelector.add(1, new ActiveTargetGoal<>(this, PlayerEntity.class, true));
-        this.targetSelector.add(3, new ActiveTargetGoal(this, MerchantEntity.class, false));
-        this.targetSelector.add(3, new ActiveTargetGoal(this, IronGolemEntity.class, true));
+        this.targetSelector.add(1, new RevengeGoal(this));
+
     }
+
+    public static DefaultAttributeContainer.Builder attributes() {
+        return HostileEntity
+                .createHostileAttributes()
+                .add(EntityAttributes.GENERIC_MOVEMENT_SPEED, 0.3D)
+                .add(EntityAttributes.GENERIC_FOLLOW_RANGE, 100.0D);
+    }
+
 
     @Override
     protected void initEquipment(Random random, LocalDifficulty localDifficulty) {
@@ -67,14 +82,4 @@ public class PirateEntity extends AbstractPirateEntity implements RangedAttackMo
     protected PersistentProjectileEntity createArrowProjectile(ItemStack arrow, float damageModifier) {
         return ProjectileUtil.createArrowProjectile(this, arrow, damageModifier);
     }
-
-    public static DefaultAttributeContainer.Builder attributes() {
-        return HostileEntity
-                .createHostileAttributes()
-                .add(EntityAttributes.GENERIC_MOVEMENT_SPEED, 0.3D)
-                .add(EntityAttributes.GENERIC_FOLLOW_RANGE, 100.0D);
-    }
-
-
-
 }
