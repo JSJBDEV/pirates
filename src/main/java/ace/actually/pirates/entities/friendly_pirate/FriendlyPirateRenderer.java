@@ -16,6 +16,6 @@ public class FriendlyPirateRenderer extends MobEntityRenderer<FriendlyPirateEnti
 
     @Override
     public Identifier getTexture(FriendlyPirateEntity entity) {
-        return new Identifier("pirates","textures/entity/pirate2.png");
+        return new Identifier("pirates","textures/entity/pirate1.png");
     }
 }

@@ -42,6 +42,7 @@ public class FriendlyPirateEntity extends AbstractPirateEntity implements Ranged
 
     public FriendlyPirateEntity(World world, BlockPos blockToDisable) {
         super(Pirates.FRIENDLY_PIRATE_TYPE, world, blockToDisable);
+        initEquipment(world.random,world.getLocalDifficulty(getBlockPos()));
     }
 
     public void genCustomName(World world)
@@ -92,12 +93,17 @@ public class FriendlyPirateEntity extends AbstractPirateEntity implements Ranged
 
     @Override
     public ActionResult interactAt(PlayerEntity player, Vec3d hitPos, Hand hand) {
-        if(!hasCustomName() && player.getStackInHand(hand).isOf(Items.GOLDEN_APPLE))
+        ItemStack stack = Pirates.recruitCost.get();
+        if(!hasCustomName() && player.getStackInHand(hand).isOf(stack.getItem()))
         {
-            player.giveItemStack(new ItemStack(Pirates.CANNONEER_ITEM));
-            player.getStackInHand(hand).decrement(1);
-            this.teleport(0,0,0);
-            this.kill();
+            if(player.getStackInHand(hand).getCount()>=stack.getCount())
+            {
+                player.giveItemStack(new ItemStack(Pirates.CANNONEER_ITEM));
+                player.getStackInHand(hand).decrement(stack.getCount());
+                this.teleport(0,0,0);
+                this.kill();
+            }
+
         }
         return super.interactAt(player, hitPos, hand);
     }

@@ -43,6 +43,9 @@ import net.minecraft.world.GameRules;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import java.util.function.Consumer;
+import java.util.function.Supplier;
+
 public class Pirates implements ModInitializer {
 	// This logger is used to write text to the console and the log file.
 	// It is considered best practice to use your mod id as the logger's name.
@@ -62,6 +65,7 @@ public class Pirates implements ModInitializer {
 	public static float baseShotPower;
 	public static int pursuitDistance;
 	public static boolean shouldEnableFlyingPirates;
+	public static Supplier<ItemStack> recruitCost;
 
 	@Override
 	public void onInitialize() {
@@ -70,6 +74,10 @@ public class Pirates implements ModInitializer {
 		baseShotPower = Float.parseFloat(ConfigUtils.config.getOrDefault("base-shot-power","2.2"));
 		pursuitDistance = Integer.parseInt(ConfigUtils.config.getOrDefault("pursuit-distance","10000"));
 		shouldEnableFlyingPirates = ConfigUtils.config.getOrDefault("should-enable-flying-pirates","false").equals("true");
+
+		String[] rc = ConfigUtils.config.getOrDefault("recruit-cost","minecraft:golden_apple,1").split(",");
+		recruitCost = () -> new ItemStack(Registries.ITEM.get(Identifier.tryParse(rc[0])),Integer.parseInt(rc[1]));
+
 		registerEntityThings();
 		//entity types do it themselves
 		registerBlocks();
@@ -88,6 +96,7 @@ public class Pirates implements ModInitializer {
 			itemGroup.add(Pirates.MOTION_INVOKING_BLOCK.asItem());
 			itemGroup.add(Pirates.SHIP_POINTER);
 			itemGroup.add(Pirates.SHIP_PATHER);
+			itemGroup.add(Pirates.CANNONEER_ITEM);
 		});
 
 		IPirateDies.EVENT.register((player, pirate) ->
