@@ -21,7 +21,10 @@ import net.minecraft.item.Items;
 import net.minecraft.nbt.NbtCompound;
 import net.minecraft.sound.SoundEvents;
 import net.minecraft.text.Text;
+import net.minecraft.util.ActionResult;
+import net.minecraft.util.Hand;
 import net.minecraft.util.math.BlockPos;
+import net.minecraft.util.math.Vec3d;
 import net.minecraft.util.math.random.Random;
 import net.minecraft.world.LocalDifficulty;
 import net.minecraft.world.ServerWorldAccess;
@@ -39,6 +42,10 @@ public class FriendlyPirateEntity extends AbstractPirateEntity implements Ranged
 
     public FriendlyPirateEntity(World world, BlockPos blockToDisable) {
         super(Pirates.FRIENDLY_PIRATE_TYPE, world, blockToDisable);
+    }
+
+    public void genCustomName(World world)
+    {
         setCustomName(Text.of(FIRST[world.random.nextInt(FIRST.length)]+" the "+LAST[world.random.nextInt(LAST.length)]));
     }
 
@@ -81,5 +88,17 @@ public class FriendlyPirateEntity extends AbstractPirateEntity implements Ranged
 
     protected PersistentProjectileEntity createArrowProjectile(ItemStack arrow, float damageModifier) {
         return ProjectileUtil.createArrowProjectile(this, arrow, damageModifier);
+    }
+
+    @Override
+    public ActionResult interactAt(PlayerEntity player, Vec3d hitPos, Hand hand) {
+        if(!hasCustomName() && player.getStackInHand(hand).isOf(Items.GOLDEN_APPLE))
+        {
+            player.giveItemStack(new ItemStack(Pirates.CANNONEER_ITEM));
+            player.getStackInHand(hand).decrement(1);
+            this.teleport(0,0,0);
+            this.kill();
+        }
+        return super.interactAt(player, hitPos, hand);
     }
 }

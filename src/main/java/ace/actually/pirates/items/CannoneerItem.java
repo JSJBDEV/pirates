@@ -26,8 +26,8 @@ public class CannoneerItem extends Item {
             world.setBlockState(pos,state.with(CannonPrimingBlock.DISARMED,false));
             pos = pos.offset(state.get(Properties.FACING).getOpposite());
             world.spawnEntity(fpe);
-
             fpe.teleport(pos.getX(),pos.getY(),pos.getZ());
+            fpe.genCustomName(world);
             context.getStack().decrement(1);
         }
         return super.useOnBlock(context);

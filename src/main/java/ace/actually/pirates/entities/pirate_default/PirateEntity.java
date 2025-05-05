@@ -1,6 +1,7 @@
 package ace.actually.pirates.entities.pirate_default;
 
 import ace.actually.pirates.Pirates;
+import ace.actually.pirates.entities.friendly_pirate.FriendlyPirateEntity;
 import ace.actually.pirates.entities.pirate_abstract.AbstractPirateEntity;
 import ace.actually.pirates.entities.pirate_abstract.PirateBowAttackGoal;
 import ace.actually.pirates.entities.pirate_abstract.PirateWanderArroundFarGoal;
@@ -41,6 +42,7 @@ public class PirateEntity extends AbstractPirateEntity implements RangedAttackMo
         this.targetSelector.add(1, new ActiveTargetGoal<>(this, PlayerEntity.class, true));
         this.targetSelector.add(3, new ActiveTargetGoal(this, MerchantEntity.class, false));
         this.targetSelector.add(3, new ActiveTargetGoal(this, IronGolemEntity.class, true));
+        this.targetSelector.add(3, new ActiveTargetGoal(this, FriendlyPirateEntity.class, true));
     }
 
     @Override
