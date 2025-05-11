@@ -1,0 +1,14 @@
+{
+  "structures": [
+    {
+      "structure": "pirates_sky:ship",
+      "weight": 1
+    }
+  ],
+  "placement": {
+    "type": "random_spread",
+    "spacing": 26,
+    "separation": 8,
+    "salt": 367452547
+  }
+}
