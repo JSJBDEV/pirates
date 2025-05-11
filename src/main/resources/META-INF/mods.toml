@@ -44,6 +44,13 @@ ordering = "NONE"
 side = "BOTH"
 
 [[dependencies.pirates]]
+modId = "vlib"
+mandatory = true
+versionRange = "*"
+ordering = "NONE"
+side = "BOTH"
+
+[[dependencies.pirates]]
 modId = "valkyrienskies"
 mandatory = true
 versionRange = "[2.1.0,)"
