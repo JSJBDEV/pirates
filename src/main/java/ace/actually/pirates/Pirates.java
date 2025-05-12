@@ -23,6 +23,10 @@ import net.fabricmc.fabric.api.itemgroup.v1.ItemGroupEvents;
 import net.fabricmc.fabric.api.object.builder.v1.block.entity.FabricBlockEntityTypeBuilder;
 import net.fabricmc.fabric.api.object.builder.v1.entity.FabricDefaultAttributeRegistry;
 import net.fabricmc.fabric.api.object.builder.v1.entity.FabricEntityTypeBuilder;
+import net.fabricmc.fabric.api.resource.ResourceManagerHelper;
+import net.fabricmc.fabric.api.resource.ResourcePackActivationType;
+import net.fabricmc.loader.api.FabricLoader;
+import net.fabricmc.loader.api.ModContainer;
 import net.minecraft.block.AbstractBlock;
 import net.minecraft.block.Blocks;
 import net.minecraft.block.entity.BlockEntityType;
@@ -34,6 +38,8 @@ import net.minecraft.item.*;
 import net.minecraft.registry.Registries;
 import net.minecraft.registry.Registry;
 import net.minecraft.registry.RegistryKey;
+import net.minecraft.resource.ResourceType;
+import net.minecraft.server.MinecraftServer;
 import net.minecraft.sound.BlockSoundGroup;
 import net.minecraft.sound.SoundEvents;
 import net.minecraft.text.Text;
@@ -43,6 +49,8 @@ import net.minecraft.world.GameRules;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import java.util.Optional;
+import java.util.function.Consumer;
 import java.util.function.Supplier;
 
 public class Pirates implements ModInitializer {
@@ -68,6 +76,22 @@ public class Pirates implements ModInitializer {
 
 	@Override
 	public void onInitialize() {
+
+		Optional<ModContainer> container = FabricLoader.getInstance().getModContainer(Pirates.MOD_ID);
+
+		if (container.isPresent()) {
+			if(ResourceManagerHelper.registerBuiltinResourcePack(
+					new Identifier("flying_ships"),
+					container.get(),
+					ResourcePackActivationType.NORMAL
+			)) {
+				LOGGER.info("Registered flying ships data pack");
+			} else {
+				LOGGER.warn("didn't work");
+			}
+		} else {
+			LOGGER.warn("Failed to register flying ships data pack");
+		}
 
 		ConfigUtils.checkConfigs();
 		baseShotPower = Float.parseFloat(ConfigUtils.config.getOrDefault("base-shot-power","2.2"));

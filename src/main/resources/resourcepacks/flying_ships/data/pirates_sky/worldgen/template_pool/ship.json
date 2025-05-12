@@ -1,0 +1,15 @@
+{
+  "name": "pirates_sky:ships",
+  "fallback": "minecraft:empty",
+  "elements": [
+    {
+      "weight": 3,
+      "element": {
+        "element_type": "minecraft:single_pool_element",
+        "projection": "rigid",
+        "location": "pirates_sky:ship/wreckerideal",
+        "processors": "minecraft:empty"
+      }
+    }
+  ]
+}
