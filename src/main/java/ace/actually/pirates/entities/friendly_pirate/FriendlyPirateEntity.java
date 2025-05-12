@@ -12,6 +12,11 @@ import net.minecraft.entity.ai.goal.LookAtEntityGoal;
 import net.minecraft.entity.ai.goal.RevengeGoal;
 import net.minecraft.entity.attribute.DefaultAttributeContainer;
 import net.minecraft.entity.attribute.EntityAttributes;
+import net.minecraft.entity.data.DataTracker;
+import net.minecraft.entity.data.TrackedData;
+import net.minecraft.entity.data.TrackedDataHandlerRegistry;
+import net.minecraft.entity.effect.StatusEffectInstance;
+import net.minecraft.entity.effect.StatusEffects;
 import net.minecraft.entity.mob.HostileEntity;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.entity.projectile.PersistentProjectileEntity;
@@ -24,6 +29,7 @@ import net.minecraft.text.Text;
 import net.minecraft.util.ActionResult;
 import net.minecraft.util.Hand;
 import net.minecraft.util.math.BlockPos;
+import net.minecraft.util.math.Box;
 import net.minecraft.util.math.Vec3d;
 import net.minecraft.util.math.random.Random;
 import net.minecraft.world.LocalDifficulty;
@@ -31,18 +37,49 @@ import net.minecraft.world.ServerWorldAccess;
 import net.minecraft.world.World;
 import org.valkyrienskies.mod.common.VSGameUtilsKt;
 
+import java.util.List;
+
 public class FriendlyPirateEntity extends AbstractPirateEntity implements RangedAttackMob {
 
-    private static final String[] FIRST = {"Johan","John","Bob","Cali","Dorris","Lopez","Wilhelm"};
-    private static final String[] LAST = {"Diver","Smith","Forest","Maze","Fisherman","Callous","Calculated"};
+    private static final String[] FIRST = {"Johan","John","Bob","Cali","Dorris","Lopez","Wilhelm","Armstrong","David","Giorno"};
+    private static final String[] LAST = {"Diver","Smith","Forest","Maze","Fisherman","Callous","Calculated","Fierce","Flatulent","Agreeable","Rational"};
+    private static final TrackedData<String> JOB = DataTracker.registerData(FriendlyPirateEntity.class, TrackedDataHandlerRegistry.STRING);
+
     public FriendlyPirateEntity(World world)
     {
         super(Pirates.FRIENDLY_PIRATE_TYPE, world, BlockPos.ORIGIN);
     }
 
+    public String getPirateJob() {
+        return dataTracker.get(JOB);
+    }
+
+    public void setPirateJob(String pirateJob) {
+        dataTracker.set(JOB,pirateJob);
+    }
+
+    @Override
+    public void writeCustomDataToNbt(NbtCompound nbt) {
+        super.writeCustomDataToNbt(nbt);
+        nbt.putString("pirateJob",dataTracker.get(JOB));
+    }
+
+    @Override
+    public void readCustomDataFromNbt(NbtCompound nbt) {
+        super.readCustomDataFromNbt(nbt);
+        dataTracker.set(JOB,nbt.getString("pirateJob"));
+    }
+
     public FriendlyPirateEntity(World world, BlockPos blockToDisable) {
         super(Pirates.FRIENDLY_PIRATE_TYPE, world, blockToDisable);
         initEquipment(world.random,world.getLocalDifficulty(getBlockPos()));
+    }
+
+    @Override
+    protected void initDataTracker() {
+        super.initDataTracker();
+        dataTracker.startTracking(JOB,"none");
+
     }
 
     public void genCustomName(World world)
@@ -56,6 +93,20 @@ public class FriendlyPirateEntity extends AbstractPirateEntity implements Ranged
         this.goalSelector.add(3, new PirateBowAttackGoal<>(this, 1.0D, 20, 20.0F));
         this.targetSelector.add(1, new RevengeGoal(this));
 
+    }
+
+    @Override
+    public void tick() {
+        super.tick();
+        if(getEntityWorld().getTimeOfDay()%1000L==0L)
+        {
+            if(getPirateJob().equals("doctor"))
+            {
+                List<FriendlyPirateEntity> crew =  getEntityWorld().getEntitiesByClass(FriendlyPirateEntity.class,new Box(getBlockPos().add(-10,-10,-10),getBlockPos().add(10,10,10)),LivingEntity::isAlive);
+                crew.forEach(a->a.addStatusEffect(new StatusEffectInstance(StatusEffects.REGENERATION,500,1)));
+                System.out.println("doctor");
+            }
+        }
     }
 
     public static DefaultAttributeContainer.Builder attributes() {

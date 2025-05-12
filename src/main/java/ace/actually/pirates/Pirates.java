@@ -10,7 +10,7 @@ import ace.actually.pirates.entities.shot.ShotEntity;
 import ace.actually.pirates.entities.pirate_default.PirateEntity;
 import ace.actually.pirates.entities.pirate_skeleton.SkeletonPirateEntity;
 import ace.actually.pirates.events.IPirateDies;
-import ace.actually.pirates.items.CannoneerItem;
+import ace.actually.pirates.items.ContractItem;
 import ace.actually.pirates.items.ShipPather;
 import ace.actually.pirates.items.ShipPointer;
 import ace.actually.pirates.sound.ModSounds;
@@ -43,7 +43,6 @@ import net.minecraft.world.GameRules;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import java.util.function.Consumer;
 import java.util.function.Supplier;
 
 public class Pirates implements ModInitializer {
@@ -97,6 +96,7 @@ public class Pirates implements ModInitializer {
 			itemGroup.add(Pirates.SHIP_POINTER);
 			itemGroup.add(Pirates.SHIP_PATHER);
 			itemGroup.add(Pirates.CANNONEER_ITEM);
+			itemGroup.add(Pirates.DOCTOR_ITEM);
 		});
 
 		IPirateDies.EVENT.register((player, pirate) ->
@@ -141,13 +141,15 @@ public class Pirates implements ModInitializer {
 	public static final Item CANNONBALL_ENT = new Item(new Item.Settings());
 	public static final ShipPointer SHIP_POINTER = new ShipPointer(new Item.Settings());
 	public static final ShipPather SHIP_PATHER = new ShipPather(new Item.Settings());
-	public static final CannoneerItem CANNONEER_ITEM = new CannoneerItem(new Item.Settings());
+	public static final ContractItem CANNONEER_ITEM = new ContractItem(CANNON_PRIMING_BLOCK,"cannoneer");
+	public static final ContractItem DOCTOR_ITEM = new ContractItem(Blocks.GOLD_BLOCK,"doctor");
 	private void registerItems()
 	{
 		Registry.register(Registries.ITEM,new Identifier("pirates","cannonball"),CANNONBALL);
 		Registry.register(Registries.ITEM,new Identifier("util_pirates","util_1"),CANNONBALL_ENT);
 		Registry.register(Registries.ITEM,new Identifier("pirates","ship_pointer"),SHIP_POINTER);
 		Registry.register(Registries.ITEM,new Identifier("pirates","cannoneer"),CANNONEER_ITEM);
+		Registry.register(Registries.ITEM,new Identifier("pirates","doctor"),DOCTOR_ITEM);
 		Registry.register(Registries.ITEM,new Identifier("pirates","ship_pather"),SHIP_PATHER);
 		Registry.register(Registries.ITEM,new Identifier("pirates","stable_block"),new BlockItem(STABLE_BLOCK,new Item.Settings()));
 
