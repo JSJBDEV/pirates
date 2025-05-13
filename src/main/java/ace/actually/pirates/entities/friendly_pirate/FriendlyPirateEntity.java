@@ -104,7 +104,6 @@ public class FriendlyPirateEntity extends AbstractPirateEntity implements Ranged
             {
                 List<FriendlyPirateEntity> crew =  getEntityWorld().getEntitiesByClass(FriendlyPirateEntity.class,new Box(getBlockPos().add(-10,-10,-10),getBlockPos().add(10,10,10)),LivingEntity::isAlive);
                 crew.forEach(a->a.addStatusEffect(new StatusEffectInstance(StatusEffects.REGENERATION,500,1)));
-                System.out.println("doctor");
             }
         }
     }
