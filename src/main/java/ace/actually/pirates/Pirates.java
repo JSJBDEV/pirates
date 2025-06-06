@@ -70,6 +70,7 @@ public class Pirates implements ModInitializer {
 			.build();
 
 	public static float baseShotPower;
+	public static float cannonFiringRange;
 	public static int pursuitDistance;
 	public static boolean shouldEnableFlyingPirates;
 	public static Supplier<ItemStack> recruitCost;
@@ -95,6 +96,7 @@ public class Pirates implements ModInitializer {
 
 		ConfigUtils.checkConfigs();
 		baseShotPower = Float.parseFloat(ConfigUtils.config.getOrDefault("base-shot-power","2.2"));
+		cannonFiringRange = Float.parseFloat(ConfigUtils.config.getOrDefault("cannon-firing-range","1.7"));
 		pursuitDistance = Integer.parseInt(ConfigUtils.config.getOrDefault("pursuit-distance","10000"));
 		shouldEnableFlyingPirates = ConfigUtils.config.getOrDefault("should-enable-flying-pirates","false").equals("true");
 
