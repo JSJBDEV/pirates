@@ -1,10 +1,13 @@
 {
   "item.pirates.cannonball": "Cannonball",
+  "item.pirates.fire_cannonball": "Flaming Cannonball",
+  "item.pirates.weighted_cannonball": "Heavy Cannonball",
   "item.pirates.ship_pointer": "Ship Pointer",
   "item.pirates.ship_pather": "Ship Pather",
   "item.pirates.cannoneer": "Cannoneer Contract",
   "item.pirates.doctor": "Doctor Contract",
 
+  "block.pirates.ship_id_block": "Ship Nameplate",
   "block.pirates.cannon_priming_block": "Cannon Activator",
   "block.pirates.motion_invoking_block": "Motion Invoker",
   "block.pirates.crew_spawner_block": "Crew Spawner",

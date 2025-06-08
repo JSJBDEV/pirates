@@ -106,7 +106,7 @@ public class MotionInvokingBlock extends BlockWithEntity {
             if(ship!=null)
             {
                 MotionInvokingBlockEntity be = (MotionInvokingBlockEntity) world.getBlockEntity(pos);
-                if(be.getCompat().equals("Eureka"))
+                if(be!=null && be.getCompat().equals("Eureka"))
                 {
                     EurekaCompat.stopMotion(ship);
                 }

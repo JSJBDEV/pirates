@@ -12,6 +12,8 @@ import ace.actually.pirates.items.ShipPather;
 import ace.actually.pirates.items.ShipPointer;
 import ace.actually.pirates.sound.ModSounds;
 import ace.actually.pirates.util.ConfigUtils;
+import g_mungus.vlib.VLib;
+import g_mungus.vlib.api.VLibGameUtils;
 import net.fabricmc.api.ModInitializer;
 import net.fabricmc.fabric.api.gamerule.v1.GameRuleFactory;
 import net.fabricmc.fabric.api.gamerule.v1.GameRuleRegistry;
@@ -25,6 +27,7 @@ import net.fabricmc.fabric.api.resource.ResourcePackActivationType;
 import net.fabricmc.loader.api.FabricLoader;
 import net.fabricmc.loader.api.ModContainer;
 import net.minecraft.block.AbstractBlock;
+import net.minecraft.block.Block;
 import net.minecraft.block.Blocks;
 import net.minecraft.block.entity.BlockEntityType;
 import net.minecraft.entity.Entity;
@@ -147,6 +150,7 @@ public class Pirates implements ModInitializer {
 	public static final CrewSpawnerBlock CREW_SPAWNER_BLOCK = new CrewSpawnerBlock(AbstractBlock.Settings.copy(Blocks.BIRCH_WOOD).noBlockBreakParticles().noCollision().dropsNothing().sounds(Silent));
 	public static final StableBlock STABLE_BLOCK = new StableBlock(AbstractBlock.Settings.create());
 	public static final ShipIdBlock SHIP_ID_BLOCK = new ShipIdBlock(AbstractBlock.Settings.create());
+	public static final Block HEAVY_BLOCK = new Block(AbstractBlock.Settings.copy(Blocks.OBSIDIAN));
 	private void registerBlocks()
 	{
 		Registry.register(Registries.BLOCK,new Identifier("pirates","cannon_priming_block"),CANNON_PRIMING_BLOCK);
@@ -155,12 +159,15 @@ public class Pirates implements ModInitializer {
 		Registry.register(Registries.BLOCK,new Identifier("pirates","crew_spawner_block"),CREW_SPAWNER_BLOCK);
 		Registry.register(Registries.BLOCK,new Identifier("pirates","stable_block"),STABLE_BLOCK);
 		Registry.register(Registries.BLOCK,new Identifier("pirates","ship_id_block"),SHIP_ID_BLOCK);
+		Registry.register(Registries.BLOCK,new Identifier("pirates","heavy_block"),HEAVY_BLOCK);
 
 	}
 
 
 
 	public static final Item CANNONBALL = new Item(new Item.Settings());
+	public static final Item FIRE_CANNONBALL = new Item(new Item.Settings());
+	public static final Item WEIGHTED_CANNONBALL = new Item(new Item.Settings());
 	public static final Item CANNONBALL_ENT = new Item(new Item.Settings());
 	public static final ShipPointer SHIP_POINTER = new ShipPointer(new Item.Settings());
 	public static final ShipPather SHIP_PATHER = new ShipPather(new Item.Settings());
@@ -169,6 +176,8 @@ public class Pirates implements ModInitializer {
 	private void registerItems()
 	{
 		Registry.register(Registries.ITEM,new Identifier("pirates","cannonball"),CANNONBALL);
+		Registry.register(Registries.ITEM,new Identifier("pirates","fire_cannonball"),FIRE_CANNONBALL);
+		Registry.register(Registries.ITEM,new Identifier("pirates","weighted_cannonball"),WEIGHTED_CANNONBALL);
 		Registry.register(Registries.ITEM,new Identifier("util_pirates","util_1"),CANNONBALL_ENT);
 		Registry.register(Registries.ITEM,new Identifier("pirates","ship_pointer"),SHIP_POINTER);
 		Registry.register(Registries.ITEM,new Identifier("pirates","cannoneer"),CANNONEER_ITEM);

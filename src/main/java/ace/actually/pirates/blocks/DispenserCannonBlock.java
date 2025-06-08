@@ -38,6 +38,26 @@ public class DispenserCannonBlock extends DispenserBlock {
                 }
             };
         }
+        if(stack.getItem() == Pirates.FIRE_CANNONBALL){
+            return new CannonDispenserBehavior() {
+                @Override
+                protected ProjectileEntity createProjectile(World world, Position position, ItemStack stack) {
+                    ShotEntity qentity = Util.make(new ShotEntity(Pirates.SHOT_ENTITY_TYPE,world,null,Pirates.CANNONBALL_ENT,3,"fire"), (entity) -> {});
+                    qentity.setPosition(new Vec3d(position.getX(),position.getY(),position.getZ()));
+                    return qentity;
+                }
+            };
+        }
+        if(stack.getItem() == Pirates.WEIGHTED_CANNONBALL){
+            return new CannonDispenserBehavior() {
+                @Override
+                protected ProjectileEntity createProjectile(World world, Position position, ItemStack stack) {
+                    ShotEntity qentity = Util.make(new ShotEntity(Pirates.SHOT_ENTITY_TYPE,world,null,Pirates.CANNONBALL_ENT,3,"heavy"), (entity) -> {});
+                    qentity.setPosition(new Vec3d(position.getX(),position.getY(),position.getZ()));
+                    return qentity;
+                }
+            };
+        }
         return super.getBehaviorForItem(stack);
     }
 
