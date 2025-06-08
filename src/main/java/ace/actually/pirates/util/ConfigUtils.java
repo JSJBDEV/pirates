@@ -80,6 +80,8 @@ public class ConfigUtils {
         defaults.add("custom-crew-entity-3=minecraft:stray");
         defaults.add("#Whether flying pirates should spawn in the world or not (default true) BETA!");
         defaults.add("should-enable-flying-pirates=false");
+        defaults.add("#what item should be used to recruit friendly pirates in the format \"minecraft:golden_apple,1\" to mean 1 golden apple");
+        defaults.add("recruit-cost=minecraft:golden_apple,1");
 
         return defaults;
     }

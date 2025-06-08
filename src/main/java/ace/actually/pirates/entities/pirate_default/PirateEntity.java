@@ -1,6 +1,7 @@
 package ace.actually.pirates.entities.pirate_default;
 
 import ace.actually.pirates.Pirates;
+import ace.actually.pirates.entities.friendly_pirate.FriendlyPirateEntity;
 import ace.actually.pirates.entities.pirate_abstract.AbstractPirateEntity;
 import ace.actually.pirates.entities.pirate_abstract.PirateBowAttackGoal;
 import ace.actually.pirates.entities.pirate_abstract.PirateWanderArroundFarGoal;
@@ -26,7 +27,7 @@ public class PirateEntity extends AbstractPirateEntity implements RangedAttackMo
     protected BlockPos blockToDisable;
 
     public PirateEntity(World world) {
-        this(world, new BlockPos(0,0,0));
+        this(world, BlockPos.ORIGIN);
     }
 
     public PirateEntity(World world, BlockPos blockToDisable) {
@@ -38,6 +39,10 @@ public class PirateEntity extends AbstractPirateEntity implements RangedAttackMo
     protected void initGoals() {
         super.initGoals();
         this.goalSelector.add(3, new PirateBowAttackGoal<>(this, 1.0D, 20, 20.0F));
+        this.targetSelector.add(1, new ActiveTargetGoal<>(this, PlayerEntity.class, true));
+        this.targetSelector.add(3, new ActiveTargetGoal(this, MerchantEntity.class, false));
+        this.targetSelector.add(3, new ActiveTargetGoal(this, IronGolemEntity.class, true));
+        this.targetSelector.add(3, new ActiveTargetGoal(this, FriendlyPirateEntity.class, true));
     }
 
     @Override

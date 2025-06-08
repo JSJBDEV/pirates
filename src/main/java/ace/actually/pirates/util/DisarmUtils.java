@@ -22,12 +22,12 @@ public class DisarmUtils {
     }
     public static void rearm(World world, BlockPos blockToDisable)
     {
-        if (!Objects.equals(blockToDisable, new BlockPos(0, 0, 0)))
+        if (!blockToDisable.equals(BlockPos.ORIGIN))
         {
             if (world.getBlockState(blockToDisable).isOf(Pirates.CANNON_PRIMING_BLOCK)) {
-                world.setBlockState(blockToDisable,world.getBlockState(blockToDisable).with(CannonPrimingBlock.DISARMED,false),2);
+                world.setBlockState(blockToDisable,world.getBlockState(blockToDisable).with(CannonPrimingBlock.DISARMED,false));
             } else if (world.getBlockState(blockToDisable).isOf(Pirates.MOTION_INVOKING_BLOCK)) {
-                world.setBlockState(blockToDisable,world.getBlockState(blockToDisable).with(MotionInvokingBlock.ARMED,true),2);
+                world.setBlockState(blockToDisable,world.getBlockState(blockToDisable).with(MotionInvokingBlock.ARMED,true));
             }
         }
     }

@@ -43,9 +43,7 @@ public class CannonPrimingBlockEntityRenderer implements BlockEntityRenderer<Can
 
         blockRenderManager.renderBlockAsEntity(Blocks.TORCH.getDefaultState(), matrices, vertexConsumers, 255, overlay);
 
-
         matrices.pop();
-
 
     }
 

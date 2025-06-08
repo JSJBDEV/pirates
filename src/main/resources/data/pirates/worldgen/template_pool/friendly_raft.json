@@ -1,13 +1,13 @@
 {
-  "name": "pirates:ships",
+  "name": "pirates:wrecks",
   "fallback": "minecraft:empty",
   "elements": [
     {
-      "weight": 3,
+      "weight": 2,
       "element": {
         "element_type": "minecraft:single_pool_element",
         "projection": "rigid",
-        "location": "pirates:flyingship/wreckerideal",
+        "location": "pirates:friendly_raft",
         "processors": "minecraft:empty"
       }
     }

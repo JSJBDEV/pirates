@@ -15,6 +15,10 @@
         {
             "structure": "pirates:wreck3",
             "weight": 1
+        },
+        {
+            "structure": "pirates:friendly_raft",
+            "weight": 1
         }
     ],
     "placement": {
