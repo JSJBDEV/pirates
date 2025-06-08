@@ -21,6 +21,9 @@ The Cannon Activator Block can be crafted with the same recipe as a Dispenser, e
 
 Cannonballs can be crafted with Blaze Powder, Gunpowder, and an Iron Ingot in any pattern.
 
+## Crew
+You may find some friendlier pirates on a raft at sea, giving one a Golden Apple will allow you to arm your cannons, so they might autofire again!
+
 ## Shipwrecks
 Shipwreck structures can be found throughout the world that contain treasure similar to what you can find on pirate ships.
 

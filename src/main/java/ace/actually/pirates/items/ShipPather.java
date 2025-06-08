@@ -17,8 +17,8 @@ import net.minecraft.util.TypedActionResult;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.world.World;
 
-public class ShipPointer extends Item {
-    public ShipPointer(Settings settings) {
+public class ShipPather extends Item {
+    public ShipPather(Settings settings) {
         super(settings);
     }
 
@@ -36,19 +36,20 @@ public class ShipPointer extends Item {
             }
             else
             {
-
                 if(context.getStack().hasNbt() && context.getStack().getNbt().contains("mib"))
                 {
                     NbtCompound compound = context.getStack().getNbt();
                     int[] v = compound.getIntArray("mib");
                     MotionInvokingBlockEntity be = (MotionInvokingBlockEntity) world.getBlockEntity(new BlockPos(v[0],v[1],v[2]));
                     BlockPos pos = context.getBlockPos();
-                    be.setTarget(new int[]{pos.getX(),pos.getY(),pos.getZ()});
+                    be.addPathNode(new BlockPos(pos.getX(),be.getPos().getY(),pos.getZ()));
+                    context.getPlayer().sendMessage(Text.translatable("text.pirates.pather.add"));
                 }
                 else
                 {
                     context.getPlayer().sendMessage(Text.translatable("text.pirates.need_mib"));
                 }
+
             }
 
         }
@@ -57,15 +58,23 @@ public class ShipPointer extends Item {
 
     @Override
     public TypedActionResult<ItemStack> use(World world, PlayerEntity user, Hand hand) {
-        if(Hand.MAIN_HAND==hand && !world.isClient)
+        if(Hand.MAIN_HAND==hand && !world.isClient && user.getMainHandStack().hasNbt() && user.getMainHandStack().getNbt().contains("mib"))
         {
             NbtCompound compound = user.getMainHandStack().getNbt();
             int[] v = compound.getIntArray("mib");
             MotionInvokingBlockEntity be = (MotionInvokingBlockEntity) world.getBlockEntity(new BlockPos(v[0],v[1],v[2]));
             int[] t = be.getTarget();
             user.sendMessage(Text.translatable("text.pirates.target").append(Text.of(" "+t[0]+" "+t[1]+" "+t[2])));
+            user.sendMessage(Text.translatable("text.pirates.paths"));
+            for(NbtElement element: be.getPath())
+            {
+                if(element.getType()==NbtElement.INT_ARRAY_TYPE)
+                {
+                    int[] ints = ((NbtIntArray) element).getIntArray();
+                    user.sendMessage(Text.of(ints[0]+" "+ints[1]+" "+ints[2]));
+                }
+            }
         }
         return super.use(world, user, hand);
     }
-
 }

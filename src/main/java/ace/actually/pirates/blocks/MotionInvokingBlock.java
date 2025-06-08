@@ -8,11 +8,15 @@ import net.minecraft.block.entity.BlockEntity;
 import net.minecraft.block.entity.BlockEntityTicker;
 import net.minecraft.block.entity.BlockEntityType;
 import net.minecraft.entity.player.PlayerEntity;
+import net.minecraft.item.ItemPlacementContext;
 import net.minecraft.item.ItemStack;
 import net.minecraft.item.Items;
 import net.minecraft.server.world.ServerWorld;
 import net.minecraft.sound.SoundCategory;
 import net.minecraft.sound.SoundEvents;
+import net.minecraft.state.StateManager;
+import net.minecraft.state.property.BooleanProperty;
+import net.minecraft.state.property.Properties;
 import net.minecraft.util.ActionResult;
 import net.minecraft.util.Hand;
 import net.minecraft.util.hit.BlockHitResult;
@@ -25,11 +29,22 @@ import org.valkyrienskies.mod.common.ValkyrienSkiesMod;
 import org.valkyrienskies.mod.common.util.DimensionIdProvider;
 
 public class MotionInvokingBlock extends BlockWithEntity {
-
+    public static final BooleanProperty ARMED = BooleanProperty.of("armed");
 
     public MotionInvokingBlock(Settings settings) {
         super(settings);
 
+    }
+
+    @Override
+    protected void appendProperties(StateManager.Builder<Block, BlockState> builder) {
+        builder.add(ARMED);
+    }
+
+    @Nullable
+    @Override
+    public BlockState getPlacementState(ItemPlacementContext ctx) {
+        return super.getPlacementState(ctx).with(ARMED,true);
     }
 
     @Override
@@ -76,7 +91,7 @@ public class MotionInvokingBlock extends BlockWithEntity {
     public static void disarm(World world, BlockPos pos) {
         if (world.isClient()) return;
 
-        world.setBlockState(pos, Blocks.SPRUCE_PLANKS.getDefaultState());
+        world.setBlockState(pos, Pirates.MOTION_INVOKING_BLOCK.getDefaultState().with(ARMED,false));
         world.playSound(null, pos, SoundEvents.BLOCK_BEACON_DEACTIVATE, SoundCategory.BLOCKS, 1, 0.95f);
 
     }
