@@ -1,5 +1,5 @@
 {
-  "name": "pirates:ships",
+  "name": "pirates_eureka:ships",
   "fallback": "minecraft:empty",
   "elements": [
     {
@@ -7,7 +7,7 @@
       "element": {
         "element_type": "minecraft:single_pool_element",
         "projection": "rigid",
-        "location": "pirates:ship/deep-sea-moray",
+        "location": "pirates_eureka:ship/deep-sea-moray",
         "processors": "minecraft:empty"
       }
     },
@@ -16,7 +16,7 @@
       "element": {
         "element_type": "minecraft:single_pool_element",
         "projection": "rigid",
-        "location": "pirates:ship/barnacle-hopper",
+        "location": "pirates_eureka:ship/barnacle-hopper",
         "processors": "minecraft:empty"
       }
     },
@@ -25,7 +25,7 @@
       "element": {
         "element_type": "minecraft:single_pool_element",
         "projection": "rigid",
-        "location": "pirates:ship/midnight-barracuda",
+        "location": "pirates_eureka:ship/midnight-barracuda",
         "processors": "minecraft:empty"
       }
     },
@@ -34,7 +34,7 @@
       "element": {
         "element_type": "minecraft:single_pool_element",
         "projection": "rigid",
-        "location": "pirates:ship/eye-of-horus",
+        "location": "pirates_eureka:ship/eye-of-horus",
         "processors": "minecraft:empty"
       }
     },
@@ -43,7 +43,7 @@
       "element": {
         "element_type": "minecraft:single_pool_element",
         "projection": "rigid",
-        "location": "pirates:ship/antelope",
+        "location": "pirates_eureka:ship/antelope",
         "processors": "minecraft:empty"
       }
     },
@@ -52,7 +52,7 @@
       "element": {
         "element_type": "minecraft:single_pool_element",
         "projection": "rigid",
-        "location": "pirates:ship/anetum-contatum",
+        "location": "pirates_eureka:ship/anetum-contatum",
         "processors": "minecraft:empty"
       }
     },
@@ -61,7 +61,7 @@
       "element": {
         "element_type": "minecraft:single_pool_element",
         "projection": "rigid",
-        "location": "pirates:ship/the-heart-attack",
+        "location": "pirates_eureka:ship/the-heart-attack",
         "processors": "minecraft:empty"
       }
     },
@@ -70,7 +70,7 @@
       "element": {
         "element_type": "minecraft:single_pool_element",
         "projection": "rigid",
-        "location": "pirates:ship/whydah",
+        "location": "pirates_eureka:ship/whydah",
         "processors": "minecraft:empty"
       }
     },
@@ -79,7 +79,7 @@
       "element": {
         "element_type": "minecraft:single_pool_element",
         "projection": "rigid",
-        "location": "pirates:ship/whydah_ghost",
+        "location": "pirates_eureka:ship/whydah-ghost",
         "processors": "minecraft:empty"
       }
     },
@@ -88,7 +88,7 @@
       "element": {
         "element_type": "minecraft:single_pool_element",
         "projection": "rigid",
-        "location": "pirates:ship/revenge",
+        "location": "pirates_eureka:ship/revenge",
         "processors": "minecraft:empty"
       }
     },
@@ -97,7 +97,25 @@
       "element": {
         "element_type": "minecraft:single_pool_element",
         "projection": "rigid",
-        "location": "pirates:ship/the-phantom-leviathan",
+        "location": "pirates_eureka:ship/the-phantom-leviathan",
+        "processors": "minecraft:empty"
+      }
+    },
+    {
+      "weight": 2,
+      "element": {
+        "element_type": "minecraft:single_pool_element",
+        "projection": "rigid",
+        "location": "pirates_eureka:ship/queen-annes-revenge",
+        "processors": "minecraft:empty"
+      }
+    },
+    {
+      "weight": 2,
+      "element": {
+        "element_type": "minecraft:single_pool_element",
+        "projection": "rigid",
+        "location": "pirates_eureka:ship/hispaniola",
         "processors": "minecraft:empty"
       }
     }

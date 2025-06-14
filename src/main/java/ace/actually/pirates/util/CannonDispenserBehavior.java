@@ -75,6 +75,6 @@ public abstract class CannonDispenserBehavior
      * {@return the force of a projectile's velocity when spawned}
      */
     protected float getForce() {
-        return Pirates.cannonFiringRange;
+        return Pirates.cannonRange;
     }
 }

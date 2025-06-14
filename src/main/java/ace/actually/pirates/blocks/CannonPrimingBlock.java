@@ -18,6 +18,7 @@ import net.minecraft.util.math.*;
 import net.minecraft.world.*;
 import org.jetbrains.annotations.Nullable;
 
+@SuppressWarnings("deprecation")
 public class CannonPrimingBlock extends BlockWithEntity {
     public CannonPrimingBlock(Settings settings) {
         super(settings);
@@ -78,20 +79,6 @@ public class CannonPrimingBlock extends BlockWithEntity {
         return checkType(type, Pirates.CANNON_PRIMING_BLOCK_ENTITY, (world1, pos, state1, be) -> be.tick(world1, pos, state1, be));
     }
 
-//    @Override
-//    public boolean emitsRedstonePower(BlockState state) {
-//        return state.get(RedstoneLampBlock.LIT);
-//    }
-//
-//    @Override
-//    public int getWeakRedstonePower(BlockState state, BlockView world, BlockPos pos, Direction direction) {
-//       if(state.get(RedstoneLampBlock.LIT))
-//       {
-//           return 15;
-//       }
-//       return 0;
-//    }
-
     @Override
     public BlockState getStateForNeighborUpdate(BlockState state, Direction direction, BlockState neighborState, WorldAccess world, BlockPos pos, BlockPos neighborPos) {
 
@@ -104,11 +91,11 @@ public class CannonPrimingBlock extends BlockWithEntity {
     }
 
     public BlockState rotate(BlockState state, BlockRotation rotation) {
-        return (BlockState)state.with(Properties.FACING, rotation.rotate((Direction)state.get(Properties.FACING)));
+        return state.with(Properties.FACING, rotation.rotate(state.get(Properties.FACING)));
     }
 
     public BlockState mirror(BlockState state, BlockMirror mirror) {
-        return state.rotate(mirror.getRotation((Direction)state.get(Properties.FACING)));
+        return state.rotate(mirror.getRotation(state.get(Properties.FACING)));
     }
 
     public static void disarm(World world, BlockPos pos) {
