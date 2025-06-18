@@ -38,8 +38,6 @@ import net.minecraft.item.*;
 import net.minecraft.registry.Registries;
 import net.minecraft.registry.Registry;
 import net.minecraft.registry.RegistryKey;
-import net.minecraft.resource.ResourceType;
-import net.minecraft.server.MinecraftServer;
 import net.minecraft.sound.BlockSoundGroup;
 import net.minecraft.sound.SoundEvents;
 import net.minecraft.text.Text;
@@ -50,7 +48,6 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.util.Optional;
-import java.util.function.Consumer;
 import java.util.function.Supplier;
 
 public class Pirates implements ModInitializer {
@@ -70,31 +67,72 @@ public class Pirates implements ModInitializer {
 			.build();
 
 	public static float baseShotPower;
+	public static float cannonRange;
 	public static int pursuitDistance;
 	public static boolean shouldEnableFlyingPirates;
 	public static Supplier<ItemStack> recruitCost;
+	public static CompatTracker loadedCompats = new CompatTracker();
 
 	@Override
 	public void onInitialize() {
 
 		Optional<ModContainer> container = FabricLoader.getInstance().getModContainer(Pirates.MOD_ID);
 
-		if (container.isPresent()) {
-			if(ResourceManagerHelper.registerBuiltinResourcePack(
-					new Identifier("flying_ships"),
-					container.get(),
-					ResourcePackActivationType.NORMAL
-			)) {
-				LOGGER.info("Registered flying ships data pack");
+		if (FabricLoader.getInstance().isModLoaded("vs_sails")) {
+			loadedCompats.sails = true;
+
+			if (container.isPresent()) {
+				if(ResourceManagerHelper.registerBuiltinResourcePack(
+						new Identifier("sails_ships"),
+						container.get(),
+						ResourcePackActivationType.DEFAULT_ENABLED
+				)) {
+					LOGGER.info("Registered vs_sails ships data pack");
+				} else {
+					LOGGER.warn("vs_sails ships data pack didn't work");
+				}
 			} else {
-				LOGGER.warn("didn't work");
+				LOGGER.warn("Failed to register vs_sails ships data pack");
 			}
-		} else {
-			LOGGER.warn("Failed to register flying ships data pack");
+		}
+		if (FabricLoader.getInstance().isModLoaded("vs_eureka")) {
+			loadedCompats.eureka = true;
+
+			if (container.isPresent()) {
+				ResourcePackActivationType eurekaActivation =
+						loadedCompats.sails ? ResourcePackActivationType.NORMAL : ResourcePackActivationType.DEFAULT_ENABLED;
+
+				if(ResourceManagerHelper.registerBuiltinResourcePack(
+						new Identifier("eureka_ships"),
+						container.get(),
+						eurekaActivation
+				)) {
+					LOGGER.info("Registered vs_eureka ships data pack");
+				} else {
+					LOGGER.warn("vs_eureka ships data pack didn't work");
+				}
+			} else {
+				LOGGER.warn("Failed to register vs_eureka ships data pack");
+			}
+
+			if (container.isPresent()) {
+				if(ResourceManagerHelper.registerBuiltinResourcePack(
+						new Identifier("flying_ships"),
+						container.get(),
+						ResourcePackActivationType.NORMAL
+				)) {
+					LOGGER.info("Registered flying ships data pack");
+				} else {
+					LOGGER.warn("didn't work");
+				}
+			} else {
+				LOGGER.warn("Failed to register flying ships data pack");
+			}
 		}
 
 		ConfigUtils.checkConfigs();
 		baseShotPower = Float.parseFloat(ConfigUtils.config.getOrDefault("base-shot-power","2.2"));
+		cannonRange = Float.parseFloat(ConfigUtils.config.getOrDefault("cannon-range","1.7"));
 		pursuitDistance = Integer.parseInt(ConfigUtils.config.getOrDefault("pursuit-distance","10000"));
 		shouldEnableFlyingPirates = ConfigUtils.config.getOrDefault("should-enable-flying-pirates","false").equals("true");
 
@@ -239,5 +277,9 @@ public class Pirates implements ModInitializer {
 
 	}
 
+	public static class CompatTracker {
+		public boolean eureka = false;
+		public boolean sails = false;
 
+	}
 }

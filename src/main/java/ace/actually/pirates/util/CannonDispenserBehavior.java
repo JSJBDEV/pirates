@@ -1,4 +1,5 @@
 package ace.actually.pirates.util;
+import ace.actually.pirates.Pirates;
 import ace.actually.pirates.sound.ModSounds;
 import net.minecraft.block.DispenserBlock;
 import net.minecraft.block.dispenser.ItemDispenserBehavior;
@@ -26,7 +27,7 @@ public abstract class CannonDispenserBehavior
         Position position = DispenserBlock.getOutputLocation(pointer);
         Direction direction = pointer.getBlockState().get(DispenserBlock.FACING);
         ProjectileEntity projectileEntity = this.createProjectile(world, position, stack);
-        projectileEntity.setVelocity(direction.getOffsetX(), (float)direction.getOffsetY() + 0.15f, direction.getOffsetZ(), this.getForce() + 0.6f, this.getVariation() / 2);
+        projectileEntity.setVelocity(direction.getOffsetX(), (float)direction.getOffsetY() + 0.15f, direction.getOffsetZ(), this.getForce(), this.getVariation() / 2);
         world.spawnEntity(projectileEntity);
 
         Ship ship = VSGameUtilsKt.getShipManagingPos(world, pointer.getPos());
@@ -74,6 +75,6 @@ public abstract class CannonDispenserBehavior
      * {@return the force of a projectile's velocity when spawned}
      */
     protected float getForce() {
-        return 1.1f;
+        return Pirates.cannonRange;
     }
 }

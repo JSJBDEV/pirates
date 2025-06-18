@@ -1,20 +1,21 @@
 package ace.actually.pirates.util;
 
 import ace.actually.pirates.blocks.entity.MotionInvokingBlockEntity;
+import com.quintonc.vs_sails.blocks.HelmBlock;
 import com.quintonc.vs_sails.registration.SailsBlocks;
+import com.quintonc.vs_sails.ship.SailsShipControl;
 import net.minecraft.block.BlockState;
 import net.minecraft.item.ItemPlacementContext;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.world.World;
 import org.joml.Vector3dc;
 import org.valkyrienskies.core.api.ships.LoadedServerShip;
-import org.valkyrienskies.eureka.EurekaBlocks;
-import org.valkyrienskies.eureka.block.ShipHelmBlock;
-import org.valkyrienskies.eureka.ship.EurekaShipControl;
 import org.valkyrienskies.mod.api.SeatedControllingPlayer;
 
-public class EurekaCompat {
+public class SailsCompat {
+
     private static int flipflop = 1;
+
     public static void moveTowards(MotionInvokingBlockEntity be, SeatedControllingPlayer power, LoadedServerShip ship)
     {
         if(power==null) return;
@@ -26,27 +27,8 @@ public class EurekaCompat {
             return;
         }
 
-
         power.setForwardImpulse(1);
         Vector3dc v3d = ship.getTransform().getPositionInWorld();
-
-        EurekaShipControl shipControl  = ship.getAttachment(EurekaShipControl.class);
-        if(shipControl!=null && shipControl.getBalloons()>0)
-        {
-            if(be.getTarget()[1]>v3d.y()-1)
-            {
-                power.setUpImpulse(1);
-            }
-            else if(be.getTarget()[1]<v3d.y()+1)
-            {
-                power.setUpImpulse(-1);
-            }
-            else
-            {
-                power.setUpImpulse(0);
-            }
-        }
-
 
         if(be.getLdx()==-1)
         {
@@ -81,9 +63,6 @@ public class EurekaCompat {
         SeatedControllingPlayer seatedControllingPlayer = ship.getAttachment(SeatedControllingPlayer.class);
         if (seatedControllingPlayer == null) return;
         seatedControllingPlayer.setLeftImpulse(0);
-        seatedControllingPlayer.setForwardImpulse(0);
-        seatedControllingPlayer.setCruise(false);
-        seatedControllingPlayer.setUpImpulse(0);
         ship.setAttachment(SeatedControllingPlayer.class, seatedControllingPlayer);
     }
 
@@ -92,6 +71,6 @@ public class EurekaCompat {
     }
 
     public static boolean checkHelm(World world, BlockPos pos) {
-        return world.getBlockState(pos.up()).getBlock() instanceof ShipHelmBlock;
+        return world.getBlockState(pos.up()).getBlock() instanceof HelmBlock;
     }
 }
