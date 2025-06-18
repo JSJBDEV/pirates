@@ -152,6 +152,9 @@ public class Pirates implements ModInitializer {
 
 		ItemGroupEvents.modifyEntriesEvent(PIRATES_ITEM_GROUP_KEY).register(itemGroup -> {
 			itemGroup.add(Pirates.CANNONBALL);
+			itemGroup.add(Pirates.FIRE_CANNONBALL);
+			itemGroup.add(Pirates.WEIGHTED_CANNONBALL);
+			itemGroup.add(Pirates.SHIP_ID_BLOCK);
 			itemGroup.add(Pirates.CANNON_PRIMING_BLOCK.asItem());
 			itemGroup.add(Pirates.CREW_SPAWNER_BLOCK.asItem());
 			itemGroup.add(Pirates.MOTION_INVOKING_BLOCK.asItem());

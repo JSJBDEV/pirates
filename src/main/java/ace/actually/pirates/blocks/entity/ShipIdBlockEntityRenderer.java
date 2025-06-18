@@ -36,7 +36,7 @@ public class ShipIdBlockEntityRenderer implements BlockEntityRenderer<ShipIdBloc
 
         matrices.multiply(RotationAxis.NEGATIVE_Z.rotationDegrees(180));
 
-        MinecraftClient.getInstance().textRenderer.draw(entity.getShipName(),0,1,0,false,matrices.peek().getPositionMatrix(),vertexConsumers, TextRenderer.TextLayerType.NORMAL,1,light);
+        MinecraftClient.getInstance().textRenderer.draw(entity.getShipName().replace("\\","§"),0,1,0,false,matrices.peek().getPositionMatrix(),vertexConsumers, TextRenderer.TextLayerType.NORMAL,1,light);
         matrices.pop();
     }
 }
