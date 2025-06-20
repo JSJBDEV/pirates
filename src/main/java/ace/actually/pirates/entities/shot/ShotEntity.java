@@ -1,8 +1,6 @@
 package ace.actually.pirates.entities.shot;
 
 import ace.actually.pirates.Pirates;
-import ace.actually.pirates.util.EurekaCompat;
-import net.minecraft.block.BlockState;
 import net.minecraft.block.Blocks;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.EntityType;
@@ -163,6 +161,16 @@ public class ShotEntity extends ThrownItemEntity implements FlyingItemEntity {
             serverWorld.setBlockBreakingInfo(entityId, blockPos, damageStage);
         }
     }
+    @Override
+    protected void onBlockHit(BlockHitResult blockHitResult) {
+        super.onBlockHit(blockHitResult);
+        if(extra.contains("heavy"))
+        {
+            getWorld().setBlockState(blockHitResult.getBlockPos(), Pirates.HEAVY_BLOCK.getDefaultState());
+        }
+
+    }
+
     private void explode() {
         World world = this.getWorld();
         BlockPos impactPos = this.getCollisionBlock(); // ✅ Get exact impact block

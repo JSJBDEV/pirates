@@ -12,6 +12,8 @@ import ace.actually.pirates.items.ShipPather;
 import ace.actually.pirates.items.ShipPointer;
 import ace.actually.pirates.sound.ModSounds;
 import ace.actually.pirates.util.ConfigUtils;
+import g_mungus.vlib.VLib;
+import g_mungus.vlib.api.VLibGameUtils;
 import net.fabricmc.api.ModInitializer;
 import net.fabricmc.fabric.api.gamerule.v1.GameRuleFactory;
 import net.fabricmc.fabric.api.gamerule.v1.GameRuleRegistry;
@@ -25,6 +27,7 @@ import net.fabricmc.fabric.api.resource.ResourcePackActivationType;
 import net.fabricmc.loader.api.FabricLoader;
 import net.fabricmc.loader.api.ModContainer;
 import net.minecraft.block.AbstractBlock;
+import net.minecraft.block.Block;
 import net.minecraft.block.Blocks;
 import net.minecraft.block.entity.BlockEntityType;
 import net.minecraft.entity.Entity;
@@ -35,8 +38,6 @@ import net.minecraft.item.*;
 import net.minecraft.registry.Registries;
 import net.minecraft.registry.Registry;
 import net.minecraft.registry.RegistryKey;
-import net.minecraft.resource.ResourceType;
-import net.minecraft.server.MinecraftServer;
 import net.minecraft.sound.BlockSoundGroup;
 import net.minecraft.sound.SoundEvents;
 import net.minecraft.text.Text;
@@ -47,7 +48,6 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.util.Optional;
-import java.util.function.Consumer;
 import java.util.function.Supplier;
 
 public class Pirates implements ModInitializer {
@@ -67,31 +67,72 @@ public class Pirates implements ModInitializer {
 			.build();
 
 	public static float baseShotPower;
+	public static float cannonRange;
 	public static int pursuitDistance;
 	public static boolean shouldEnableFlyingPirates;
 	public static Supplier<ItemStack> recruitCost;
+	public static CompatTracker loadedCompats = new CompatTracker();
 
 	@Override
 	public void onInitialize() {
 
 		Optional<ModContainer> container = FabricLoader.getInstance().getModContainer(Pirates.MOD_ID);
 
-		if (container.isPresent()) {
-			if(ResourceManagerHelper.registerBuiltinResourcePack(
-					new Identifier("flying_ships"),
-					container.get(),
-					ResourcePackActivationType.NORMAL
-			)) {
-				LOGGER.info("Registered flying ships data pack");
+		if (FabricLoader.getInstance().isModLoaded("vs_sails")) {
+			loadedCompats.sails = true;
+
+			if (container.isPresent()) {
+				if(ResourceManagerHelper.registerBuiltinResourcePack(
+						new Identifier("sails_ships"),
+						container.get(),
+						ResourcePackActivationType.DEFAULT_ENABLED
+				)) {
+					LOGGER.info("Registered vs_sails ships data pack");
+				} else {
+					LOGGER.warn("vs_sails ships data pack didn't work");
+				}
 			} else {
-				LOGGER.warn("didn't work");
+				LOGGER.warn("Failed to register vs_sails ships data pack");
 			}
-		} else {
-			LOGGER.warn("Failed to register flying ships data pack");
+		}
+		if (FabricLoader.getInstance().isModLoaded("vs_eureka")) {
+			loadedCompats.eureka = true;
+
+			if (container.isPresent()) {
+				ResourcePackActivationType eurekaActivation =
+						loadedCompats.sails ? ResourcePackActivationType.NORMAL : ResourcePackActivationType.DEFAULT_ENABLED;
+
+				if(ResourceManagerHelper.registerBuiltinResourcePack(
+						new Identifier("eureka_ships"),
+						container.get(),
+						eurekaActivation
+				)) {
+					LOGGER.info("Registered vs_eureka ships data pack");
+				} else {
+					LOGGER.warn("vs_eureka ships data pack didn't work");
+				}
+			} else {
+				LOGGER.warn("Failed to register vs_eureka ships data pack");
+			}
+
+			if (container.isPresent()) {
+				if(ResourceManagerHelper.registerBuiltinResourcePack(
+						new Identifier("flying_ships"),
+						container.get(),
+						ResourcePackActivationType.NORMAL
+				)) {
+					LOGGER.info("Registered flying ships data pack");
+				} else {
+					LOGGER.warn("didn't work");
+				}
+			} else {
+				LOGGER.warn("Failed to register flying ships data pack");
+			}
 		}
 
 		ConfigUtils.checkConfigs();
 		baseShotPower = Float.parseFloat(ConfigUtils.config.getOrDefault("base-shot-power","2.2"));
+		cannonRange = Float.parseFloat(ConfigUtils.config.getOrDefault("cannon-range","1.7"));
 		pursuitDistance = Integer.parseInt(ConfigUtils.config.getOrDefault("pursuit-distance","10000"));
 		shouldEnableFlyingPirates = ConfigUtils.config.getOrDefault("should-enable-flying-pirates","false").equals("true");
 
@@ -111,6 +152,9 @@ public class Pirates implements ModInitializer {
 
 		ItemGroupEvents.modifyEntriesEvent(PIRATES_ITEM_GROUP_KEY).register(itemGroup -> {
 			itemGroup.add(Pirates.CANNONBALL);
+			itemGroup.add(Pirates.FIRE_CANNONBALL);
+			itemGroup.add(Pirates.WEIGHTED_CANNONBALL);
+			itemGroup.add(Pirates.SHIP_ID_BLOCK);
 			itemGroup.add(Pirates.CANNON_PRIMING_BLOCK.asItem());
 			itemGroup.add(Pirates.CREW_SPAWNER_BLOCK.asItem());
 			itemGroup.add(Pirates.MOTION_INVOKING_BLOCK.asItem());
@@ -147,6 +191,7 @@ public class Pirates implements ModInitializer {
 	public static final CrewSpawnerBlock CREW_SPAWNER_BLOCK = new CrewSpawnerBlock(AbstractBlock.Settings.copy(Blocks.BIRCH_WOOD).noBlockBreakParticles().noCollision().dropsNothing().sounds(Silent));
 	public static final StableBlock STABLE_BLOCK = new StableBlock(AbstractBlock.Settings.create());
 	public static final ShipIdBlock SHIP_ID_BLOCK = new ShipIdBlock(AbstractBlock.Settings.create());
+	public static final Block HEAVY_BLOCK = new Block(AbstractBlock.Settings.copy(Blocks.OBSIDIAN));
 	private void registerBlocks()
 	{
 		Registry.register(Registries.BLOCK,new Identifier("pirates","cannon_priming_block"),CANNON_PRIMING_BLOCK);
@@ -155,12 +200,15 @@ public class Pirates implements ModInitializer {
 		Registry.register(Registries.BLOCK,new Identifier("pirates","crew_spawner_block"),CREW_SPAWNER_BLOCK);
 		Registry.register(Registries.BLOCK,new Identifier("pirates","stable_block"),STABLE_BLOCK);
 		Registry.register(Registries.BLOCK,new Identifier("pirates","ship_id_block"),SHIP_ID_BLOCK);
+		Registry.register(Registries.BLOCK,new Identifier("pirates","heavy_block"),HEAVY_BLOCK);
 
 	}
 
 
 
 	public static final Item CANNONBALL = new Item(new Item.Settings());
+	public static final Item FIRE_CANNONBALL = new Item(new Item.Settings());
+	public static final Item WEIGHTED_CANNONBALL = new Item(new Item.Settings());
 	public static final Item CANNONBALL_ENT = new Item(new Item.Settings());
 	public static final ShipPointer SHIP_POINTER = new ShipPointer(new Item.Settings());
 	public static final ShipPather SHIP_PATHER = new ShipPather(new Item.Settings());
@@ -169,6 +217,8 @@ public class Pirates implements ModInitializer {
 	private void registerItems()
 	{
 		Registry.register(Registries.ITEM,new Identifier("pirates","cannonball"),CANNONBALL);
+		Registry.register(Registries.ITEM,new Identifier("pirates","fire_cannonball"),FIRE_CANNONBALL);
+		Registry.register(Registries.ITEM,new Identifier("pirates","weighted_cannonball"),WEIGHTED_CANNONBALL);
 		Registry.register(Registries.ITEM,new Identifier("util_pirates","util_1"),CANNONBALL_ENT);
 		Registry.register(Registries.ITEM,new Identifier("pirates","ship_pointer"),SHIP_POINTER);
 		Registry.register(Registries.ITEM,new Identifier("pirates","cannoneer"),CANNONEER_ITEM);
@@ -230,5 +280,9 @@ public class Pirates implements ModInitializer {
 
 	}
 
+	public static class CompatTracker {
+		public boolean eureka = false;
+		public boolean sails = false;
 
+	}
 }

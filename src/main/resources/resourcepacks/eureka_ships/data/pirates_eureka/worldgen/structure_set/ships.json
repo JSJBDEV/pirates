@@ -1,7 +1,7 @@
 {
     "structures": [
         {
-            "structure": "pirates:ship",
+            "structure": "pirates_eureka:ship",
             "weight": 1
         }
     ],
