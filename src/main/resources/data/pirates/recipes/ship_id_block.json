@@ -1,0 +1,14 @@
+{
+  "type": "minecraft:crafting_shapeless",
+  "group": "shipidblock",
+  "ingredients": [
+
+    {"item": "minecraft:paper"},
+    {"item": "minecraft:black_dye"},
+    {"item": "minecraft:iron_ingot"}
+
+  ],
+  "result": {
+    "item": "pirates:ship_id_block"
+  }
+}

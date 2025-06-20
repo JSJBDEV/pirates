@@ -1,6 +1,7 @@
 package ace.actually.pirates.entities.shot;
 
 import ace.actually.pirates.Pirates;
+import net.minecraft.block.Blocks;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.EntityType;
 import net.minecraft.entity.FlyingItemEntity;
@@ -13,6 +14,7 @@ import net.minecraft.network.packet.Packet;
 import net.minecraft.network.packet.s2c.play.EntitySpawnS2CPacket;
 import net.minecraft.particle.ParticleTypes;
 import net.minecraft.server.world.ServerWorld;
+import net.minecraft.util.hit.BlockHitResult;
 import net.minecraft.util.hit.EntityHitResult;
 import net.minecraft.util.hit.HitResult;
 import net.minecraft.world.World;
@@ -69,6 +71,16 @@ public class ShotEntity extends ThrownItemEntity implements FlyingItemEntity {
         if (!this.getWorld().isClient) {
             explode();
         }
+    }
+
+    @Override
+    protected void onBlockHit(BlockHitResult blockHitResult) {
+        super.onBlockHit(blockHitResult);
+        if(extra.contains("heavy"))
+        {
+            getWorld().setBlockState(blockHitResult.getBlockPos(), Pirates.HEAVY_BLOCK.getDefaultState());
+        }
+
     }
 
     private void explode() {
