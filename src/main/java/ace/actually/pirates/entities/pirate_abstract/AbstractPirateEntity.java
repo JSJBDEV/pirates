@@ -1,5 +1,8 @@
 package ace.actually.pirates.entities.pirate_abstract;
 
+import ace.actually.pirates.Pirates;
+import ace.actually.pirates.blocks.CannonPrimingBlock;
+import ace.actually.pirates.blocks.MotionInvokingBlock;
 import ace.actually.pirates.events.IPirateDies;
 import ace.actually.pirates.util.DisarmUtils;
 import net.minecraft.entity.EntityData;
@@ -15,6 +18,8 @@ import net.minecraft.world.LocalDifficulty;
 import net.minecraft.world.ServerWorldAccess;
 import net.minecraft.world.World;
 import org.valkyrienskies.mod.common.VSGameUtilsKt;
+
+import java.util.Objects;
 
 public abstract class AbstractPirateEntity  extends HostileEntity {
 
