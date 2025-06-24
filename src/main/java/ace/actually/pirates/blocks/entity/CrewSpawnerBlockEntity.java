@@ -107,10 +107,7 @@ public class CrewSpawnerBlockEntity extends BlockEntity {
             blockResult = origin1.west();
         }
 
-        // rearm the disarm cannon with new crew
-        if (world.getBlockState(blockResult).isOf(Pirates.CANNON_PRIMING_BLOCK) &&
-            world.getBlockState(blockResult).get(Properties.DISARMED))
-            CannonPrimingBlock.rearmCannon(world, blockResult);
+
         return blockResult;
     }
 

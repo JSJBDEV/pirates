@@ -30,6 +30,8 @@ import org.valkyrienskies.eureka.fabric.EurekaModFabric;
 import org.valkyrienskies.mod.common.VSClientGameUtils;
 import org.valkyrienskies.mod.common.VSGameUtilsKt;
 
+import java.util.function.Consumer;
+
 public class ShotEntity extends ThrownItemEntity implements FlyingItemEntity {
     private LivingEntity in;
     private float damage=6;
@@ -98,27 +100,69 @@ public class ShotEntity extends ThrownItemEntity implements FlyingItemEntity {
         }
         return null; // No impact detected
     }
-    private boolean isBelowWaterLine(BlockPos pos, Ship ship) {
-        // ✅ Convert BlockPos to world coordinates using Valkyrien Skies' Vector3d
+    private boolean isBelowWaterLine(BlockPos pos, Ship ship, Vec3d shotDirection) {
+        // Convert BlockPos to world coordinates
         Vector3d worldVec = VSGameUtilsKt.toWorldCoordinates(ship,
                 pos.getX() + 0.5, pos.getY() + 0.5, pos.getZ() + 0.5);
 
-        // ✅ Convert Vector3d to BlockPos (flooring the values to ensure a valid position)
+        // Convert to world BlockPos
         BlockPos worldPos = new BlockPos((int) Math.floor(worldVec.x()),
-                                         (int) Math.floor(worldVec.y()),
-                                         (int) Math.floor(worldVec.z()));
+                (int) Math.floor(worldVec.y()),
+                (int) Math.floor(worldVec.z()));
 
-        // 🔹 Now check for water below in actual world space
-        int depth = 3;
-        for (int i = 0; i < depth; i++) {
-            BlockPos checkPos = worldPos.down(i); // Move down in world coordinates
+        // Step 1️⃣ — Check if water below (depth 3)
+        boolean waterBelow = false;
+        for (int i = 0; i < 3; i++) {
+            BlockPos checkPos = worldPos.down(i);
             BlockState state = this.getWorld().getBlockState(checkPos);
-
             if (state.isOf(Blocks.WATER)) {
-                return true; // ✅ Found water below the ship
+                waterBelow = true;
+                break;
             }
         }
-        return false; // ❌ No water found below
+        if (!waterBelow) {
+            // Debug:
+            // System.out.println("No water below → no leak");
+            return false; // Not below waterline → skip further checks
+        }
+
+        // Step 2️⃣ — Check surrounding blocks to determine if hull or thin structure (mast, etc.)
+        // Calculate "left" and "right" vectors based on shot direction
+        Vec3d left = shotDirection.crossProduct(new Vec3d(0, 1, 0)).normalize(); // Left
+        Vec3d right = left.multiply(-1); // Right
+
+        // Prepare surrounding positions
+        BlockPos leftPos = worldPos.add((int) Math.round(left.x), 0, (int) Math.round(left.z));
+        BlockPos rightPos = worldPos.add((int) Math.round(right.x), 0, (int) Math.round(right.z));
+        BlockPos upPos = worldPos.up();
+        BlockPos downPos = worldPos.down();
+
+        // Get block states
+        BlockState centerState = this.getWorld().getBlockState(worldPos);
+        BlockState leftState = this.getWorld().getBlockState(leftPos);
+        BlockState rightState = this.getWorld().getBlockState(rightPos);
+        BlockState upState = this.getWorld().getBlockState(upPos);
+        BlockState downState = this.getWorld().getBlockState(downPos);
+
+        // Count how many neighbors match center block
+        int sameCount = 0;
+        if (leftState.getBlock() == centerState.getBlock()) sameCount++;
+        if (rightState.getBlock() == centerState.getBlock()) sameCount++;
+        if (upState.getBlock() == centerState.getBlock()) sameCount++;
+        if (downState.getBlock() == centerState.getBlock()) sameCount++;
+
+        // Step 3️⃣ — Threshold for "is this block part of hull"
+        int threshold = 2; // Tune this — recommend 2 or 3
+
+        if (sameCount >= threshold) {
+            // Debug:
+            // System.out.println("HULL detected! sameCount=" + sameCount);
+            return true; // Surrounded → likely hull → leak
+        } else {
+            // Debug:
+            // System.out.println("THIN structure (mast/beam), sameCount=" + sameCount + " → no leak");
+            return false; // Thin structure → no leak
+        }
     }
     /**
      * 🔹 Applies explosion splash damage & knockback to entities near the impact area.
@@ -189,27 +233,23 @@ public class ShotEntity extends ThrownItemEntity implements FlyingItemEntity {
         boolean isShipBlock = VSGameUtilsKt.isBlockInShipyard(world, impactPos);
 
         if (!isShipBlock) {
+            Consumer<BlockPos> breakAndExplode = pos -> {
+                BlockState state = world.getBlockState(pos);
+                if (!state.isAir() && state.getHardness(world, pos) >= 0) {
+                    world.breakBlock(pos, true);
+                }
+                applyExplosionEffects(world, pos);
+            };
+
             // 🔹 Ensure first block is destroyed
-            BlockState blockStateFirst = world.getBlockState(impactPos);
-            if (!blockStateFirst.isAir() && blockStateFirst.getHardness(world, impactPos) >= 0) {
-                world.breakBlock(impactPos, true); // ✅ Destroy block
-            }
-            applyExplosionEffects(world, impactPos);
+            breakAndExplode.accept(impactPos);
             // ✅ Handle Non-Ship Blocks (Piercing Shot with Breakable Blocks)
             for (int i = 0; i < penetrationPower; i++) {
                 currentPos = currentPos.add(shotDirection.multiply(stepSize)); // Move forward in exact trajectory
                 BlockPos blockToBreak = new BlockPos((int) Math.floor(currentPos.x),
                         (int) Math.floor(currentPos.y),
                         (int) Math.floor(currentPos.z));
-                BlockState blockStateNext = world.getBlockState(blockToBreak);
-
-                // 🔹 Ensure block is solid & breakable
-                if (!blockStateNext.isAir() && blockStateNext.getHardness(world, blockToBreak) >= 0) {
-                    world.breakBlock(blockToBreak, true); // ✅ Destroy block
-                }
-
-                // 💥 Apply Explosion Splash Damage & Knockback on Every Hit
-                applyExplosionEffects(world, blockToBreak);
+                breakAndExplode.accept(blockToBreak);
             }
         } else {
             // ✅ Handle Ship Blocks (Check if Below Waterline or Not)
@@ -217,33 +257,14 @@ public class ShotEntity extends ThrownItemEntity implements FlyingItemEntity {
             if (ship == null)
                 return;
 
-            boolean isBelowWater = isBelowWaterLine(impactPos, ship);
-
-            // 🔹 Ensure first block is affected
-            BlockState blockStateFirst = world.getBlockState(impactPos);
-            if (!blockStateFirst.isAir() && blockStateFirst.getHardness(world, impactPos) >= 0) {
-                if (isBelowWater) {
-                    // 🌊 Below Waterline: Replace Blocks with Netherite for Sinking Effect
-                    world.setBlockState(impactPos, Pirates.CREW_SPAWNER_BLOCK.getDefaultState());
-                } else {
-                    // 🚢 Above Waterline: Apply Visual Damage & Splash Damage
-                    damageBlockVisual(world, impactPos);
-                    applyExplosionEffects(world, impactPos);
-                }
-            }
-            // just for sinking
-            penetrationPower = 2; // make water sink this ship in a sensible way :33
-            for (int i = 0; i < penetrationPower; i++) {
-                currentPos = currentPos.add(shotDirection.multiply(stepSize)); // Move forward in exact trajectory
-                BlockPos blockToAffect = new BlockPos((int) Math.floor(currentPos.x),
-                        (int) Math.floor(currentPos.y),
-                        (int) Math.floor(currentPos.z));
+            boolean isBelowWater = isBelowWaterLine(impactPos, ship, shotDirection);
+            // lambda
+            Consumer<BlockPos> breakAndExplodeHull = blockToAffect -> {
                 BlockState blockStateNext = world.getBlockState(blockToAffect);
-
                 if (!blockStateNext.isAir() && blockStateNext.getHardness(world, blockToAffect) >= 0) {
                     if (isBelowWater) {
                         // 🌊 Below Waterline: Replace Blocks with Netherite for Sinking Effect
-                        world.setBlockState(blockToAffect, Pirates.CREW_SPAWNER_BLOCK.getDefaultState());
+                        world.setBlockState(blockToAffect, Pirates.HEAVY_BLOCK.getDefaultState());
                     } else {
                         // 🚢 Above Waterline: Apply Visual Damage & Splash Damage
                         damageBlockVisual(world, blockToAffect);
@@ -253,6 +274,18 @@ public class ShotEntity extends ThrownItemEntity implements FlyingItemEntity {
                     // 🛠️ If the block is NOT breakable, just apply knockback & explosion effects
                     applyExplosionEffects(world, blockToAffect);
                 }
+            };
+
+            // 🔹 Ensure first block is affected
+            breakAndExplodeHull.accept(impactPos);
+            // just for sinking
+            penetrationPower = 2; // make water sink this ship in a sensible way :33
+            for (int i = 0; i < penetrationPower; i++) {
+                currentPos = currentPos.add(shotDirection.multiply(stepSize)); // Move forward in exact trajectory
+                BlockPos blockToAffect = new BlockPos((int) Math.floor(currentPos.x),
+                        (int) Math.floor(currentPos.y),
+                        (int) Math.floor(currentPos.z));
+                breakAndExplodeHull.accept(blockToAffect);
             }
         }
 

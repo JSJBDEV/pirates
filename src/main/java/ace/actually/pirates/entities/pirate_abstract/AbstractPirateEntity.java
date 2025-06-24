@@ -61,17 +61,6 @@ public abstract class AbstractPirateEntity  extends HostileEntity {
         IPirateDies.EVENT.invoker().interact(attackingPlayer,this);
         super.remove(reason);
     }
-
-    private void disableSavedBlock() {
-        if (!Objects.equals(blockToDisable, new BlockPos(0, 0, 0))) {
-            IPirateDies.EVENT.invoker().interact(attackingPlayer,this);
-            if (this.getWorld().getBlockState(blockToDisable).isOf(Pirates.CANNON_PRIMING_BLOCK)) {
-                CannonPrimingBlock.disarm(this.getWorld(), blockToDisable);
-            } else if (this.getWorld().getBlockState(blockToDisable).isOf(Pirates.MOTION_INVOKING_BLOCK)) {
-                MotionInvokingBlock.disarm(this.getWorld(), blockToDisable);
-            }
-        }
-    }
     public boolean isOnShip() {
         return VSGameUtilsKt.getShipManaging(this) != null;
     }
