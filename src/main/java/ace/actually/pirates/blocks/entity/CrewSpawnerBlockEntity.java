@@ -9,6 +9,7 @@ import ace.actually.pirates.events.IPirateSpawns;
 import ace.actually.pirates.entities.CrewSpawnType;
 import ace.actually.pirates.entities.CrewTypes;
 import ace.actually.pirates.util.ConfigUtils;
+import ewewukek.musketmod.Items;
 import net.minecraft.block.BlockState;
 import net.minecraft.block.entity.BlockEntity;
 import net.minecraft.enchantment.Enchantments;
@@ -16,8 +17,9 @@ import net.minecraft.entity.Entity;
 import net.minecraft.entity.EntityType;
 import net.minecraft.entity.EquipmentSlot;
 import net.minecraft.entity.passive.VillagerEntity;
+import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
-import net.minecraft.item.Items;
+//import net.minecraft.item.Items;
 import net.minecraft.nbt.NbtCompound;
 import net.minecraft.server.network.EntityTrackerEntry;
 import net.minecraft.server.world.ServerWorld;
@@ -32,6 +34,7 @@ import org.valkyrienskies.mod.common.VSGameUtilsKt;
 import net.minecraft.world.EntityList;
 
 import java.util.Optional;
+import java.util.Random;
 
 public class CrewSpawnerBlockEntity extends BlockEntity {
 
@@ -113,19 +116,20 @@ public class CrewSpawnerBlockEntity extends BlockEntity {
 
     private static Entity getEntityFromState(World world, BlockEntity be) {
         Entity crew = null;
+        Item randomGun = AbstractPirateEntity.guns[new Random().nextInt(AbstractPirateEntity.guns.length)];
         switch (be.getCachedState().get(CrewTypes.CREW_SPAWN_TYPE))
         {
             case PIRATE ->
             {
                 crew = new PirateEntity(world, checkForBlocksToCrew(world, be.getPos()));
-                crew.equipStack(EquipmentSlot.MAINHAND, new ItemStack(Items.BOW));
+                crew.equipStack(EquipmentSlot.MAINHAND, new ItemStack(randomGun));
             }
             case VILLAGER ->  crew = new VillagerEntity(EntityType.VILLAGER, world, VillagerType.forBiome(world.getBiome(be.getPos())));
             case SKELETON_PIRATE ->
             {
                 BlockPos blockToCrew = checkForBlocksToCrew(world, be.getPos());
                 crew = new PirateEntity(world, blockToCrew);
-                ItemStack itemStack = new ItemStack(Items.BOW);
+                ItemStack itemStack = new ItemStack(randomGun);
                 if (world.getBlockState(blockToCrew).isOf(Pirates.MOTION_INVOKING_BLOCK)) {
                     itemStack.addEnchantment(Enchantments.POWER, 2);
                 }

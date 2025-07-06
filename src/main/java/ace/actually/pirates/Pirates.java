@@ -56,7 +56,7 @@ public class Pirates implements ModInitializer {
 	// That way, it's clear which mod wrote info, warnings, and errors.
 	public static final String MOD_ID = "pirates";
     public static final Logger LOGGER = LoggerFactory.getLogger("pirates");
-
+	public static final Identifier CANNON_SMOKE_PACKET_ID = new Identifier(MOD_ID, "cannon_smoke");
 	public static final GameRules.Key<GameRules.BooleanRule> PIRATES_IS_LIVE_WORLD =
 			GameRuleRegistry.register("piratesIsLive", GameRules.Category.MISC, GameRuleFactory.createBooleanRule(true));
 

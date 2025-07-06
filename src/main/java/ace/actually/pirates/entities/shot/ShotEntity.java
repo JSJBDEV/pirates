@@ -264,9 +264,13 @@ public class ShotEntity extends ThrownItemEntity implements FlyingItemEntity {
                 if (!blockStateNext.isAir() && blockStateNext.getHardness(world, blockToAffect) >= 0) {
                     if (isBelowWater) {
                         // 🌊 Below Waterline: Replace Blocks with Netherite for Sinking Effect
-                        world.setBlockState(blockToAffect, Pirates.HEAVY_BLOCK.getDefaultState());
+//                        world.setBlockState(blockToAffect, Pirates.HEAVY_BLOCK.getDefaultState());
                     } else {
                         // 🚢 Above Waterline: Apply Visual Damage & Splash Damage
+                        if (!blockStateNext.isAir() && blockStateNext.getHardness(world, blockToAffect) >= 0) {
+                            world.breakBlock(blockToAffect, true);
+                        }
+
                         damageBlockVisual(world, blockToAffect);
                         applyExplosionEffects(world, blockToAffect);
                     }
@@ -278,15 +282,15 @@ public class ShotEntity extends ThrownItemEntity implements FlyingItemEntity {
 
             // 🔹 Ensure first block is affected
             breakAndExplodeHull.accept(impactPos);
-            // just for sinking
-            penetrationPower = 2; // make water sink this ship in a sensible way :33
-            for (int i = 0; i < penetrationPower; i++) {
-                currentPos = currentPos.add(shotDirection.multiply(stepSize)); // Move forward in exact trajectory
-                BlockPos blockToAffect = new BlockPos((int) Math.floor(currentPos.x),
-                        (int) Math.floor(currentPos.y),
-                        (int) Math.floor(currentPos.z));
-                breakAndExplodeHull.accept(blockToAffect);
-            }
+//            // just for sinking
+//            penetrationPower = 2; // make water sink this ship in a sensible way :33
+//            for (int i = 0; i < penetrationPower; i++) {
+//                currentPos = currentPos.add(shotDirection.multiply(stepSize)); // Move forward in exact trajectory
+//                BlockPos blockToAffect = new BlockPos((int) Math.floor(currentPos.x),
+//                        (int) Math.floor(currentPos.y),
+//                        (int) Math.floor(currentPos.z));
+//                breakAndExplodeHull.accept(blockToAffect);
+//            }
         }
 
         this.discard();

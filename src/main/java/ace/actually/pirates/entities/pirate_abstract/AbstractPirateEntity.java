@@ -3,15 +3,22 @@ package ace.actually.pirates.entities.pirate_abstract;
 import ace.actually.pirates.Pirates;
 import ace.actually.pirates.blocks.CannonPrimingBlock;
 import ace.actually.pirates.blocks.MotionInvokingBlock;
+import ace.actually.pirates.entities.friendly_pirate.FriendlyPirateEntity;
 import ace.actually.pirates.events.IPirateDies;
 import ace.actually.pirates.util.DisarmUtils;
+import ewewukek.musketmod.GunItem;
+import ewewukek.musketmod.Items;
 import net.minecraft.entity.EntityData;
 import net.minecraft.entity.EntityType;
 import net.minecraft.entity.SpawnReason;
 import net.minecraft.entity.ai.goal.LookAroundGoal;
 import net.minecraft.entity.ai.goal.LookAtEntityGoal;
-import net.minecraft.entity.mob.HostileEntity;
+import net.minecraft.entity.data.DataTracker;
+import net.minecraft.entity.data.TrackedData;
+import net.minecraft.entity.data.TrackedDataHandlerRegistry;
+import net.minecraft.entity.mob.IllagerEntity;
 import net.minecraft.entity.player.PlayerEntity;
+import net.minecraft.item.Item;
 import net.minecraft.nbt.NbtCompound;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.world.LocalDifficulty;
@@ -21,11 +28,11 @@ import org.valkyrienskies.mod.common.VSGameUtilsKt;
 
 import java.util.Objects;
 
-public abstract class AbstractPirateEntity  extends HostileEntity {
+public abstract class AbstractPirateEntity extends IllagerEntity {
 
     protected BlockPos blockToDisable;
 
-    protected AbstractPirateEntity(EntityType<? extends HostileEntity> entityType, World world, BlockPos blockToDisable) {
+    protected AbstractPirateEntity(EntityType<? extends IllagerEntity> entityType, World world, BlockPos blockToDisable) {
         super(entityType, world);
 
         this.blockToDisable = blockToDisable;
@@ -35,7 +42,14 @@ public abstract class AbstractPirateEntity  extends HostileEntity {
     public boolean isPersistent() {
         return true;
     }
-
+    @Override
+    public void addBonusForWave(int wave, boolean unused) {
+        // Your pirate might not need any wave bonus, so leave it empty or log something
+    }
+    @Override
+    public net.minecraft.sound.SoundEvent getCelebratingSound() {
+        return null; // or a custom pirate celebration sound if you have one
+    }
 
     @Override
     public EntityData initialize(ServerWorldAccess world, LocalDifficulty difficulty, SpawnReason spawnReason, EntityData entityData, NbtCompound entityTag) {
@@ -86,5 +100,36 @@ public abstract class AbstractPirateEntity  extends HostileEntity {
             this.blockToDisable = new BlockPos(x, y, z);
         }
     }
-
+    // for musket mod with reloading and firing
+    public static final Item[] guns = {
+            Items.MUSKET,
+            Items.MUSKET_WITH_BAYONET,
+            Items.BLUNDERBUSS,
+            Items.PISTOL,
+            Items.MUSKET_WITH_SCOPE
+    };
+    protected static final TrackedData<Boolean> CHARGING =
+            DataTracker.registerData(FriendlyPirateEntity.class, TrackedDataHandlerRegistry.BOOLEAN);
+    @Override
+    protected void initDataTracker() {
+        super.initDataTracker();
+        dataTracker.startTracking(CHARGING, false);
+    }
+    public boolean isCharging() {
+        return this.dataTracker.get(CHARGING);
+    }
+    public void setCharging(boolean charging) {
+        this.dataTracker.set(CHARGING, charging);
+    }
+    @Override
+    public IllagerEntity.State getState() {
+        if (this.isCharging()) {
+            return State.CROSSBOW_CHARGE;
+        } else if (GunItem.isHoldingGun(this)) {
+            if (this.isAttacking())
+                return State.CROSSBOW_HOLD;
+            return ((this.isHolding(Items.PISTOL)) ? State.NEUTRAL : State.CROSSBOW_CHARGE);
+        }
+        return State.CROSSBOW_CHARGE; // almost never reach this state
+    }
 }
