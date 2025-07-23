@@ -7,7 +7,7 @@ license = "MIT"
 
 [[mods]]
 modId = "pirates"
-version = "1.7"
+version = "1.8.2"
 displayName = "Valkyrien Pirates Forge"
 authors = ["Acrogeneous", "G_Mungus", "Quoissant"]
 description = '''
@@ -31,13 +31,6 @@ side = "BOTH"
 
 [[dependencies.pirates]]
 modId = "connectormod"
-mandatory = true
-versionRange = "*"
-ordering = "NONE"
-side = "BOTH"
-
-[[dependencies.pirates]]
-modId = "vs_eureka"
 mandatory = true
 versionRange = "*"
 ordering = "NONE"
