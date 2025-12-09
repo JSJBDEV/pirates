@@ -10,6 +10,7 @@ import ace.actually.pirates.events.IPirateDies;
 import ace.actually.pirates.items.ContractItem;
 import ace.actually.pirates.items.ShipPather;
 import ace.actually.pirates.items.ShipPointer;
+import ace.actually.pirates.items.TestItem;
 import ace.actually.pirates.sound.ModSounds;
 import ace.actually.pirates.util.ConfigUtils;
 import g_mungus.vlib.VLib;
@@ -214,6 +215,7 @@ public class Pirates implements ModInitializer {
 	public static final ShipPather SHIP_PATHER = new ShipPather(new Item.Settings());
 	public static final ContractItem CANNONEER_ITEM = new ContractItem(CANNON_PRIMING_BLOCK,"cannoneer");
 	public static final ContractItem DOCTOR_ITEM = new ContractItem(Blocks.GOLD_BLOCK,"doctor");
+	public static final TestItem TEST_ITEM = new TestItem(new Item.Settings());
 	private void registerItems()
 	{
 		Registry.register(Registries.ITEM,new Identifier("pirates","cannonball"),CANNONBALL);
@@ -227,6 +229,8 @@ public class Pirates implements ModInitializer {
 		Registry.register(Registries.ITEM,new Identifier("pirates","stable_block"),new BlockItem(STABLE_BLOCK,new Item.Settings()));
 
 		Registry.register(Registries.ITEM,new Identifier("pirates","cannon_priming_block"),new BlockItem(CANNON_PRIMING_BLOCK,new Item.Settings()));
+
+		Registry.register(Registries.ITEM,new Identifier("pirates","test"),TEST_ITEM);
 
 		Registry.register(Registries.ITEM,new Identifier("pirates","motion_invoking_block"),new BlockItem(MOTION_INVOKING_BLOCK,new Item.Settings()));
 		Registry.register(Registries.ITEM,new Identifier("pirates","crew_spawner_block"),new BlockItem(CREW_SPAWNER_BLOCK,new Item.Settings()));
