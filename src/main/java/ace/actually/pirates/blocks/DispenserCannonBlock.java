@@ -3,37 +3,42 @@ package ace.actually.pirates.blocks;
 import ace.actually.pirates.Pirates;
 import ace.actually.pirates.entities.shot.ShotEntity;
 import ace.actually.pirates.util.CannonDispenserBehavior;
-import net.minecraft.block.*;
-import net.minecraft.block.dispenser.DispenserBehavior;
-import net.minecraft.block.entity.BlockEntity;
-import net.minecraft.block.entity.DispenserBlockEntity;
-import net.minecraft.entity.projectile.ProjectileEntity;
-import net.minecraft.item.ItemStack;
-import net.minecraft.item.Items;
-import net.minecraft.state.property.Properties;
-import net.minecraft.text.Text;
-import net.minecraft.util.Util;
-import net.minecraft.util.math.BlockPos;
-import net.minecraft.util.math.Direction;
-import net.minecraft.util.math.Position;
-import net.minecraft.util.math.Vec3d;
-import net.minecraft.world.BlockView;
-import net.minecraft.world.World;
-import net.minecraft.world.WorldAccess;
+import net.minecraft.Util;
+
+import net.minecraft.core.BlockPos;
+import net.minecraft.core.Direction;
+import net.minecraft.core.Position;
+import net.minecraft.core.dispenser.DispenseItemBehavior;
+import net.minecraft.network.chat.Component;
+import net.minecraft.world.entity.projectile.Projectile;
+import net.minecraft.world.item.ItemStack;
+import net.minecraft.world.item.Items;
+import net.minecraft.world.level.BlockGetter;
+import net.minecraft.world.level.Level;
+import net.minecraft.world.level.LevelAccessor;
+import net.minecraft.world.level.block.Block;
+import net.minecraft.world.level.block.Blocks;
+import net.minecraft.world.level.block.DispenserBlock;
+import net.minecraft.world.level.block.entity.BlockEntity;
+import net.minecraft.world.level.block.entity.DispenserBlockEntity;
+import net.minecraft.world.level.block.state.BlockBehaviour;
+import net.minecraft.world.level.block.state.BlockState;
+import net.minecraft.world.level.block.state.properties.BlockStateProperties;
+import net.minecraft.world.phys.Vec3;
 
 public class DispenserCannonBlock extends DispenserBlock {
-    public DispenserCannonBlock(AbstractBlock.Settings settings) {
+    public DispenserCannonBlock(BlockBehaviour.Properties settings) {
         super(settings);
     }
 
     @Override
-    protected DispenserBehavior getBehaviorForItem(ItemStack stack) {
+    protected DispenseItemBehavior getDispenseMethod(ItemStack stack) {
         if(stack.getItem() == Pirates.CANNONBALL){
             return new CannonDispenserBehavior() {
                 @Override
-                protected ProjectileEntity createProjectile(World world, Position position, ItemStack stack) {
+                protected Projectile createProjectile(Level world, Position position, ItemStack stack) {
                     ShotEntity qentity = Util.make(new ShotEntity(Pirates.SHOT_ENTITY_TYPE,world,null,Pirates.CANNONBALL_ENT,6,""), (entity) -> {});
-                    qentity.setPosition(new Vec3d(position.getX(),position.getY(),position.getZ()));
+                    qentity.setPos(new Vec3(position.x(),position.y(),position.z()));
                     return qentity;
                 }
             };
@@ -41,9 +46,9 @@ public class DispenserCannonBlock extends DispenserBlock {
         if(stack.getItem() == Pirates.FIRE_CANNONBALL){
             return new CannonDispenserBehavior() {
                 @Override
-                protected ProjectileEntity createProjectile(World world, Position position, ItemStack stack) {
+                protected Projectile createProjectile(Level world, Position position, ItemStack stack) {
                     ShotEntity qentity = Util.make(new ShotEntity(Pirates.SHOT_ENTITY_TYPE,world,null,Pirates.CANNONBALL_ENT,3,"fire"), (entity) -> {});
-                    qentity.setPosition(new Vec3d(position.getX(),position.getY(),position.getZ()));
+                    qentity.setPos(new Vec3(position.x(),position.y(),position.z()));
                     return qentity;
                 }
             };
@@ -51,39 +56,39 @@ public class DispenserCannonBlock extends DispenserBlock {
         if(stack.getItem() == Pirates.WEIGHTED_CANNONBALL){
             return new CannonDispenserBehavior() {
                 @Override
-                protected ProjectileEntity createProjectile(World world, Position position, ItemStack stack) {
+                protected Projectile createProjectile(Level world, Position position, ItemStack stack) {
                     ShotEntity qentity = Util.make(new ShotEntity(Pirates.SHOT_ENTITY_TYPE,world,null,Pirates.CANNONBALL_ENT,3,"heavy"), (entity) -> {});
-                    qentity.setPosition(new Vec3d(position.getX(),position.getY(),position.getZ()));
+                    qentity.setPos(new Vec3(position.x(),position.y(),position.z()));
                     return qentity;
                 }
             };
         }
-        return super.getBehaviorForItem(stack);
+        return super.getDispenseMethod(stack);
     }
 
     @SuppressWarnings("deprecation")
     @Override
-    public BlockState getStateForNeighborUpdate(BlockState state, Direction direction, BlockState neighborState, WorldAccess world, BlockPos pos, BlockPos neighborPos) {
+    public BlockState updateShape(BlockState state, Direction direction, BlockState neighborState, LevelAccessor world, BlockPos pos, BlockPos neighborPos) {
 
-        if (!world.getBlockState(pos.add(state.get(Properties.FACING).getOpposite().getVector())).isOf(Pirates.CANNON_PRIMING_BLOCK) || world.getBlockState(pos.add(state.get(Properties.FACING).getOpposite().getVector())).get(Properties.FACING) != state.get(Properties.FACING)) {
-            world.setBlockState(pos, Blocks.DISPENSER.getDefaultState().with(Properties.FACING, state.get(FACING)), 3);
+        if (!world.getBlockState(pos.offset(state.getValue(BlockStateProperties.FACING).getOpposite().getNormal())).is(Pirates.CANNON_PRIMING_BLOCK) || world.getBlockState(pos.offset(state.getValue(BlockStateProperties.FACING).getOpposite().getNormal())).getValue(BlockStateProperties.FACING) != state.getValue(BlockStateProperties.FACING)) {
+            world.setBlock(pos, Blocks.DISPENSER.defaultBlockState().setValue(BlockStateProperties.FACING, state.getValue(FACING)), 3);
         }
 
-        return super.getStateForNeighborUpdate(state, direction, neighborState, world, pos, neighborPos);
+        return super.updateShape(state, direction, neighborState, world, pos, neighborPos);
     }
 
     @Override
-    public BlockEntity createBlockEntity(BlockPos pos, BlockState state) {
+    public BlockEntity newBlockEntity(BlockPos pos, BlockState state) {
         DispenserBlockEntity entity = new DispenserBlockEntity(pos, state);
-        entity.setCustomName(Text.of("Cannon"));
+        entity.setCustomName(Component.nullToEmpty("Cannon"));
         return entity;
     }
 
     @Override
-    public void neighborUpdate(BlockState state, World world, BlockPos pos, Block sourceBlock, BlockPos sourcePos, boolean notify) {}
+    public void neighborChanged(BlockState state, Level world, BlockPos pos, Block sourceBlock, BlockPos sourcePos, boolean notify) {}
 
     @Override
-    public ItemStack getPickStack(BlockView world, BlockPos pos, BlockState state) {
+    public ItemStack getCloneItemStack(BlockGetter world, BlockPos pos, BlockState state) {
         return new ItemStack(Items.DISPENSER);
     }
 

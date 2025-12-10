@@ -4,49 +4,49 @@ import ace.actually.pirates.Pirates;
 import ace.actually.pirates.blocks.CannonPrimingBlock;
 import ace.actually.pirates.entities.friendly_pirate.FriendlyPirateEntity;
 import ace.actually.pirates.util.DisarmUtils;
-import net.minecraft.block.Block;
-import net.minecraft.block.BlockState;
-import net.minecraft.item.Item;
-import net.minecraft.item.ItemUsageContext;
-import net.minecraft.server.world.ServerWorld;
-import net.minecraft.state.property.Properties;
-import net.minecraft.util.ActionResult;
-import net.minecraft.util.math.BlockPos;
+import net.minecraft.core.BlockPos;
+import net.minecraft.server.level.ServerLevel;
+import net.minecraft.world.InteractionResult;
+import net.minecraft.world.item.Item;
+import net.minecraft.world.item.context.UseOnContext;
+import net.minecraft.world.level.block.Block;
+import net.minecraft.world.level.block.state.BlockState;
+import net.minecraft.world.level.block.state.properties.BlockStateProperties;
 
 public class ContractItem extends Item {
     Block jobsite;
     String jobname;
     public ContractItem(Block jobsite, String jobname) {
-        super(new Settings());
+        super(new Properties());
         this.jobname=jobname;
         this.jobsite=jobsite;
     }
 
     @Override
-    public ActionResult useOnBlock(ItemUsageContext context) {
-        if(context.getWorld() instanceof ServerWorld world && context.getWorld().getBlockState(context.getBlockPos()).isOf(jobsite))
+    public InteractionResult useOn(UseOnContext context) {
+        if(context.getLevel() instanceof ServerLevel world && context.getLevel().getBlockState(context.getClickedPos()).is(jobsite))
         {
-            BlockPos pos = context.getBlockPos();
+            BlockPos pos = context.getClickedPos();
             FriendlyPirateEntity fpe = new FriendlyPirateEntity(world,pos);
             fpe.setPirateJob(jobname);
             BlockState state = world.getBlockState(pos);
             DisarmUtils.rearm(world,pos);
 
             BlockPos spos;
-            if(state.contains(Properties.FACING))
+            if(state.hasProperty(BlockStateProperties.FACING))
             {
-                spos = pos.offset(state.get(Properties.FACING).getOpposite());
+                spos = pos.relative(state.getValue(BlockStateProperties.FACING).getOpposite());
             }
             else
             {
-                spos = pos.up();
+                spos = pos.above();
             }
-            world.spawnEntity(fpe);
-            fpe.teleport(spos.getX(),spos.getY(),spos.getZ());
+            world.addFreshEntity(fpe);
+            fpe.teleportToWithTicket(spos.getX(),spos.getY(),spos.getZ());
             fpe.genCustomName(world);
-            context.getStack().decrement(1);
+            context.getItemInHand().shrink(1);
 
         }
-        return super.useOnBlock(context);
+        return super.useOn(context);
     }
 }

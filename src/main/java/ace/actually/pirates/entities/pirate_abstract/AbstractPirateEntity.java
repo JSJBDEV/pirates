@@ -2,58 +2,58 @@ package ace.actually.pirates.entities.pirate_abstract;
 
 import ace.actually.pirates.events.IPirateDies;
 import ace.actually.pirates.util.DisarmUtils;
-import net.minecraft.entity.EntityData;
-import net.minecraft.entity.EntityType;
-import net.minecraft.entity.SpawnReason;
-import net.minecraft.entity.ai.goal.LookAroundGoal;
-import net.minecraft.entity.ai.goal.LookAtEntityGoal;
-import net.minecraft.entity.mob.HostileEntity;
-import net.minecraft.entity.player.PlayerEntity;
-import net.minecraft.nbt.NbtCompound;
-import net.minecraft.util.math.BlockPos;
-import net.minecraft.world.LocalDifficulty;
-import net.minecraft.world.ServerWorldAccess;
-import net.minecraft.world.World;
+import net.minecraft.core.BlockPos;
+import net.minecraft.nbt.CompoundTag;
+import net.minecraft.world.DifficultyInstance;
+import net.minecraft.world.entity.EntityType;
+import net.minecraft.world.entity.MobSpawnType;
+import net.minecraft.world.entity.SpawnGroupData;
+import net.minecraft.world.entity.ai.goal.LookAtPlayerGoal;
+import net.minecraft.world.entity.ai.goal.RandomLookAroundGoal;
+import net.minecraft.world.entity.monster.Monster;
+import net.minecraft.world.entity.player.Player;
+import net.minecraft.world.level.Level;
+import net.minecraft.world.level.ServerLevelAccessor;
 import org.valkyrienskies.mod.common.VSGameUtilsKt;
 
-public abstract class AbstractPirateEntity  extends HostileEntity {
+public abstract class AbstractPirateEntity  extends Monster {
 
     protected BlockPos blockToDisable;
 
-    protected AbstractPirateEntity(EntityType<? extends HostileEntity> entityType, World world, BlockPos blockToDisable) {
+    protected AbstractPirateEntity(EntityType<? extends Monster> entityType, Level world, BlockPos blockToDisable) {
         super(entityType, world);
 
         this.blockToDisable = blockToDisable;
     }
 
     @Override
-    public boolean isPersistent() {
+    public boolean isPersistenceRequired() {
         return true;
     }
 
 
     @Override
-    public EntityData initialize(ServerWorldAccess world, LocalDifficulty difficulty, SpawnReason spawnReason, EntityData entityData, NbtCompound entityTag) {
-        entityData = super.initialize(world, difficulty, spawnReason, entityData, entityTag);
-        initEquipment(random, difficulty);
-        DisarmUtils.rearm(getWorld(),blockToDisable);
-        setPersistent();
+    public SpawnGroupData finalizeSpawn(ServerLevelAccessor world, DifficultyInstance difficulty, MobSpawnType spawnReason, SpawnGroupData entityData, CompoundTag entityTag) {
+        entityData = super.finalizeSpawn(world, difficulty, spawnReason, entityData, entityTag);
+        populateDefaultEquipmentSlots(random, difficulty);
+        DisarmUtils.rearm(level(),blockToDisable);
+        setPersistenceRequired();
         return entityData;
     }
 
     @Override
-    protected void initGoals() {
-        super.initGoals();
-        this.goalSelector.add(5, new PirateWanderArroundFarGoal(this, 1.0D));
-        this.goalSelector.add(6, new LookAtEntityGoal(this, PlayerEntity.class, 200.0F));
-        this.goalSelector.add(6, new LookAroundGoal(this));
+    protected void registerGoals() {
+        super.registerGoals();
+        this.goalSelector.addGoal(5, new PirateWanderArroundFarGoal(this, 1.0D));
+        this.goalSelector.addGoal(6, new LookAtPlayerGoal(this, Player.class, 200.0F));
+        this.goalSelector.addGoal(6, new RandomLookAroundGoal(this));
 
     }
 
     @Override
     public void remove(RemovalReason reason) {
-        DisarmUtils.disarm(getWorld(),blockToDisable);
-        IPirateDies.EVENT.invoker().interact(attackingPlayer,this);
+        DisarmUtils.disarm(level(),blockToDisable);
+        IPirateDies.EVENT.invoker().interact(lastHurtByPlayer,this);
         super.remove(reason);
     }
 
@@ -64,8 +64,8 @@ public abstract class AbstractPirateEntity  extends HostileEntity {
     }
 
     @Override
-    public void writeCustomDataToNbt(NbtCompound nbt) {
-        super.writeCustomDataToNbt(nbt);
+    public void addAdditionalSaveData(CompoundTag nbt) {
+        super.addAdditionalSaveData(nbt);
         nbt.putInt("BlockToDisableX", this.blockToDisable.getX());
         nbt.putInt("BlockToDisableY", this.blockToDisable.getY());
         nbt.putInt("BlockToDisableZ", this.blockToDisable.getZ());
@@ -73,8 +73,8 @@ public abstract class AbstractPirateEntity  extends HostileEntity {
 
 
     @Override
-    public void readCustomDataFromNbt(NbtCompound nbt) {
-        super.readCustomDataFromNbt(nbt);
+    public void readAdditionalSaveData(CompoundTag nbt) {
+        super.readAdditionalSaveData(nbt);
         int x, y, z;
         if (nbt.contains("BlockToDisableX") && nbt.contains("BlockToDisableY") && nbt.contains("BlockToDisableZ")) {
             x = nbt.getInt("BlockToDisableX");

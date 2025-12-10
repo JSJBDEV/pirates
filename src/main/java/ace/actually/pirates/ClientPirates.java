@@ -11,13 +11,13 @@ import net.fabricmc.api.ClientModInitializer;
 import net.fabricmc.fabric.api.blockrenderlayer.v1.BlockRenderLayerMap;
 import net.fabricmc.fabric.api.client.rendering.v1.EntityModelLayerRegistry;
 import net.fabricmc.fabric.api.client.rendering.v1.EntityRendererRegistry;
-import net.minecraft.client.render.RenderLayer;
-import net.minecraft.client.render.block.entity.BlockEntityRendererFactories;
-import net.minecraft.client.render.entity.model.EntityModelLayer;
-import net.minecraft.util.Identifier;
+import net.minecraft.client.model.geom.ModelLayerLocation;
+import net.minecraft.client.renderer.RenderType;
+import net.minecraft.client.renderer.blockentity.BlockEntityRenderers;
+import net.minecraft.resources.ResourceLocation;
 
 public class ClientPirates implements ClientModInitializer {
-    public static final EntityModelLayer SKELETON_PIRATE = new EntityModelLayer(new Identifier("pirates", "skeleton_pirate"), "main");
+    public static final ModelLayerLocation SKELETON_PIRATE = new ModelLayerLocation(new ResourceLocation("pirates", "skeleton_pirate"), "main");
 
     @Override
     public void onInitializeClient() {
@@ -27,9 +27,9 @@ public class ClientPirates implements ClientModInitializer {
         //EntityRendererRegistry.register(Pirates.SKELETON_PIRATE_ENTITY_TYPE, SkeletonPirateEntityRenderer::new);
         EntityRendererRegistry.register(Pirates.SHOT_ENTITY_TYPE, (context) -> new ShotEntityRenderer(context, 1,false));
 
-        BlockEntityRendererFactories.register(Pirates.CANNON_PRIMING_BLOCK_ENTITY, CannonPrimingBlockEntityRenderer::new);
-        BlockEntityRendererFactories.register(Pirates.SHIP_ID_BLOCK_ENTITY, ShipIdBlockEntityRenderer::new);
-        BlockRenderLayerMap.INSTANCE.putBlock(Pirates.SHIP_ID_BLOCK, RenderLayer.getTranslucent());
+        BlockEntityRenderers.register(Pirates.CANNON_PRIMING_BLOCK_ENTITY, CannonPrimingBlockEntityRenderer::new);
+        BlockEntityRenderers.register(Pirates.SHIP_ID_BLOCK_ENTITY, ShipIdBlockEntityRenderer::new);
+        BlockRenderLayerMap.INSTANCE.putBlock(Pirates.SHIP_ID_BLOCK, RenderType.translucent());
 
         //EntityModelLayerRegistry.registerModelLayer(SKELETON_PIRATE, SkeletonPirateModel::getTexturedModelData);
 

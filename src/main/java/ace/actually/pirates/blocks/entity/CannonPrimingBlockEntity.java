@@ -3,16 +3,19 @@ package ace.actually.pirates.blocks.entity;
 import ace.actually.pirates.Pirates;
 import ace.actually.pirates.blocks.CannonPrimingBlock;
 import ace.actually.pirates.util.ConfigUtils;
-import net.minecraft.block.*;
-import net.minecraft.block.entity.BlockEntity;
-import net.minecraft.scoreboard.Team;
-import net.minecraft.server.world.ServerWorld;
-import net.minecraft.state.property.Properties;
-import net.minecraft.util.hit.BlockHitResult;
-import net.minecraft.util.math.*;
-import net.minecraft.world.GameRules;
-import net.minecraft.world.RaycastContext;
-import net.minecraft.world.World;
+import net.minecraft.core.BlockPos;
+import net.minecraft.core.Vec3i;
+import net.minecraft.server.level.ServerLevel;
+import net.minecraft.world.level.ClipContext;
+import net.minecraft.world.level.Level;
+import net.minecraft.world.level.block.DispenserBlock;
+import net.minecraft.world.level.block.RedstoneLampBlock;
+import net.minecraft.world.level.block.entity.BlockEntity;
+import net.minecraft.world.level.block.state.BlockState;
+import net.minecraft.world.level.block.state.properties.BlockStateProperties;
+import net.minecraft.world.phys.BlockHitResult;
+import net.minecraft.world.phys.Vec3;
+import net.minecraft.world.scores.PlayerTeam;
 import org.valkyrienskies.core.api.ships.ServerShip;
 import org.valkyrienskies.mod.common.VSGameUtilsKt;
 
@@ -29,12 +32,12 @@ public class CannonPrimingBlockEntity extends BlockEntity {
         randomRotation = Math.random() * 2.5;
     }
 
-    public void tick(World world, BlockPos pos, BlockState state, CannonPrimingBlockEntity be) {
+    public void tick(Level world, BlockPos pos, BlockState state, CannonPrimingBlockEntity be) {
 
 
-        if (world instanceof ServerWorld sw && cooldown == 0) {
+        if (world instanceof ServerLevel sw && cooldown == 0) {
 
-            if ((checkShouldFire(sw, pos, state) && !state.get(CannonPrimingBlock.DISARMED))){
+            if ((checkShouldFire(sw, pos, state) && !state.getValue(CannonPrimingBlock.DISARMED))){
 
 
                 fire(sw, pos, state);
@@ -42,31 +45,31 @@ public class CannonPrimingBlockEntity extends BlockEntity {
                 cooldown = 3;
             }
         } else if (cooldown == 4) {
-            if (!world.isReceivingRedstonePower(pos)) {
+            if (!world.hasNeighborSignal(pos)) {
                 cooldown --;
             }
         } else  {
             cooldown --;
         }
 
-        if (state.get(RedstoneLampBlock.LIT) && lastCooldown - cooldown == 10) {
-            world.setBlockState(pos, state.with(RedstoneLampBlock.LIT, false));
+        if (state.getValue(RedstoneLampBlock.LIT) && lastCooldown - cooldown == 10) {
+            world.setBlockAndUpdate(pos, state.setValue(RedstoneLampBlock.LIT, false));
         }
     }
 
-    public void fire(World world, BlockPos pos, BlockState state, int cooldown) {
+    public void fire(Level world, BlockPos pos, BlockState state, int cooldown) {
         if (this.cooldown > 3) return;
-        world.setBlockState(pos, state.with(RedstoneLampBlock.LIT, true));
+        world.setBlockAndUpdate(pos, state.setValue(RedstoneLampBlock.LIT, true));
         this.cooldown = cooldown;
         lastCooldown = this.cooldown;
 
-        BlockPos ahead = pos.add(state.get(Properties.FACING).getVector());
-        if (world.getBlockState(ahead).isOf(Pirates.DISPENSER_CANNON_BLOCK)) {
-            world.scheduleBlockTick(ahead, world.getBlockState(ahead).getBlock(), 4);
+        BlockPos ahead = pos.offset(state.getValue(BlockStateProperties.FACING).getNormal());
+        if (world.getBlockState(ahead).is(Pirates.DISPENSER_CANNON_BLOCK)) {
+            world.scheduleTick(ahead, world.getBlockState(ahead).getBlock(), 4);
         }
     }
 
-    public void fire(ServerWorld world, BlockPos pos, BlockState state) {
+    public void fire(ServerLevel world, BlockPos pos, BlockState state) {
         if(cooldownConfig==-5)
         {
             cooldownConfig = Integer.parseInt(ConfigUtils.config.getOrDefault("cannon-firing-pause","40"));
@@ -77,31 +80,31 @@ public class CannonPrimingBlockEntity extends BlockEntity {
     }
 
 
-    private static boolean checkShouldFire(ServerWorld world, BlockPos pos, BlockState state) {
-        Vec3i raycastStart = state.get(Properties.FACING).getVector();
-        if(!(world.getBlockState(pos.add(raycastStart)).getBlock() instanceof DispenserBlock)|| world.getBlockState(pos.add(raycastStart)).get(Properties.FACING) != state.get(Properties.FACING)){
+    private static boolean checkShouldFire(ServerLevel world, BlockPos pos, BlockState state) {
+        Vec3i raycastStart = state.getValue(BlockStateProperties.FACING).getNormal();
+        if(!(world.getBlockState(pos.offset(raycastStart)).getBlock() instanceof DispenserBlock)|| world.getBlockState(pos.offset(raycastStart)).getValue(BlockStateProperties.FACING) != state.getValue(BlockStateProperties.FACING)){
             return false;
         }
 
-        RaycastContext context = new RaycastContext(
-                VSGameUtilsKt.toWorldCoordinates(world, Vec3d.ofCenter(pos.add(raycastStart.multiply(2)))),
-                VSGameUtilsKt.toWorldCoordinates(world, Vec3d.ofCenter(pos.add(raycastStart.multiply(32)))),
-                RaycastContext.ShapeType.COLLIDER,
-                RaycastContext.FluidHandling.NONE,
+        ClipContext context = new ClipContext(
+                VSGameUtilsKt.toWorldCoordinates(world, Vec3.atCenterOf(pos.offset(raycastStart.multiply(2)))),
+                VSGameUtilsKt.toWorldCoordinates(world, Vec3.atCenterOf(pos.offset(raycastStart.multiply(32)))),
+                ClipContext.Block.COLLIDER,
+                ClipContext.Fluid.NONE,
                 null);
 
-        BlockHitResult result = world.raycast(context);
+        BlockHitResult result = world.clip(context);
         if(VSGameUtilsKt.isBlockInShipyard(world, result.getBlockPos()))
         {
             ServerShip thisShip = VSGameUtilsKt.getShipManagingPos(world,pos);
-            Team team = world.getScoreboard().getPlayerTeam(thisShip.getSlug());
+            PlayerTeam team = world.getScoreboard().getPlayersTeam(thisShip.getSlug());
             if(team!=null)
             {
                 ServerShip otherShip = VSGameUtilsKt.getShipManagingPos(world,result.getBlockPos());
-                Team otherTeam = world.getScoreboard().getPlayerTeam(otherShip.getSlug());
+                PlayerTeam otherTeam = world.getScoreboard().getPlayersTeam(otherShip.getSlug());
                 if(otherTeam!=null)
                 {
-                    return !team.isEqual(otherTeam);
+                    return !team.isAlliedTo(otherTeam);
                 }
             }
             return true;

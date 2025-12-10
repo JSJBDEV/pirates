@@ -3,22 +3,21 @@ package ace.actually.pirates.events;
 import ace.actually.pirates.entities.pirate_abstract.AbstractPirateEntity;
 import net.fabricmc.fabric.api.event.Event;
 import net.fabricmc.fabric.api.event.EventFactory;
-import net.minecraft.entity.player.PlayerEntity;
-import net.minecraft.util.ActionResult;
+import net.minecraft.world.InteractionResult;
 
 public interface IPirateSpawns {
     Event<IPirateSpawns> EVENT = EventFactory.createArrayBacked(IPirateSpawns.class,
             (listeners) -> (pirate) -> {
                 for (IPirateSpawns listener : listeners) {
-                    ActionResult result = listener.interact(pirate);
+                    InteractionResult result = listener.interact(pirate);
 
-                    if(result != ActionResult.PASS) {
+                    if(result != InteractionResult.PASS) {
                         return result;
                     }
                 }
 
-                return ActionResult.PASS;
+                return InteractionResult.PASS;
             });
 
-    ActionResult interact(AbstractPirateEntity pirate);
+    InteractionResult interact(AbstractPirateEntity pirate);
 }

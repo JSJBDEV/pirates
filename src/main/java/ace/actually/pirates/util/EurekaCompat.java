@@ -2,10 +2,8 @@ package ace.actually.pirates.util;
 
 import ace.actually.pirates.blocks.entity.MotionInvokingBlockEntity;
 import com.quintonc.vs_sails.registration.SailsBlocks;
-import net.minecraft.block.BlockState;
-import net.minecraft.item.ItemPlacementContext;
-import net.minecraft.util.math.BlockPos;
-import net.minecraft.world.World;
+import net.minecraft.core.BlockPos;
+import net.minecraft.world.level.Level;
 import org.joml.Vector3dc;
 import org.valkyrienskies.core.api.ships.LoadedServerShip;
 import org.valkyrienskies.eureka.EurekaBlocks;
@@ -91,7 +89,7 @@ public class EurekaCompat {
         return Math.abs(x-xto);
     }
 
-    public static boolean checkHelm(World world, BlockPos pos) {
-        return world.getBlockState(pos.up()).getBlock() instanceof ShipHelmBlock;
+    public static boolean checkHelm(Level world, BlockPos pos) {
+        return world.getBlockState(pos.above()).getBlock() instanceof ShipHelmBlock;
     }
 }

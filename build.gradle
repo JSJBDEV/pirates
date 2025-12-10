@@ -1,7 +1,7 @@
 plugins {
-	id 'fabric-loom' version '1.6-SNAPSHOT'
+	id 'net.fabricmc.fabric-loom-remap' version "${loom_version}"
 	id 'maven-publish'
-  id "org.jetbrains.kotlin.jvm" version "1.9.23"
+	id "org.jetbrains.kotlin.jvm" version "2.2.21"
 }
 
 version = project.mod_version
@@ -30,23 +30,44 @@ repositories {
 			}
 		}
 	}
+
+
+	maven { url = "https://maven.bawnorton.com/releases" }
+
+	maven {
+		name = "Valkyrien Skies Internal"
+		url = 'https://maven.valkyrienskies.org'
+	}
 }
 
 dependencies {
 	// To change the versions see the gradle.properties file
 	minecraft "com.mojang:minecraft:${project.minecraft_version}"
-	mappings "net.fabricmc:yarn:${project.yarn_mappings}:v2"
+	mappings loom.officialMojangMappings()
 	modImplementation "net.fabricmc:fabric-loader:${project.loader_version}"
 
-	// Fabric API. This is technically optional, but you probably want it anyway.
-	modImplementation "maven.modrinth:valkyrien-skies:1.20.1-fabric-2.3.0-beta.5"
+	modApi("org.valkyrienskies:valkyrienskies-120-fabric:${vs2_version}") {
+		exclude group: 'com.simibubi', module: ''
+		exclude group: 'dev.engine-room', module: ''
+		exclude group: 'com.jozufozu', module: ''
+	}
+	implementation("org.valkyrienskies.core:api:${vscore_version}") {
+		exclude group: 'org.joml', module: ''
+	}
+	implementation("org.valkyrienskies.core:internal:${vscore_version}") {
+		exclude group: 'org.joml', module: ''
+	}
+	implementation("org.valkyrienskies.core:util:${vscore_version}") {
+		exclude group: 'org.joml', module: ''
+	}
+
 	modImplementation "maven.modrinth:eureka:1.20.1-fabric-1.5.1-beta.3"
 	modImplementation "maven.modrinth:valkyrien-sails:1.20.1-0.1.6-fabric"
 
-	modImplementation "maven.modrinth:vlib:1.20.1-0.0.11-alpha+fabric"
-
 	modImplementation "maven.modrinth:architectury-api:9.2.14+fabric"
+	modImplementation "maven.modrinth:vlib:1.20.1-0.1.0+fabric"
 
+	// Fabric API. This is technically optional, but you probably want it anyway.
 	modImplementation "net.fabricmc.fabric-api:fabric-api:${project.fabric_version}"
 	modImplementation "net.fabricmc:fabric-language-kotlin:${project.fabric_kotlin_version}"
 }
@@ -55,7 +76,7 @@ processResources {
 	inputs.property "version", project.version
 
 	filesMatching("fabric.mod.json") {
-		expand "version": project.version
+		expand "version": inputs.properties.version
 	}
 }
 
@@ -80,8 +101,10 @@ java {
 }
 
 jar {
+	inputs.property "archivesName", project.base.archivesName
+
 	from("LICENSE") {
-		rename { "${it}_${project.base.archivesName.get()}"}
+		rename { "${it}_${inputs.properties.archivesName}"}
 	}
 }
 

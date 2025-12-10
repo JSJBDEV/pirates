@@ -1,32 +1,31 @@
 package ace.actually.pirates.entities.shot;
 
 import ace.actually.pirates.Pirates;
-import net.minecraft.block.Blocks;
-import net.minecraft.entity.Entity;
-import net.minecraft.entity.EntityType;
-import net.minecraft.entity.FlyingItemEntity;
-import net.minecraft.entity.LivingEntity;
-import net.minecraft.entity.projectile.thrown.ThrownItemEntity;
-import net.minecraft.item.Item;
-import net.minecraft.item.ItemStack;
-import net.minecraft.network.listener.ClientPlayPacketListener;
-import net.minecraft.network.packet.Packet;
-import net.minecraft.network.packet.s2c.play.EntitySpawnS2CPacket;
-import net.minecraft.particle.ParticleTypes;
-import net.minecraft.server.world.ServerWorld;
-import net.minecraft.util.hit.BlockHitResult;
-import net.minecraft.util.hit.EntityHitResult;
-import net.minecraft.util.hit.HitResult;
-import net.minecraft.world.World;
+import net.minecraft.core.particles.ParticleTypes;
+import net.minecraft.network.protocol.Packet;
+import net.minecraft.network.protocol.game.ClientGamePacketListener;
+import net.minecraft.network.protocol.game.ClientboundAddEntityPacket;
+import net.minecraft.server.level.ServerLevel;
+import net.minecraft.world.entity.Entity;
+import net.minecraft.world.entity.EntityType;
+import net.minecraft.world.entity.LivingEntity;
+import net.minecraft.world.entity.projectile.ItemSupplier;
+import net.minecraft.world.entity.projectile.ThrowableItemProjectile;
+import net.minecraft.world.item.Item;
+import net.minecraft.world.item.ItemStack;
+import net.minecraft.world.level.Level;
+import net.minecraft.world.phys.BlockHitResult;
+import net.minecraft.world.phys.EntityHitResult;
+import net.minecraft.world.phys.HitResult;
 
-public class ShotEntity extends ThrownItemEntity implements FlyingItemEntity {
+public class ShotEntity extends ThrowableItemProjectile implements ItemSupplier {
     private LivingEntity in;
     private float damage=6;
     private String extra="";
     private int tickAge = 0;
 
 
-    public ShotEntity(EntityType<? extends ThrownItemEntity> entityType, World world, LivingEntity caster, Item toShow, float damageTo, String special) {
+    public ShotEntity(EntityType<? extends ThrowableItemProjectile> entityType, Level world, LivingEntity caster, Item toShow, float damageTo, String special) {
         super(entityType, world);
         in=caster;
         setItem(new ItemStack(toShow));
@@ -34,7 +33,7 @@ public class ShotEntity extends ThrownItemEntity implements FlyingItemEntity {
         extra=special;
     }
 
-    public ShotEntity(World world)
+    public ShotEntity(Level world)
     {
         super(Pirates.SHOT_ENTITY_TYPE, world);
     }
@@ -42,49 +41,49 @@ public class ShotEntity extends ThrownItemEntity implements FlyingItemEntity {
     @Override
     public void tick () {
         if (this.tickAge > 500) {
-            if (!this.getWorld().isClient()) {
+            if (!this.level().isClientSide()) {
                 explode();
             }
         } else {
             this.tickAge++;
         }
 
-        if (!getWorld().isClient() && getVelocity().length() > 0.85) {
-            ((ServerWorld)getWorld()).spawnParticles(ParticleTypes.CLOUD, getX(), getY(), getZ(), 1, 0, 0, 0, 0);
+        if (!level().isClientSide() && getDeltaMovement().length() > 0.85) {
+            ((ServerLevel)level()).sendParticles(ParticleTypes.CLOUD, getX(), getY(), getZ(), 1, 0, 0, 0, 0);
         }
         super.tick();
     }
 
     @Override
-    protected void onCollision(HitResult hitResult) {
-        super.onCollision(hitResult);
-        if (!this.getWorld().isClient) {
+    protected void onHit(HitResult hitResult) {
+        super.onHit(hitResult);
+        if (!this.level().isClientSide) {
             explode();
         }
     }
 
     @Override
-    protected void onEntityHit(EntityHitResult entityHitResult) {
-        super.onEntityHit(entityHitResult);
+    protected void onHitEntity(EntityHitResult entityHitResult) {
+        super.onHitEntity(entityHitResult);
         Entity entity = entityHitResult.getEntity();
-        entity.damage(this.getDamageSources().explosion(null), damage);
-        if (!this.getWorld().isClient) {
+        entity.hurt(this.damageSources().explosion(null), damage);
+        if (!this.level().isClientSide) {
             explode();
         }
     }
 
     @Override
-    protected void onBlockHit(BlockHitResult blockHitResult) {
-        super.onBlockHit(blockHitResult);
+    protected void onHitBlock(BlockHitResult blockHitResult) {
+        super.onHitBlock(blockHitResult);
         if(extra.contains("heavy"))
         {
-            getWorld().setBlockState(blockHitResult.getBlockPos(), Pirates.HEAVY_BLOCK.getDefaultState());
+            level().setBlockAndUpdate(blockHitResult.getBlockPos(), Pirates.HEAVY_BLOCK.defaultBlockState());
         }
 
     }
 
     private void explode() {
-        this.getWorld().createExplosion(this, this.getX(), this.getY(), this.getZ(), Pirates.baseShotPower, extra.contains("fire"), World.ExplosionSourceType.TNT);
+        this.level().explode(this, this.getX(), this.getY(), this.getZ(), Pirates.baseShotPower, extra.contains("fire"), Level.ExplosionInteraction.TNT);
         this.discard();
     }
 
@@ -94,12 +93,12 @@ public class ShotEntity extends ThrownItemEntity implements FlyingItemEntity {
     }
 
     @Override
-    public ItemStack getStack() {
-        return super.getStack();
+    public ItemStack getItem() {
+        return super.getItem();
     }
 
-    public Packet<ClientPlayPacketListener> createSpawnPacket() {
+    public Packet<ClientGamePacketListener> getAddEntityPacket() {
         Entity entity = in;
-        return new EntitySpawnS2CPacket(this, entity == null ? 0 : entity.getId());
+        return new ClientboundAddEntityPacket(this, entity == null ? 0 : entity.getId());
     }
 }

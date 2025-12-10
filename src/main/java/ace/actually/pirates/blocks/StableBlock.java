@@ -3,42 +3,44 @@ package ace.actually.pirates.blocks;
 import ace.actually.pirates.Pirates;
 import ace.actually.pirates.blocks.entity.MotionInvokingBlockEntity;
 import ace.actually.pirates.blocks.entity.StableBlockEntity;
-import net.minecraft.block.*;
-import net.minecraft.block.entity.BlockEntity;
-import net.minecraft.block.entity.BlockEntityTicker;
-import net.minecraft.block.entity.BlockEntityType;
-import net.minecraft.entity.player.PlayerEntity;
-import net.minecraft.item.ItemStack;
-import net.minecraft.server.world.ServerWorld;
-import net.minecraft.util.ActionResult;
-import net.minecraft.util.Hand;
-import net.minecraft.util.hit.BlockHitResult;
-import net.minecraft.util.math.BlockPos;
-import net.minecraft.world.World;
+
+import net.minecraft.core.BlockPos;
+import net.minecraft.server.level.ServerLevel;
+import net.minecraft.world.InteractionHand;
+import net.minecraft.world.InteractionResult;
+import net.minecraft.world.entity.player.Player;
+import net.minecraft.world.level.Level;
+import net.minecraft.world.level.block.BaseEntityBlock;
+import net.minecraft.world.level.block.RenderShape;
+import net.minecraft.world.level.block.entity.BlockEntity;
+import net.minecraft.world.level.block.entity.BlockEntityTicker;
+import net.minecraft.world.level.block.entity.BlockEntityType;
+import net.minecraft.world.level.block.state.BlockState;
+import net.minecraft.world.phys.BlockHitResult;
 import org.jetbrains.annotations.Nullable;
 
-public class StableBlock extends BlockWithEntity {
-    public StableBlock(Settings settings) {
+public class StableBlock extends BaseEntityBlock {
+    public StableBlock(Properties settings) {
         super(settings);
     }
 
     @Override
-    public BlockRenderType getRenderType(BlockState state) {
-        return BlockRenderType.MODEL;
+    public RenderShape getRenderShape(BlockState state) {
+        return RenderShape.MODEL;
     }
 
     @Nullable
     @Override
-    public BlockEntity createBlockEntity(BlockPos pos, BlockState state) {
+    public BlockEntity newBlockEntity(BlockPos pos, BlockState state) {
         return new StableBlockEntity(pos, state);
     }
 
     @Override
-    public ActionResult onUse(BlockState state, World world, BlockPos pos, PlayerEntity player, Hand hand, BlockHitResult hit) {
-        if(world instanceof ServerWorld serverWorld && hand==Hand.MAIN_HAND)
+    public InteractionResult use(BlockState state, Level world, BlockPos pos, Player player, InteractionHand hand, BlockHitResult hit) {
+        if(world instanceof ServerLevel serverWorld && hand==InteractionHand.MAIN_HAND)
         {
             StableBlockEntity be = (StableBlockEntity) serverWorld.getBlockEntity(pos);
-            String name = player.getMainHandStack().getName().getString();
+            String name = player.getMainHandItem().getHoverName().getString();
             System.out.println(name);
             try {
                 double mult = Double.parseDouble(name);
@@ -46,12 +48,12 @@ public class StableBlock extends BlockWithEntity {
             }
             catch (Exception ignored){}
         }
-        return super.onUse(state, world, pos, player, hand, hit);
+        return super.use(state, world, pos, player, hand, hit);
     }
 
     @Nullable
     @Override
-    public <T extends BlockEntity> BlockEntityTicker<T> getTicker(World world, BlockState state, BlockEntityType<T> type) {
-        return checkType(type, Pirates.STABLE_BLOCK_ENTITY, StableBlockEntity::tick);
+    public <T extends BlockEntity> BlockEntityTicker<T> getTicker(Level world, BlockState state, BlockEntityType<T> type) {
+        return createTickerHelper(type, Pirates.STABLE_BLOCK_ENTITY, StableBlockEntity::tick);
     }
 }

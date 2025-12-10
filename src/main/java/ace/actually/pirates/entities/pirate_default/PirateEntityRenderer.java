@@ -1,19 +1,20 @@
 package ace.actually.pirates.entities.pirate_default;
 
-import net.minecraft.client.render.entity.EntityRendererFactory;
-import net.minecraft.client.render.entity.MobEntityRenderer;
-import net.minecraft.client.render.entity.feature.HeldItemFeatureRenderer;
-import net.minecraft.client.render.entity.model.*;
-import net.minecraft.util.Identifier;
+import net.minecraft.client.model.EntityModel;
+import net.minecraft.client.model.geom.ModelLayers;
+import net.minecraft.client.renderer.entity.EntityRendererProvider;
+import net.minecraft.client.renderer.entity.MobRenderer;
+import net.minecraft.client.renderer.entity.layers.ItemInHandLayer;
+import net.minecraft.resources.ResourceLocation;
 
-public class PirateEntityRenderer extends MobEntityRenderer<PirateEntity, EntityModel<PirateEntity>> {
-    public PirateEntityRenderer(EntityRendererFactory.Context context) {
-        super(context, new PirateEntityModel(context.getPart(EntityModelLayers.PILLAGER)), 0.5F);
-        this.addFeature(new HeldItemFeatureRenderer(this, context.getHeldItemRenderer()));
+public class PirateEntityRenderer extends MobRenderer<PirateEntity, EntityModel<PirateEntity>> {
+    public PirateEntityRenderer(EntityRendererProvider.Context context) {
+        super(context, new PirateEntityModel(context.bakeLayer(ModelLayers.PILLAGER)), 0.5F);
+        this.addLayer(new ItemInHandLayer(this, context.getItemInHandRenderer()));
     }
 
     @Override
-    public Identifier getTexture(PirateEntity entity) {
-        return new Identifier("pirates","textures/entity/pirate2.png");
+    public ResourceLocation getTextureLocation(PirateEntity entity) {
+        return new ResourceLocation("pirates","textures/entity/pirate2.png");
     }
 }

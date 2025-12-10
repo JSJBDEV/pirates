@@ -13,8 +13,6 @@ import ace.actually.pirates.items.ShipPointer;
 import ace.actually.pirates.items.TestItem;
 import ace.actually.pirates.sound.ModSounds;
 import ace.actually.pirates.util.ConfigUtils;
-import g_mungus.vlib.VLib;
-import g_mungus.vlib.api.VLibGameUtils;
 import net.fabricmc.api.ModInitializer;
 import net.fabricmc.fabric.api.gamerule.v1.GameRuleFactory;
 import net.fabricmc.fabric.api.gamerule.v1.GameRuleRegistry;
@@ -27,24 +25,27 @@ import net.fabricmc.fabric.api.resource.ResourceManagerHelper;
 import net.fabricmc.fabric.api.resource.ResourcePackActivationType;
 import net.fabricmc.loader.api.FabricLoader;
 import net.fabricmc.loader.api.ModContainer;
-import net.minecraft.block.AbstractBlock;
-import net.minecraft.block.Block;
-import net.minecraft.block.Blocks;
-import net.minecraft.block.entity.BlockEntityType;
-import net.minecraft.entity.Entity;
-import net.minecraft.entity.EntityDimensions;
-import net.minecraft.entity.EntityType;
-import net.minecraft.entity.SpawnGroup;
-import net.minecraft.item.*;
-import net.minecraft.registry.Registries;
-import net.minecraft.registry.Registry;
-import net.minecraft.registry.RegistryKey;
-import net.minecraft.sound.BlockSoundGroup;
-import net.minecraft.sound.SoundEvents;
-import net.minecraft.text.Text;
-import net.minecraft.util.ActionResult;
-import net.minecraft.util.Identifier;
-import net.minecraft.world.GameRules;
+import net.minecraft.core.Registry;
+import net.minecraft.core.registries.BuiltInRegistries;
+import net.minecraft.network.chat.Component;
+import net.minecraft.resources.ResourceKey;
+import net.minecraft.resources.ResourceLocation;
+import net.minecraft.sounds.SoundEvents;
+import net.minecraft.world.InteractionResult;
+import net.minecraft.world.entity.Entity;
+import net.minecraft.world.entity.EntityDimensions;
+import net.minecraft.world.entity.EntityType;
+import net.minecraft.world.entity.MobCategory;
+import net.minecraft.world.item.BlockItem;
+import net.minecraft.world.item.CreativeModeTab;
+import net.minecraft.world.item.Item;
+import net.minecraft.world.item.ItemStack;
+import net.minecraft.world.level.GameRules;
+import net.minecraft.world.level.block.Block;
+import net.minecraft.world.level.block.Blocks;
+import net.minecraft.world.level.block.SoundType;
+import net.minecraft.world.level.block.entity.BlockEntityType;
+import net.minecraft.world.level.block.state.BlockBehaviour;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -58,13 +59,13 @@ public class Pirates implements ModInitializer {
 	public static final String MOD_ID = "pirates";
     public static final Logger LOGGER = LoggerFactory.getLogger("pirates");
 
-	public static final GameRules.Key<GameRules.BooleanRule> PIRATES_IS_LIVE_WORLD =
+	public static final GameRules.Key<GameRules.BooleanValue> PIRATES_IS_LIVE_WORLD =
 			GameRuleRegistry.register("piratesIsLive", GameRules.Category.MISC, GameRuleFactory.createBooleanRule(true));
 
-	public static final RegistryKey<ItemGroup> PIRATES_ITEM_GROUP_KEY = RegistryKey.of(Registries.ITEM_GROUP.getKey(), Identifier.of(MOD_ID, "item_group"));
-	public static final ItemGroup PIRATES_ITEM_GROUP = FabricItemGroup.builder()
+	public static final ResourceKey<CreativeModeTab> PIRATES_ITEM_GROUP_KEY = ResourceKey.create(BuiltInRegistries.CREATIVE_MODE_TAB.key(), ResourceLocation.tryBuild(MOD_ID, "item_group"));
+	public static final CreativeModeTab PIRATES_ITEM_GROUP = FabricItemGroup.builder()
 			.icon(() -> new ItemStack(Pirates.CANNONBALL))
-			.displayName(Text.of("Valkyrien Pirates"))
+			.title(Component.nullToEmpty("Valkyrien Pirates"))
 			.build();
 
 	public static float baseShotPower;
@@ -84,7 +85,7 @@ public class Pirates implements ModInitializer {
 
 			if (container.isPresent()) {
 				if(ResourceManagerHelper.registerBuiltinResourcePack(
-						new Identifier("sails_ships"),
+						new ResourceLocation("sails_ships"),
 						container.get(),
 						ResourcePackActivationType.DEFAULT_ENABLED
 				)) {
@@ -104,7 +105,7 @@ public class Pirates implements ModInitializer {
 						loadedCompats.sails ? ResourcePackActivationType.NORMAL : ResourcePackActivationType.DEFAULT_ENABLED;
 
 				if(ResourceManagerHelper.registerBuiltinResourcePack(
-						new Identifier("eureka_ships"),
+						new ResourceLocation("eureka_ships"),
 						container.get(),
 						eurekaActivation
 				)) {
@@ -118,7 +119,7 @@ public class Pirates implements ModInitializer {
 
 			if (container.isPresent()) {
 				if(ResourceManagerHelper.registerBuiltinResourcePack(
-						new Identifier("flying_ships"),
+						new ResourceLocation("flying_ships"),
 						container.get(),
 						ResourcePackActivationType.NORMAL
 				)) {
@@ -138,7 +139,7 @@ public class Pirates implements ModInitializer {
 		shouldEnableFlyingPirates = ConfigUtils.config.getOrDefault("should-enable-flying-pirates","false").equals("true");
 
 		String[] rc = ConfigUtils.config.getOrDefault("recruit-cost","minecraft:golden_apple,1").split(",");
-		recruitCost = () -> new ItemStack(Registries.ITEM.get(Identifier.tryParse(rc[0])),Integer.parseInt(rc[1]));
+		recruitCost = () -> new ItemStack(BuiltInRegistries.ITEM.get(ResourceLocation.tryParse(rc[0])),Integer.parseInt(rc[1]));
 
 		registerEntityThings();
 		//entity types do it themselves
@@ -149,26 +150,26 @@ public class Pirates implements ModInitializer {
 		ModSounds.registerSounds();
 		LOGGER.info("Let there be motion!");
 
-		Registry.register(Registries.ITEM_GROUP, PIRATES_ITEM_GROUP_KEY, PIRATES_ITEM_GROUP);
+		Registry.register(BuiltInRegistries.CREATIVE_MODE_TAB, PIRATES_ITEM_GROUP_KEY, PIRATES_ITEM_GROUP);
 
 		ItemGroupEvents.modifyEntriesEvent(PIRATES_ITEM_GROUP_KEY).register(itemGroup -> {
-			itemGroup.add(Pirates.CANNONBALL);
-			itemGroup.add(Pirates.FIRE_CANNONBALL);
-			itemGroup.add(Pirates.WEIGHTED_CANNONBALL);
-			itemGroup.add(Pirates.SHIP_ID_BLOCK);
-			itemGroup.add(Pirates.CANNON_PRIMING_BLOCK.asItem());
-			itemGroup.add(Pirates.CREW_SPAWNER_BLOCK.asItem());
-			itemGroup.add(Pirates.MOTION_INVOKING_BLOCK.asItem());
-			itemGroup.add(Pirates.SHIP_POINTER);
-			itemGroup.add(Pirates.SHIP_PATHER);
-			itemGroup.add(Pirates.CANNONEER_ITEM);
-			itemGroup.add(Pirates.DOCTOR_ITEM);
+			itemGroup.accept(Pirates.CANNONBALL);
+			itemGroup.accept(Pirates.FIRE_CANNONBALL);
+			itemGroup.accept(Pirates.WEIGHTED_CANNONBALL);
+			itemGroup.accept(Pirates.SHIP_ID_BLOCK);
+			itemGroup.accept(Pirates.CANNON_PRIMING_BLOCK.asItem());
+			itemGroup.accept(Pirates.CREW_SPAWNER_BLOCK.asItem());
+			itemGroup.accept(Pirates.MOTION_INVOKING_BLOCK.asItem());
+			itemGroup.accept(Pirates.SHIP_POINTER);
+			itemGroup.accept(Pirates.SHIP_PATHER);
+			itemGroup.accept(Pirates.CANNONEER_ITEM);
+			itemGroup.accept(Pirates.DOCTOR_ITEM);
 		});
 
 		IPirateDies.EVENT.register((player, pirate) ->
 		{
 			//System.out.println(pirate.getUuidAsString());
-			return ActionResult.PASS;
+			return InteractionResult.PASS;
 		});
 
 
@@ -184,103 +185,103 @@ public class Pirates implements ModInitializer {
 
 	}
 
-	private static final BlockSoundGroup Silent = new BlockSoundGroup(0, 0, SoundEvents.ENTITY_COD_AMBIENT, SoundEvents.ENTITY_COD_AMBIENT, SoundEvents.ENTITY_COD_AMBIENT, SoundEvents.ENTITY_COD_AMBIENT, SoundEvents.ENTITY_COD_AMBIENT);
+	private static final SoundType Silent = new SoundType(0, 0, SoundEvents.COD_AMBIENT, SoundEvents.COD_AMBIENT, SoundEvents.COD_AMBIENT, SoundEvents.COD_AMBIENT, SoundEvents.COD_AMBIENT);
 
-	public static final MotionInvokingBlock MOTION_INVOKING_BLOCK = new MotionInvokingBlock(AbstractBlock.Settings.copy(Blocks.BIRCH_WOOD).noBlockBreakParticles().hardness(7).dropsNothing());
-	public static final CannonPrimingBlock CANNON_PRIMING_BLOCK = new CannonPrimingBlock(AbstractBlock.Settings.copy(Blocks.DISPENSER).hardness(5));
-	public static final DispenserCannonBlock DISPENSER_CANNON_BLOCK = new DispenserCannonBlock(AbstractBlock.Settings.copy(Blocks.DISPENSER).hardness(5));
-	public static final CrewSpawnerBlock CREW_SPAWNER_BLOCK = new CrewSpawnerBlock(AbstractBlock.Settings.copy(Blocks.BIRCH_WOOD).noBlockBreakParticles().noCollision().dropsNothing().sounds(Silent));
-	public static final StableBlock STABLE_BLOCK = new StableBlock(AbstractBlock.Settings.create());
-	public static final ShipIdBlock SHIP_ID_BLOCK = new ShipIdBlock(AbstractBlock.Settings.create());
-	public static final Block HEAVY_BLOCK = new Block(AbstractBlock.Settings.copy(Blocks.OBSIDIAN));
+	public static final MotionInvokingBlock MOTION_INVOKING_BLOCK = new MotionInvokingBlock(BlockBehaviour.Properties.copy(Blocks.BIRCH_WOOD).noParticlesOnBreak().destroyTime(7).noLootTable());
+	public static final CannonPrimingBlock CANNON_PRIMING_BLOCK = new CannonPrimingBlock(BlockBehaviour.Properties.copy(Blocks.DISPENSER).destroyTime(5));
+	public static final DispenserCannonBlock DISPENSER_CANNON_BLOCK = new DispenserCannonBlock(BlockBehaviour.Properties.copy(Blocks.DISPENSER).destroyTime(5));
+	public static final CrewSpawnerBlock CREW_SPAWNER_BLOCK = new CrewSpawnerBlock(BlockBehaviour.Properties.copy(Blocks.BIRCH_WOOD).noParticlesOnBreak().noCollission().noLootTable().sound(Silent));
+	public static final StableBlock STABLE_BLOCK = new StableBlock(BlockBehaviour.Properties.of());
+	public static final ShipIdBlock SHIP_ID_BLOCK = new ShipIdBlock(BlockBehaviour.Properties.of());
+	public static final Block HEAVY_BLOCK = new Block(BlockBehaviour.Properties.copy(Blocks.OBSIDIAN));
 	private void registerBlocks()
 	{
-		Registry.register(Registries.BLOCK,new Identifier("pirates","cannon_priming_block"),CANNON_PRIMING_BLOCK);
-		Registry.register(Registries.BLOCK,new Identifier("pirates","motion_invoking_block"),MOTION_INVOKING_BLOCK);
-		Registry.register(Registries.BLOCK,new Identifier("pirates","dispenser_cannon_block"),DISPENSER_CANNON_BLOCK);
-		Registry.register(Registries.BLOCK,new Identifier("pirates","crew_spawner_block"),CREW_SPAWNER_BLOCK);
-		Registry.register(Registries.BLOCK,new Identifier("pirates","stable_block"),STABLE_BLOCK);
-		Registry.register(Registries.BLOCK,new Identifier("pirates","ship_id_block"),SHIP_ID_BLOCK);
-		Registry.register(Registries.BLOCK,new Identifier("pirates","heavy_block"),HEAVY_BLOCK);
+		Registry.register(BuiltInRegistries.BLOCK,new ResourceLocation("pirates","cannon_priming_block"),CANNON_PRIMING_BLOCK);
+		Registry.register(BuiltInRegistries.BLOCK,new ResourceLocation("pirates","motion_invoking_block"),MOTION_INVOKING_BLOCK);
+		Registry.register(BuiltInRegistries.BLOCK,new ResourceLocation("pirates","dispenser_cannon_block"),DISPENSER_CANNON_BLOCK);
+		Registry.register(BuiltInRegistries.BLOCK,new ResourceLocation("pirates","crew_spawner_block"),CREW_SPAWNER_BLOCK);
+		Registry.register(BuiltInRegistries.BLOCK,new ResourceLocation("pirates","stable_block"),STABLE_BLOCK);
+		Registry.register(BuiltInRegistries.BLOCK,new ResourceLocation("pirates","ship_id_block"),SHIP_ID_BLOCK);
+		Registry.register(BuiltInRegistries.BLOCK,new ResourceLocation("pirates","heavy_block"),HEAVY_BLOCK);
 
 	}
 
 
 
-	public static final Item CANNONBALL = new Item(new Item.Settings());
-	public static final Item FIRE_CANNONBALL = new Item(new Item.Settings());
-	public static final Item WEIGHTED_CANNONBALL = new Item(new Item.Settings());
-	public static final Item CANNONBALL_ENT = new Item(new Item.Settings());
-	public static final ShipPointer SHIP_POINTER = new ShipPointer(new Item.Settings());
-	public static final ShipPather SHIP_PATHER = new ShipPather(new Item.Settings());
+	public static final Item CANNONBALL = new Item(new Item.Properties());
+	public static final Item FIRE_CANNONBALL = new Item(new Item.Properties());
+	public static final Item WEIGHTED_CANNONBALL = new Item(new Item.Properties());
+	public static final Item CANNONBALL_ENT = new Item(new Item.Properties());
+	public static final ShipPointer SHIP_POINTER = new ShipPointer(new Item.Properties());
+	public static final ShipPather SHIP_PATHER = new ShipPather(new Item.Properties());
 	public static final ContractItem CANNONEER_ITEM = new ContractItem(CANNON_PRIMING_BLOCK,"cannoneer");
 	public static final ContractItem DOCTOR_ITEM = new ContractItem(Blocks.GOLD_BLOCK,"doctor");
-	public static final TestItem TEST_ITEM = new TestItem(new Item.Settings());
+	public static final TestItem TEST_ITEM = new TestItem(new Item.Properties());
 	private void registerItems()
 	{
-		Registry.register(Registries.ITEM,new Identifier("pirates","cannonball"),CANNONBALL);
-		Registry.register(Registries.ITEM,new Identifier("pirates","fire_cannonball"),FIRE_CANNONBALL);
-		Registry.register(Registries.ITEM,new Identifier("pirates","weighted_cannonball"),WEIGHTED_CANNONBALL);
-		Registry.register(Registries.ITEM,new Identifier("util_pirates","util_1"),CANNONBALL_ENT);
-		Registry.register(Registries.ITEM,new Identifier("pirates","ship_pointer"),SHIP_POINTER);
-		Registry.register(Registries.ITEM,new Identifier("pirates","cannoneer"),CANNONEER_ITEM);
-		Registry.register(Registries.ITEM,new Identifier("pirates","doctor"),DOCTOR_ITEM);
-		Registry.register(Registries.ITEM,new Identifier("pirates","ship_pather"),SHIP_PATHER);
-		Registry.register(Registries.ITEM,new Identifier("pirates","stable_block"),new BlockItem(STABLE_BLOCK,new Item.Settings()));
+		Registry.register(BuiltInRegistries.ITEM,new ResourceLocation("pirates","cannonball"),CANNONBALL);
+		Registry.register(BuiltInRegistries.ITEM,new ResourceLocation("pirates","fire_cannonball"),FIRE_CANNONBALL);
+		Registry.register(BuiltInRegistries.ITEM,new ResourceLocation("pirates","weighted_cannonball"),WEIGHTED_CANNONBALL);
+		Registry.register(BuiltInRegistries.ITEM,new ResourceLocation("util_pirates","util_1"),CANNONBALL_ENT);
+		Registry.register(BuiltInRegistries.ITEM,new ResourceLocation("pirates","ship_pointer"),SHIP_POINTER);
+		Registry.register(BuiltInRegistries.ITEM,new ResourceLocation("pirates","cannoneer"),CANNONEER_ITEM);
+		Registry.register(BuiltInRegistries.ITEM,new ResourceLocation("pirates","doctor"),DOCTOR_ITEM);
+		Registry.register(BuiltInRegistries.ITEM,new ResourceLocation("pirates","ship_pather"),SHIP_PATHER);
+		Registry.register(BuiltInRegistries.ITEM,new ResourceLocation("pirates","stable_block"),new BlockItem(STABLE_BLOCK,new Item.Properties()));
 
-		Registry.register(Registries.ITEM,new Identifier("pirates","cannon_priming_block"),new BlockItem(CANNON_PRIMING_BLOCK,new Item.Settings()));
+		Registry.register(BuiltInRegistries.ITEM,new ResourceLocation("pirates","cannon_priming_block"),new BlockItem(CANNON_PRIMING_BLOCK,new Item.Properties()));
 
-		Registry.register(Registries.ITEM,new Identifier("pirates","test"),TEST_ITEM);
+		Registry.register(BuiltInRegistries.ITEM,new ResourceLocation("pirates","test"),TEST_ITEM);
 
-		Registry.register(Registries.ITEM,new Identifier("pirates","motion_invoking_block"),new BlockItem(MOTION_INVOKING_BLOCK,new Item.Settings()));
-		Registry.register(Registries.ITEM,new Identifier("pirates","crew_spawner_block"),new BlockItem(CREW_SPAWNER_BLOCK,new Item.Settings()));
-		Registry.register(Registries.ITEM,new Identifier("pirates","ship_id_block"),new BlockItem(SHIP_ID_BLOCK,new Item.Settings()));
+		Registry.register(BuiltInRegistries.ITEM,new ResourceLocation("pirates","motion_invoking_block"),new BlockItem(MOTION_INVOKING_BLOCK,new Item.Properties()));
+		Registry.register(BuiltInRegistries.ITEM,new ResourceLocation("pirates","crew_spawner_block"),new BlockItem(CREW_SPAWNER_BLOCK,new Item.Properties()));
+		Registry.register(BuiltInRegistries.ITEM,new ResourceLocation("pirates","ship_id_block"),new BlockItem(SHIP_ID_BLOCK,new Item.Properties()));
 
 	}
 
 
 	//block entities
 	public static final BlockEntityType<MotionInvokingBlockEntity> MOTION_INVOKING_BLOCK_ENTITY = Registry.register(
-			Registries.BLOCK_ENTITY_TYPE,
-			new Identifier("pirates", "motion_invoking_block_entity"),
+			BuiltInRegistries.BLOCK_ENTITY_TYPE,
+			new ResourceLocation("pirates", "motion_invoking_block_entity"),
 			FabricBlockEntityTypeBuilder.create(MotionInvokingBlockEntity::new, MOTION_INVOKING_BLOCK).build()
 	);
 	public static final BlockEntityType<CannonPrimingBlockEntity> CANNON_PRIMING_BLOCK_ENTITY = Registry.register(
-			Registries.BLOCK_ENTITY_TYPE,
-			new Identifier("pirates", "cannon_priming_block_entity"),
+			BuiltInRegistries.BLOCK_ENTITY_TYPE,
+			new ResourceLocation("pirates", "cannon_priming_block_entity"),
 			FabricBlockEntityTypeBuilder.create(CannonPrimingBlockEntity::new, CANNON_PRIMING_BLOCK).build()
 	);
 	public static final BlockEntityType<CrewSpawnerBlockEntity> CREW_SPAWNER_BLOCK_ENTITY = Registry.register(
-			Registries.BLOCK_ENTITY_TYPE,
-			new Identifier("pirates", "crew_spawner_block_entity"),
+			BuiltInRegistries.BLOCK_ENTITY_TYPE,
+			new ResourceLocation("pirates", "crew_spawner_block_entity"),
 			FabricBlockEntityTypeBuilder.create(CrewSpawnerBlockEntity::new, CREW_SPAWNER_BLOCK).build()
 	);
 	public static final BlockEntityType<StableBlockEntity> STABLE_BLOCK_ENTITY = Registry.register(
-			Registries.BLOCK_ENTITY_TYPE,
-			new Identifier("pirates", "stable_block_entity"),
+			BuiltInRegistries.BLOCK_ENTITY_TYPE,
+			new ResourceLocation("pirates", "stable_block_entity"),
 			FabricBlockEntityTypeBuilder.create(StableBlockEntity::new, STABLE_BLOCK).build()
 	);
 	public static final BlockEntityType<ShipIdBlockEntity> SHIP_ID_BLOCK_ENTITY = Registry.register(
-			Registries.BLOCK_ENTITY_TYPE,
-			new Identifier("pirates", "ship_id_block_entity"),
+			BuiltInRegistries.BLOCK_ENTITY_TYPE,
+			new ResourceLocation("pirates", "ship_id_block_entity"),
 			FabricBlockEntityTypeBuilder.create(ShipIdBlockEntity::new, SHIP_ID_BLOCK).build()
 	);
 
 
 	//entities
-	public static final EntityType<ShotEntity> SHOT_ENTITY_TYPE =registerEntity("shot",SpawnGroup.MISC,EntityDimensions.changing(0.5f,0.5f),((type, world) -> new ShotEntity(world)));
+	public static final EntityType<ShotEntity> SHOT_ENTITY_TYPE =registerEntity("shot",MobCategory.MISC,EntityDimensions.scalable(0.5f,0.5f),((type, world) -> new ShotEntity(world)));
 
-	public static final EntityType<PirateEntity> PIRATE_ENTITY_TYPE =registerEntity("pirate",SpawnGroup.MISC,EntityDimensions.changing(0.6f,1.9f),((type, world) -> new PirateEntity(world)));
+	public static final EntityType<PirateEntity> PIRATE_ENTITY_TYPE =registerEntity("pirate",MobCategory.MISC,EntityDimensions.scalable(0.6f,1.9f),((type, world) -> new PirateEntity(world)));
 
-	public static final EntityType<FriendlyPirateEntity> FRIENDLY_PIRATE_TYPE =registerEntity("friendly_pirate",SpawnGroup.MISC,EntityDimensions.changing(0.6f,1.9f),((type, world) -> new FriendlyPirateEntity(world)));
+	public static final EntityType<FriendlyPirateEntity> FRIENDLY_PIRATE_TYPE =registerEntity("friendly_pirate",MobCategory.MISC,EntityDimensions.scalable(0.6f,1.9f),((type, world) -> new FriendlyPirateEntity(world)));
 
 
 	public static final EntityType<SkeletonPirateEntity> SKELETON_PIRATE_ENTITY_TYPE = null; //=registerEntity("skeleton_pirate",SpawnGroup.MISC,EntityDimensions.changing(0.6f,1.9f),((type, world) -> new SkeletonPirateEntity(world)));
 
 
 
-	public static <T extends Entity> EntityType<T> registerEntity(String name, SpawnGroup category, EntityDimensions size, EntityType.EntityFactory<T> factory) {
-		return Registry.register(Registries.ENTITY_TYPE, new Identifier("pirates", name), FabricEntityTypeBuilder.create(category, factory).dimensions(size).build());
+	public static <T extends Entity> EntityType<T> registerEntity(String name, MobCategory category, EntityDimensions size, EntityType.EntityFactory<T> factory) {
+		return Registry.register(BuiltInRegistries.ENTITY_TYPE, new ResourceLocation("pirates", name), FabricEntityTypeBuilder.create(category, factory).dimensions(size).build());
 
 	}
 

@@ -5,32 +5,32 @@ import ace.actually.pirates.util.ConfigUtils;
 import ace.actually.pirates.util.EurekaCompat;
 import ace.actually.pirates.Pirates;
 import ace.actually.pirates.util.SailsCompat;
-import net.fabricmc.loader.api.FabricLoader;
-import net.minecraft.block.BlockState;
-import net.minecraft.block.entity.BlockEntity;
-import net.minecraft.nbt.NbtCompound;
-import net.minecraft.nbt.NbtIntArray;
-import net.minecraft.nbt.NbtList;
-import net.minecraft.server.world.ServerWorld;
-import net.minecraft.util.math.BlockPos;
-import net.minecraft.util.math.ChunkPos;
-import net.minecraft.world.World;
+import net.minecraft.core.BlockPos;
+import net.minecraft.nbt.CompoundTag;
+import net.minecraft.nbt.IntArrayTag;
+import net.minecraft.nbt.ListTag;
+import net.minecraft.server.level.ServerLevel;
+import net.minecraft.world.level.ChunkPos;
+import net.minecraft.world.level.Level;
+import net.minecraft.world.level.block.entity.BlockEntity;
+import net.minecraft.world.level.block.state.BlockState;
 import org.joml.Vector3d;
 import org.joml.Vector3dc;
 import org.valkyrienskies.core.api.ships.LoadedServerShip;
 import org.valkyrienskies.core.api.ships.Ship;
 import org.valkyrienskies.mod.api.SeatedControllingPlayer;
 import org.valkyrienskies.mod.common.VSGameUtilsKt;
-import org.valkyrienskies.mod.common.util.GameTickForceApplier;
+import org.valkyrienskies.mod.common.ValkyrienSkiesMod;
+import org.valkyrienskies.mod.common.util.GameToPhysicsAdapter;
 
 import java.util.List;
 
 import static ace.actually.pirates.blocks.MotionInvokingBlock.COMPAT;
-import static net.minecraft.state.property.Properties.HORIZONTAL_FACING;
+import static net.minecraft.world.level.block.state.properties.BlockStateProperties.HORIZONTAL_FACING;
 
 @SuppressWarnings("UnstableApiUsage")
 public class MotionInvokingBlockEntity extends BlockEntity {
-    NbtList path = new NbtList();
+    ListTag path = new ListTag();
     long nextInstruction = 0;
     //boolean isChecked = false;
 
@@ -51,7 +51,7 @@ public class MotionInvokingBlockEntity extends BlockEntity {
 //        markDirty();
 //    }
 
-    public static void tick(World world, BlockPos pos, BlockState state, MotionInvokingBlockEntity be) {
+    public static void tick(Level world, BlockPos pos, BlockState state, MotionInvokingBlockEntity be) {
 
 //        if (!be.isChecked) {
 //            state.with(COMPAT, 0);
@@ -65,22 +65,22 @@ public class MotionInvokingBlockEntity extends BlockEntity {
 //            be.isChecked = true;
 //        }
 
-        if(!state.get(MotionInvokingBlock.ARMED)) return;
+        if(!state.getValue(MotionInvokingBlock.ARMED)) return;
 
         //ensure compat value matches loaded dependencies and a helm is present
-        if (state.get(COMPAT).equals(1)) {
+        if (state.getValue(COMPAT).equals(1)) {
             if (!Pirates.loadedCompats.sails) {
-                state = state.with(COMPAT, 0);
-                world.setBlockState(pos, state, 10);
+                state = state.setValue(COMPAT, 0);
+                world.setBlock(pos, state, 10);
                 return;
             } else if (!SailsCompat.checkHelm(world, pos)) {
                 MotionInvokingBlock.disarm(world, pos);
                 return;
             }
-        } else if (state.get(COMPAT).equals(2)) {
+        } else if (state.getValue(COMPAT).equals(2)) {
             if (!Pirates.loadedCompats.eureka) {
-                state = state.with(COMPAT, 0);
-                world.setBlockState(pos, state, 10);
+                state = state.setValue(COMPAT, 0);
+                world.setBlock(pos, state, 10);
                 return;
             } else if (!EurekaCompat.checkHelm(world, pos)) {
                 MotionInvokingBlock.disarm(world, pos);
@@ -92,25 +92,25 @@ public class MotionInvokingBlockEntity extends BlockEntity {
             updateTicks = Integer.parseInt(ConfigUtils.config.getOrDefault("controlled-ship-updates","100"));
 
         }
-        if (!world.isClient && world.getGameRules().getBoolean(Pirates.PIRATES_IS_LIVE_WORLD) && world.getTime() >= be.nextInstruction) {
+        if (!world.isClientSide && world.getGameRules().getBoolean(Pirates.PIRATES_IS_LIVE_WORLD) && world.getGameTime() >= be.nextInstruction) {
 
             if (VSGameUtilsKt.isBlockInShipyard(world, pos)) {
                 ChunkPos chunkPos = world.getChunk(pos).getPos();
-                LoadedServerShip ship = VSGameUtilsKt.getShipObjectManagingPos((ServerWorld) world, chunkPos);
+                LoadedServerShip ship = VSGameUtilsKt.getShipObjectManagingPos((ServerLevel) world, chunkPos);
 
                 if (ship != null) {
                     ship.setStatic(false);
                     SeatedControllingPlayer seatedControllingPlayer = ship.getAttachment(SeatedControllingPlayer.class);
-                    if (seatedControllingPlayer == null && (world.getBlockState(pos.up()).contains(HORIZONTAL_FACING))) {
-                        if (state.get(COMPAT).equals(1)) {
-                            seatedControllingPlayer = new SeatedControllingPlayer(world.getBlockState(pos.up()).get(HORIZONTAL_FACING).getOpposite()); //not sure this is necessary
-                        } else if (state.get(COMPAT).equals(2)) {
-                            seatedControllingPlayer = new SeatedControllingPlayer(world.getBlockState(pos.up()).get(HORIZONTAL_FACING).getOpposite());
+                    if (seatedControllingPlayer == null && (world.getBlockState(pos.above()).hasProperty(HORIZONTAL_FACING))) {
+                        if (state.getValue(COMPAT).equals(1)) {
+                            seatedControllingPlayer = new SeatedControllingPlayer(world.getBlockState(pos.above()).getValue(HORIZONTAL_FACING).getOpposite()); //not sure this is necessary
+                        } else if (state.getValue(COMPAT).equals(2)) {
+                            seatedControllingPlayer = new SeatedControllingPlayer(world.getBlockState(pos.above()).getValue(HORIZONTAL_FACING).getOpposite());
                         }
                         ship.setAttachment(SeatedControllingPlayer.class, seatedControllingPlayer);
                     }
 
-                    if(world.getTimeOfDay()%updateTicks==0) {
+                    if(world.getDayTime()%updateTicks==0) {
                         if(be.path.isEmpty()) {
                             List<Ship> ships = VSGameUtilsKt.getAllShips(world).stream().filter(a-> {
                                 if(a.getId()==ship.getId()) return false;
@@ -129,13 +129,13 @@ public class MotionInvokingBlockEntity extends BlockEntity {
                             Vector3dc f1 = ship.getTransform().getPositionInWorld();
                             Vector3dc f2 = new Vector3d(v[0],v[1],v[2]);
                             if(f1.distanceSquared(f2)<100) {
-                                NbtIntArray nbtInts = (NbtIntArray) be.path.remove(0);
+                                IntArrayTag nbtInts = (IntArrayTag) be.path.remove(0);
                                 be.path.add(nbtInts);
                             }
                         }
                     }
 
-                    switch (state.get(COMPAT)) {
+                    switch (state.getValue(COMPAT)) {
                         case 1 -> SailsCompat.moveTowards(be,seatedControllingPlayer,ship);
                         case 2 -> EurekaCompat.moveTowards(be,seatedControllingPlayer,ship);
                         default -> be.moveShipForward(ship);
@@ -146,19 +146,19 @@ public class MotionInvokingBlockEntity extends BlockEntity {
     }
 
     @Override
-    protected void writeNbt(NbtCompound nbt) {
+    protected void saveAdditional(CompoundTag nbt) {
         nbt.put("path",path);
         nbt.putLong("nextInstruction", nextInstruction);
         nbt.putIntArray("target",target);
-        super.writeNbt(nbt);
+        super.saveAdditional(nbt);
     }
 
     @Override
-    public void readNbt(NbtCompound nbt) {
-        super.readNbt(nbt);
+    public void load(CompoundTag nbt) {
+        super.load(nbt);
         nextInstruction = nbt.getLong("nextInstruction");
         if(nbt.contains("path")) {
-            path = (NbtList) nbt.get("path");
+            path = (ListTag) nbt.get("path");
         }
 
         if(nbt.contains("target")) {
@@ -169,7 +169,7 @@ public class MotionInvokingBlockEntity extends BlockEntity {
 
     public void setTarget(int[] target) {
         this.target = target;
-        markDirty();
+        setChanged();
     }
 
     public int[] getTarget() {
@@ -192,17 +192,17 @@ public class MotionInvokingBlockEntity extends BlockEntity {
         this.ldz = ldz;
     }
 
-    public NbtList getPath() {
+    public ListTag getPath() {
         return path;
     }
 
-    public void setPath(NbtList path) {
+    public void setPath(ListTag path) {
         this.path = path;
-        markDirty();
+        setChanged();
     }
     public void addPathNode(BlockPos pos) {
-        this.path.add(new NbtIntArray(new int[]{pos.getX(),pos.getY(),pos.getZ()}));
-        markDirty();
+        this.path.add(new IntArrayTag(new int[]{pos.getX(),pos.getY(),pos.getZ()}));
+        setChanged();
     }
 
     /**
@@ -214,16 +214,14 @@ public class MotionInvokingBlockEntity extends BlockEntity {
         double mass = ship.getInertiaData().getMass();
         Vector3d qdc = ship.getTransform().getShipToWorldRotation().getEulerAnglesZXY(new Vector3d()).normalize().mul(mass*10);
         qdc = new Vector3d(-qdc.x,0,-qdc.z);
-        GameTickForceApplier gtfa = ship.getAttachment(GameTickForceApplier.class);
+        GameToPhysicsAdapter gtfa = ValkyrienSkiesMod.getOrCreateGTPA(VSGameUtilsKt.getDimensionId(level));
 
-        if(gtfa!=null) {
-            Vector3dc v3dc = ship.getInertiaData().getCenterOfMassInShip();
-            Vector3d loc = new Vector3d(v3dc.x()+1,v3dc.y(),v3dc.z()+1);
-            //if(world instanceof ServerWorld serverWorld)
-            //{
-            //    serverWorld.spawnParticles(ParticleTypes.BUBBLE,loc.x,loc.y,loc.z,1,0,0,0,0);
-            //}
-            gtfa.applyInvariantForceToPos(qdc,loc.sub(ship.getTransform().getPositionInShip()));
-        }
+        Vector3dc v3dc = ship.getInertiaData().getCenterOfMassInShip();
+        Vector3d loc = new Vector3d(v3dc.x()+1,v3dc.y(),v3dc.z()+1);
+        //if(world instanceof ServerWorld serverWorld)
+        //{
+        //    serverWorld.spawnParticles(ParticleTypes.BUBBLE,loc.x,loc.y,loc.z,1,0,0,0,0);
+        //}
+        gtfa.applyInvariantForceToPos(ship.getId(),qdc,loc.sub(ship.getTransform().getPositionInShip()));
     }
 }

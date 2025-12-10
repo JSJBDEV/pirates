@@ -5,36 +5,35 @@ import ace.actually.pirates.entities.pirate_abstract.AbstractPirateEntity;
 import ace.actually.pirates.entities.pirate_abstract.PirateBowAttackGoal;
 import ace.actually.pirates.entities.pirate_abstract.PirateWanderArroundFarGoal;
 import ace.actually.pirates.util.DisarmUtils;
-import net.minecraft.entity.*;
-import net.minecraft.entity.ai.RangedAttackMob;
-import net.minecraft.entity.ai.goal.LookAroundGoal;
-import net.minecraft.entity.ai.goal.LookAtEntityGoal;
-import net.minecraft.entity.ai.goal.RevengeGoal;
-import net.minecraft.entity.attribute.DefaultAttributeContainer;
-import net.minecraft.entity.attribute.EntityAttributes;
-import net.minecraft.entity.data.DataTracker;
-import net.minecraft.entity.data.TrackedData;
-import net.minecraft.entity.data.TrackedDataHandlerRegistry;
-import net.minecraft.entity.effect.StatusEffectInstance;
-import net.minecraft.entity.effect.StatusEffects;
-import net.minecraft.entity.mob.HostileEntity;
-import net.minecraft.entity.player.PlayerEntity;
-import net.minecraft.entity.projectile.PersistentProjectileEntity;
-import net.minecraft.entity.projectile.ProjectileUtil;
-import net.minecraft.item.ItemStack;
-import net.minecraft.item.Items;
-import net.minecraft.nbt.NbtCompound;
-import net.minecraft.sound.SoundEvents;
-import net.minecraft.text.Text;
-import net.minecraft.util.ActionResult;
-import net.minecraft.util.Hand;
-import net.minecraft.util.math.BlockPos;
-import net.minecraft.util.math.Box;
-import net.minecraft.util.math.Vec3d;
-import net.minecraft.util.math.random.Random;
-import net.minecraft.world.LocalDifficulty;
-import net.minecraft.world.ServerWorldAccess;
-import net.minecraft.world.World;
+import net.minecraft.core.BlockPos;
+
+import net.minecraft.nbt.CompoundTag;
+import net.minecraft.network.chat.Component;
+import net.minecraft.network.syncher.EntityDataAccessor;
+import net.minecraft.network.syncher.EntityDataSerializers;
+import net.minecraft.network.syncher.SynchedEntityData;
+import net.minecraft.sounds.SoundEvents;
+import net.minecraft.util.RandomSource;
+import net.minecraft.world.DifficultyInstance;
+import net.minecraft.world.InteractionHand;
+import net.minecraft.world.InteractionResult;
+import net.minecraft.world.effect.MobEffectInstance;
+import net.minecraft.world.effect.MobEffects;
+import net.minecraft.world.entity.EquipmentSlot;
+import net.minecraft.world.entity.LivingEntity;
+import net.minecraft.world.entity.ai.attributes.AttributeSupplier;
+import net.minecraft.world.entity.ai.attributes.Attributes;
+import net.minecraft.world.entity.ai.goal.target.HurtByTargetGoal;
+import net.minecraft.world.entity.monster.Monster;
+import net.minecraft.world.entity.monster.RangedAttackMob;
+import net.minecraft.world.entity.player.Player;
+import net.minecraft.world.entity.projectile.AbstractArrow;
+import net.minecraft.world.entity.projectile.ProjectileUtil;
+import net.minecraft.world.item.ItemStack;
+import net.minecraft.world.item.Items;
+import net.minecraft.world.level.Level;
+import net.minecraft.world.phys.AABB;
+import net.minecraft.world.phys.Vec3;
 import org.valkyrienskies.mod.common.VSGameUtilsKt;
 
 import java.util.List;
@@ -43,114 +42,114 @@ public class FriendlyPirateEntity extends AbstractPirateEntity implements Ranged
 
     private static final String[] FIRST = {"Johan","John","Bob","Cali","Dorris","Lopez","Wilhelm","Armstrong","David","Giorno"};
     private static final String[] LAST = {"Diver","Smith","Forest","Maze","Fisherman","Callous","Calculated","Fierce","Flatulent","Agreeable","Rational"};
-    private static final TrackedData<String> JOB = DataTracker.registerData(FriendlyPirateEntity.class, TrackedDataHandlerRegistry.STRING);
+    private static final EntityDataAccessor<String> JOB = SynchedEntityData.defineId(FriendlyPirateEntity.class, EntityDataSerializers.STRING);
 
-    public FriendlyPirateEntity(World world)
+    public FriendlyPirateEntity(Level world)
     {
-        super(Pirates.FRIENDLY_PIRATE_TYPE, world, BlockPos.ORIGIN);
+        super(Pirates.FRIENDLY_PIRATE_TYPE, world, BlockPos.ZERO);
     }
 
     public String getPirateJob() {
-        return dataTracker.get(JOB);
+        return entityData.get(JOB);
     }
 
     public void setPirateJob(String pirateJob) {
-        dataTracker.set(JOB,pirateJob);
+        entityData.set(JOB,pirateJob);
     }
 
     @Override
-    public void writeCustomDataToNbt(NbtCompound nbt) {
-        super.writeCustomDataToNbt(nbt);
-        nbt.putString("pirateJob",dataTracker.get(JOB));
+    public void addAdditionalSaveData(CompoundTag nbt) {
+        super.addAdditionalSaveData(nbt);
+        nbt.putString("pirateJob",entityData.get(JOB));
     }
 
     @Override
-    public void readCustomDataFromNbt(NbtCompound nbt) {
-        super.readCustomDataFromNbt(nbt);
-        dataTracker.set(JOB,nbt.getString("pirateJob"));
+    public void readAdditionalSaveData(CompoundTag nbt) {
+        super.readAdditionalSaveData(nbt);
+        entityData.set(JOB,nbt.getString("pirateJob"));
     }
 
-    public FriendlyPirateEntity(World world, BlockPos blockToDisable) {
+    public FriendlyPirateEntity(Level world, BlockPos blockToDisable) {
         super(Pirates.FRIENDLY_PIRATE_TYPE, world, blockToDisable);
-        initEquipment(world.random,world.getLocalDifficulty(getBlockPos()));
+        populateDefaultEquipmentSlots(world.random,world.getCurrentDifficultyAt(blockPosition()));
     }
 
     @Override
-    protected void initDataTracker() {
-        super.initDataTracker();
-        dataTracker.startTracking(JOB,"none");
+    protected void defineSynchedData() {
+        super.defineSynchedData();
+        entityData.define(JOB,"none");
 
     }
 
-    public void genCustomName(World world)
+    public void genCustomName(Level world)
     {
-        setCustomName(Text.of(FIRST[world.random.nextInt(FIRST.length)]+" the "+LAST[world.random.nextInt(LAST.length)]));
+        setCustomName(Component.nullToEmpty(FIRST[world.random.nextInt(FIRST.length)]+" the "+LAST[world.random.nextInt(LAST.length)]));
     }
 
     @Override
-    protected void initGoals() {
-        super.initGoals();
-        this.goalSelector.add(3, new PirateBowAttackGoal<>(this, 1.0D, 20, 20.0F));
-        this.targetSelector.add(1, new RevengeGoal(this));
+    protected void registerGoals() {
+        super.registerGoals();
+        this.goalSelector.addGoal(3, new PirateBowAttackGoal<>(this, 1.0D, 20, 20.0F));
+        this.targetSelector.addGoal(1, new HurtByTargetGoal(this));
 
     }
 
     @Override
     public void tick() {
         super.tick();
-        if(getEntityWorld().getTimeOfDay()%1000L==0L)
+        if(getCommandSenderWorld().getDayTime()%1000L==0L)
         {
             if(getPirateJob().equals("doctor"))
             {
-                List<FriendlyPirateEntity> crew =  getEntityWorld().getEntitiesByClass(FriendlyPirateEntity.class,new Box(getBlockPos().add(-10,-10,-10),getBlockPos().add(10,10,10)),LivingEntity::isAlive);
-                crew.forEach(a->a.addStatusEffect(new StatusEffectInstance(StatusEffects.REGENERATION,500,1)));
+                List<FriendlyPirateEntity> crew =  getCommandSenderWorld().getEntitiesOfClass(FriendlyPirateEntity.class,new AABB(blockPosition().offset(-10,-10,-10),blockPosition().offset(10,10,10)),LivingEntity::isAlive);
+                crew.forEach(a->a.addEffect(new MobEffectInstance(MobEffects.REGENERATION,500,1)));
             }
         }
     }
 
-    public static DefaultAttributeContainer.Builder attributes() {
-        return HostileEntity
-                .createHostileAttributes()
-                .add(EntityAttributes.GENERIC_MOVEMENT_SPEED, 0.3D)
-                .add(EntityAttributes.GENERIC_FOLLOW_RANGE, 100.0D);
+    public static AttributeSupplier.Builder attributes() {
+        return Monster
+                .createMonsterAttributes()
+                .add(Attributes.MOVEMENT_SPEED, 0.3D)
+                .add(Attributes.FOLLOW_RANGE, 100.0D);
     }
 
 
     @Override
-    protected void initEquipment(Random random, LocalDifficulty localDifficulty) {
-        super.initEquipment(random, localDifficulty);
-        this.equipStack(EquipmentSlot.MAINHAND, new ItemStack(Items.BOW));
+    protected void populateDefaultEquipmentSlots(RandomSource random, DifficultyInstance localDifficulty) {
+        super.populateDefaultEquipmentSlots(random, localDifficulty);
+        this.setItemSlot(EquipmentSlot.MAINHAND, new ItemStack(Items.BOW));
     }
 
     @Override
-    public void attack(LivingEntity target, float pullProgress) {
+    public void performRangedAttack(LivingEntity target, float pullProgress) {
 
-        ItemStack itemStack = this.getStackInHand(ProjectileUtil.getHandPossiblyHolding(this, Items.BOW));
-        PersistentProjectileEntity persistentProjectileEntity = this.createArrowProjectile(itemStack, pullProgress);
+        ItemStack itemStack = this.getItemInHand(ProjectileUtil.getWeaponHoldingHand(this, Items.BOW));
+        AbstractArrow persistentProjectileEntity = this.createArrowProjectile(itemStack, pullProgress);
         double d = target.getX() - this.getX();
-        double e = target.getBodyY(0.3333333333333333) - persistentProjectileEntity.getY();
+        double e = target.getY(0.3333333333333333) - persistentProjectileEntity.getY();
         double f = target.getZ() - this.getZ();
         double g = Math.sqrt(d * d + f * f);
-        persistentProjectileEntity.setVelocity(d, e + g * 0.20000000298023224, f, 1.6F, (float) (14 - this.getEntityWorld().getDifficulty().getId() * 4));
-        this.playSound(SoundEvents.ENTITY_SKELETON_SHOOT, 1.0F, 1.0F / (this.getRandom().nextFloat() * 0.4F + 0.8F));
-        this.getEntityWorld().spawnEntity(persistentProjectileEntity);
+        persistentProjectileEntity.shoot(d, e + g * 0.20000000298023224, f, 1.6F, (float) (14 - this.getCommandSenderWorld().getDifficulty().getId() * 4));
+        this.playSound(SoundEvents.SKELETON_SHOOT, 1.0F, 1.0F / (this.getRandom().nextFloat() * 0.4F + 0.8F));
+        this.getCommandSenderWorld().addFreshEntity(persistentProjectileEntity);
 
     }
 
-    protected PersistentProjectileEntity createArrowProjectile(ItemStack arrow, float damageModifier) {
-        return ProjectileUtil.createArrowProjectile(this, arrow, damageModifier);
+    protected AbstractArrow createArrowProjectile(ItemStack arrow, float damageModifier) {
+        return ProjectileUtil.getMobArrow(this, arrow, damageModifier);
     }
 
     @Override
-    public ActionResult interactAt(PlayerEntity player, Vec3d hitPos, Hand hand) {
+    public InteractionResult interactAt(Player player, Vec3 hitPos, InteractionHand hand) {
         ItemStack stack = Pirates.recruitCost.get();
-        if(!hasCustomName() && player.getStackInHand(hand).isOf(stack.getItem()))
+        if(!hasCustomName() && player.getItemInHand(hand).is(stack.getItem()))
         {
-            if(player.getStackInHand(hand).getCount()>=stack.getCount())
+            if(player.getItemInHand(hand).getCount()>=stack.getCount())
             {
-                player.giveItemStack(new ItemStack(Pirates.CANNONEER_ITEM));
-                player.getStackInHand(hand).decrement(stack.getCount());
-                this.teleport(0,0,0);
+                player.addItem(new ItemStack(Pirates.CANNONEER_ITEM));
+                player.getItemInHand(hand).shrink(stack.getCount());
+                this.teleportToWithTicket(0,0,0);
                 this.kill();
             }
 
