@@ -1,34 +1,62 @@
-![Valkyrien Pirates](https://cdn.modrinth.com/data/jv8hXuHT/images/d66f02a291bb47729754697b556ad481f9f07ad9.jpeg)
+<p align="center">
+<img src="icon_big.png" width="512" height="512">
+</p>
+<h1 align="center">
+Valkyrien Skies : Addon Template
+</h1>
+<p align="center">
+The official VS Addon template, for VS <b>2.4.0</b> and onward!
+</p>
 
+## Getting Started
+### Namespace / Mod ID
+This template's default namespace/mod ID is "vs_template"- you'll likely want to change this!
 
-# Valkyrien Pirates
-This mod adds pirate ships to your world which sail of their own accord. These ships come with a fearsome crew, and cannons which will shoot at your ship. Killing the pirates will disarm the cannons, leaving the ship and its booty free for you to plunder!!
+You can do so by altering the following files:
+- Change the base package name in `settings.gradle.kts`
+- Change the name and id variables in `gradle.properties`
+- Change the MOD_ID in `VSTemplateMod.kt` in the `common` module
+- Edit the `mods.toml` file in `src/main/resources/META-INF/` in the `forge` module
+- Edit the `fabric.mod.json` file in `src/main/resources/` in the `fabric` module
 
-<img src="https://cdn.modrinth.com/data/jv8hXuHT/images/61390e97a94c08814abce579afc76a209fbfd843.png" alt="drawing" width="400"/>
+You should also rename anything prefixed with "VSTemplate" to your mod's name!
 
-## Ships
-Pirate ships generate as structures and are assembled by a Motion Invoking Block (unobtainable in survival) once within simulation distance. This block will drive the ship in a pattern - by default in a circle.
+If you are using IntelliJ, it is reccomended to refactor in your IDE rather than 
+changing the file name in file explorer, as it will automatically edit 
+the references to the old name to match your new one.
 
-Pirates that spawn on ships have a special property: some pirates are designated as cannoneers or helmsmen. Killing a cannoneer will stop its cannon from auto-firing, and killing the helmsman will replace the ship's Motion Invoking Block with Spruce Planks.
+### Understanding Dependencies
+In this mod's `gradle.properties` file, you will find a few properties that define the versions of 
+each dependency this project has, including VS2 and its core. You  can change these properties to update
+dependency versions easily across the entire project, without having to edit buildscripts!
 
-<img src="https://cdn.modrinth.com/data/jv8hXuHT/images/c35e72fce832c6035cb9074b4588fbc69cd6c9c7.jpeg" alt="drawing" width="400"/>
+Most dependencies have some easy way to discover the latest/reccomended version to depend on.
+Valkyrien Skies itself is similar! The `vs_core_version` property should be equal to the identically named property in the [Valkyrien Skies Github Repo](https://github.com/ValkyrienSkies/Valkyrien-Skies-2),
+and the `vs2_version` is the mod version, followed by the <b>first 10 characters</b> of the latest commit hash. 
 
-## Cannons
-To combat these pirate ships, you will likely want to bring your own cannons! Cannons can be created by placing a **Cannon Activator Block** behind a Dispenser. This will convert the dispenser into a **Cannon Dispenser**, letting you fire **Cannonballs** from it. To shoot a cannon, power the Cannon Activator Block (back of cannon) with a redstone signal.
+You can find the most recent
+retrievable version of VS easily  by going to the Packages tab for [Fabric](https://github.com/ValkyrienSkies/Valkyrien-Skies-2/packages/2020982) or [Forge](https://github.com/ValkyrienSkies/Valkyrien-Skies-2/packages/2020984)!
 
-## Crafting
-The Cannon Activator Block can be crafted with the same recipe as a Dispenser, except with Gunpowder instead of Redstone Dust.
+### Building and Running
+Before running the mod after each change made, it is recommended to run the `./gradlew clean` task in your command line, followed by clicking the sync button in the top right.
+This ensures the files built are up to date with your code changes.
 
-Cannonballs can be crafted with Blaze Powder, Gunpowder, and an Iron Ingot in any pattern.
+Alternatively to gradle clean, you can also manually delete your build folders. This is helpful if that task fails, for whatever reason.
 
-## Crew
-You may find some friendlier pirates on a raft at sea, giving one a Golden Apple will allow you to arm your cannons, so they might autofire again!
+### Mod Structure
+This mod template uses a multiloader structure, with 3 modules:
+- `common` : This module contains code shared between both Fabric and Forge. This is where the majority of your mod's code should go!
+- `fabric` : This module contains code specific to the Fabric loader. This includes the Fabric mod initializer, and any Fabric-specific implementations of common code.
+- `forge` : This module contains code specific to the Forge loader. This includes the Forge mod class, and any Forge-specific implementations of common code.
 
-## Shipwrecks
-Shipwreck structures can be found throughout the world that contain treasure similar to what you can find on pirate ships.
+Within each module, you will find 3 primary submodules:
+- `src/main/java` : This is where Java code goes. This is primarily used for Mixins, as Mixins cannot be written in Kotlin. You may also choose to relocate your primary mod files here, and not use Kotlin at all if you wish.
+- `src/main/kotlin` : This is where Kotlin code goes. VS is primarily written in Kotlin, so it tends to be easier to work with VS when also writing in Kotlin.
+- `src/main/resources` : This is where resources go, such as Forge's `mods.toml`, Fabric's `fabric.mod.json`, mod assets, and data files.
 
-## Credits
-- Acrogeneous - Original author and fearless captain
-- G_Mungus - Author and cunning quartermaster
-- Ankiolyne - Artist and tactful navigator
-- Qoissant - Author and inspired ship architect
+### Using the VS Api
+You can access the VS Core Api statically through `ValkyrienSkies.api` (with parenthesis for a method call in Java). The API's javadocs contain tons of extra information on how to use each part of it, so give them a read!
+
+Additionally, there are a few features in VS2 itself- such as `BlockEntityPhysicsListener`- that you may want to use.
+
+<i>This template was built for Valkyrien Skies 2.4.0+. Changes in API from 2.3 will make it almost certainly not function with releases of the mod prior to 2.4, so make sure you intend to develop for that version!</i>

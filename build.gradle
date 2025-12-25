@@ -1,104 +1,123 @@
+import org.jetbrains.kotlin.gradle.tasks.KotlinJvmCompile
+
 plugins {
-	id 'fabric-loom' version '1.6-SNAPSHOT'
-	id 'maven-publish'
-  id "org.jetbrains.kotlin.jvm" version "1.9.23"
+    id 'dev.architectury.loom' version '1.3.355' apply false
+    id 'architectury-plugin' version '3.4.146'
+    id "org.jetbrains.kotlin.jvm" version "$kotlin_version" apply false
+
+    id 'com.matthewprenger.cursegradle' version '1.4.0' apply false
+    id "com.modrinth.minotaur" version "2.4.5" apply false
 }
 
-version = project.mod_version
-group = project.maven_group
+// Version determinance in line with VS conventions
+if (project.hasProperty("CustomReleaseVersion")) {
+    // Remove release/ from the version if present
+    version = project.property("CustomReleaseVersion").replaceFirst("^release/", "")
+} else {
+    String gitRevision = "git rev-parse HEAD".execute().text.trim()
+    if (gitRevision.isEmpty()) {
+        gitRevision = 'unknown'
+    }
 
-base {
-	archivesName = project.archives_base_name
+    version = mod_version + '+' + (gitRevision.length() >= 10 ? gitRevision.substring(0, 10) : gitRevision)
 }
 
-repositories {
-	// Add repositories to retrieve artifacts from in here.
-	// You should only use this when depending on other mods because
-	// Loom adds the essential maven repositories to download Minecraft and libraries from automatically.
-	// See https://docs.gradle.org/current/userguide/declaring_repositories.html
-	// for more information about repositories.
-	repositories {
-		exclusiveContent {
-			forRepository {
-				maven {
-					name = "Modrinth"
-					url = "https://api.modrinth.com/maven"
-				}
-			}
-			filter {
-				includeGroup "maven.modrinth"
-			}
-		}
-	}
+architectury {
+    minecraft = project.minecraft_version
 }
 
-dependencies {
-	// To change the versions see the gradle.properties file
-	minecraft "com.mojang:minecraft:${project.minecraft_version}"
-	mappings "net.fabricmc:yarn:${project.yarn_mappings}:v2"
-	modImplementation "net.fabricmc:fabric-loader:${project.loader_version}"
+allprojects {
+    apply plugin: "java"
+    apply plugin: "kotlin"
+    apply plugin: "architectury-plugin"
+    apply plugin: "maven-publish"
 
-	// Fabric API. This is technically optional, but you probably want it anyway.
-	modImplementation "maven.modrinth:valkyrien-skies:1.20.1-fabric-2.3.0-beta.5"
-	modImplementation "maven.modrinth:eureka:1.20.1-fabric-1.5.1-beta.3"
-	modImplementation "maven.modrinth:valkyrien-sails:1.20.1-0.1.6-fabric"
+    archivesBaseName = rootProject.archives_base_name
+    version = rootProject.version
+    group = rootProject.maven_group
 
-	modImplementation "maven.modrinth:vlib:1.20.1-0.0.11-alpha+fabric"
+    // Copied from VS oddities. Forces arch to use the right version (which it doesn't for some reason on some machines)
+    configurations.configureEach {
+        resolutionStrategy.force "org.lwjgl:lwjgl-stb:3.3.1"
+        resolutionStrategy.force "org.lwjgl:lwjgl-opengl:3.3.1"
+        resolutionStrategy.force "org.lwjgl:lwjgl-openal:3.3.1"
+        resolutionStrategy.force "org.lwjgl:lwjgl-tinyfd:3.3.1"
+        resolutionStrategy.force "org.lwjgl:lwjgl-jemalloc:3.3.1"
+        resolutionStrategy.force "org.lwjgl:lwjgl-glfw:3.3.1"
+        resolutionStrategy.force "org.lwjgl:lwjgl:3.3.1"
+    }
 
-	modImplementation "maven.modrinth:architectury-api:9.2.14+fabric"
+    repositories {
+        //Add any repositories to fetch dependencies from here.
+        //Most dependencies are mirrored to the VS Maven, so by default only it is included alongside mavenLocal and KFF.
+        mavenLocal()
+        maven {
+            name = "Valkyrien Skies Internal"
+            url = project.vs_maven_url ?: 'https://maven.valkyrienskies.org'
+            if (project.vs_maven_username && project.vs_maven_password) {
+                credentials {
+                    username = project.vs_maven_username
+                    password = project.vs_maven_password
+                }
+            }
+        }
+        maven {
+            name = 'Kotlin for Forge'
+            url = 'https://thedarkcolour.github.io/KotlinForForge/'
+            content { includeGroup "thedarkcolour" }
+        }
+        repositories {
+            exclusiveContent {
+                forRepository {
+                    maven {
+                        name = "Modrinth"
+                        url = "https://api.modrinth.com/maven"
+                    }
+                }
+                filter {
+                    includeGroup "maven.modrinth"
+                }
+            }
+        }
+    }
 
-	modImplementation "net.fabricmc.fabric-api:fabric-api:${project.fabric_version}"
-	modImplementation "net.fabricmc:fabric-language-kotlin:${project.fabric_kotlin_version}"
+    java {
+        withSourcesJar()
+    }
+
+    tasks.withType(JavaCompile).configureEach {
+        options.encoding = "UTF-8"
+
+        options.release = 17
+    }
+
+    tasks.withType(KotlinJvmCompile).configureEach {
+        kotlinOptions {
+            jvmTarget = "17"
+            freeCompilerArgs += "-Xjvm-default=all"
+
+        }
+    }
+
+    String buildNumber = System.getenv("GITHUB_RUN_NUMBER")
 }
 
-processResources {
-	inputs.property "version", project.version
+subprojects {
+    apply plugin: 'dev.architectury.loom'
+    apply plugin: "org.jetbrains.kotlin.jvm"
 
-	filesMatching("fabric.mod.json") {
-		expand "version": project.version
-	}
-}
+    repositories {
+        //Add repositories here if necessary.
+    }
 
-tasks.withType(JavaCompile).configureEach {
-	it.options.release = 17
-}
+    loom {
+        silentMojangMappingsLicense()
+    }
 
-tasks.withType(org.jetbrains.kotlin.gradle.tasks.KotlinCompile).all {
-	kotlinOptions {
-		jvmTarget = 17
-	}
-}
+    dependencies {
+        minecraft "net.minecraft:minecraft:$rootProject.minecraft_version"
+        mappings loom.officialMojangMappings()
+    }
 
-java {
-	// Loom will automatically attach sourcesJar to a RemapSourcesJar task and to the "build" task
-	// if it is present.
-	// If you remove this line, sources will not be generated.
-	withSourcesJar()
 
-	sourceCompatibility = JavaVersion.VERSION_17
-	targetCompatibility = JavaVersion.VERSION_17
-}
-
-jar {
-	from("LICENSE") {
-		rename { "${it}_${project.base.archivesName.get()}"}
-	}
-}
-
-// configure the maven publication
-publishing {
-	publications {
-		create("mavenJava", MavenPublication) {
-			artifactId = project.archives_base_name
-			from components.java
-		}
-	}
-
-	// See https://docs.gradle.org/current/userguide/publishing_maven.html for information on how to set up publishing.
-	repositories {
-		// Add repositories to publish to here.
-		// Notice: This block does NOT have the same function as the block in the top level.
-		// The repositories here will be used for publishing your artifact, not for
-		// retrieving dependencies.
-	}
 }

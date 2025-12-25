@@ -1,0 +1,22 @@
+{
+  "item.pirates.cannonball": "Cannonball",
+  "item.pirates.fire_cannonball": "Flamin' Cannonball",
+  "item.pirates.weighted_cannonball": "'Eavy Cannonball",
+  "item.pirates.ship_pointer": "Point'er For Thay Ship",
+  "item.pirates.ship_pather": "Path'er For Thay Ship",
+  "item.pirates.cannoneer": "Powd'er Mate's Arrr-greement",
+  "item.pirates.doctor": "Fix'er O' Scurvy's Arrr-greement",
+
+  "block.pirates.ship_id_block": "Nam'er for Thay Ship",
+  "block.pirates.CANNON_PRIMING_BLOCK.get()": "Cannon Activat-arrr",
+  "block.Pirates.MOTION_INVOKING_BLOCK.get()": "Davy Jones' Ship Controll-arrr",
+  "block.pirates.crew_spawner_block": "Mat'ey Spawn-arrrr",
+
+  "entity.pirates.pirate": "Pirate",
+  "entity.pirates.friendly_pirate": "Pirate Mat'ey",
+
+  "text.pirates.target": "Arrr ya ship now may'be headin':",
+  "text.pirates.paths": "Aye ya ship be headin' betwe'en:",
+  "text.pirates.pather.add": "Ya ship now may'be heads: ",
+  "text.pirates.need_mib": "Ya scallywag, ye need to contac't ya Davy Jones' Ship Controll-arrr!"
+}

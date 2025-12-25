@@ -1,0 +1,22 @@
+{
+  "item.pirates.cannonball": "Cannonball",
+  "item.pirates.fire_cannonball": "Flaming Cannonball",
+  "item.pirates.weighted_cannonball": "Heavy Cannonball",
+  "item.pirates.ship_pointer": "Ship Pointer",
+  "item.pirates.ship_pather": "Ship Pather",
+  "item.pirates.cannoneer": "Cannoneer Contract",
+  "item.pirates.doctor": "Doctor Contract",
+
+  "block.pirates.ship_id_block": "Ship Nameplate",
+  "block.pirates.CANNON_PRIMING_BLOCK.get()": "Cannon Activator",
+  "block.Pirates.MOTION_INVOKING_BLOCK.get()": "Motion Invoker",
+  "block.pirates.crew_spawner_block": "Crew Spawner",
+
+  "entity.pirates.pirate": "Pirate",
+  "entity.pirates.friendly_pirate": "Befriendable Pirate",
+
+  "text.pirates.target": "The ships target position now is:",
+  "text.pirates.paths": "The ships path positions are:",
+  "text.pirates.pather.add": "Added a new position to this ships path!",
+  "text.pirates.need_mib": "You need to interact with a motion invoking block first!"
+}
