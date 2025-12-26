@@ -1,59 +1,93 @@
 architectury {
-    common rootProject.enabled_platforms.split(',')
+    common(rootProject.enabled_platforms.split(","))
 }
 
 loom {
     accessWidenerPath = file("src/main/resources/pirates.accesswidener")
 }
 
-test {
-    useJUnitPlatform()
-}
-
-sourceSets {
-    test.kotlin.srcDirs += "src/test/kotlin"
+repositories {
+    // Add repositories to retrieve artifacts from in here.
+    // You should only use this when depending on other mods because
+    // Loom adds the essential maven repositories to download Minecraft and libraries from automatically.
+    // See https://docs.gradle.org/current/userguide/declaring_repositories.html
+    // for more information about repositories.
+    repositories {
+        exclusiveContent {
+            forRepository {
+                maven {
+                    name = "Modrinth"
+                    url = "https://api.modrinth.com/maven"
+                }
+            }
+            filter {
+                includeGroup "maven.modrinth"
+            }
+        }
+    }
 }
 
 dependencies {
-    // We depend on Fabric Loader here to use the Fabric @Environment annotations,
-    // which get remapped to the correct annotations on each platform.
-    // Do NOT use other classes from Fabric Loader.
-    modImplementation "net.fabricmc:fabric-loader:$rootProject.fabric_loader_version"
-
-    implementation(("io.github.llamalad7:mixinextras-common:0.4.1"))
-
-    // Architectury API. This is optional, and you can comment it out if you don't need it.
-    modImplementation "dev.architectury:architectury:$rootProject.architectury_api_version"
+    // We depend on fabric loader here to use the fabric @Environment annotations and get the mixin dependencies
+    // Do NOT use other classes from fabric loader
+    modImplementation "net.fabricmc:fabric-loader:${rootProject.fabric_loader_version}"
+    modCompileOnly "net.fabricmc.fabric-api:fabric-api:${rootProject.fabric_api_version}"
 
     compileOnly "maven.modrinth:eureka:1.20.1-fabric-1.5.1-beta.3"
     compileOnly "maven.modrinth:valkyrien-sails:1.20.1-0.1.6-fabric"
     compileOnly "maven.modrinth:vlib:1.20.1-0.1.0+fabric"
+    //modImplementation("maven.modrinth:vlib:1.20.1-0.0.9-alpha+fabric")
 
-    modApi("org.valkyrienskies:valkyrienskies-120-common:${rootProject.vs2_version}") {
-        exclude group: "com.simibubi"
-        exclude group: "io.github.fabricators_of_create"
-        exclude group: "dev.engine-room"
-        exclude group: "dev.engine_room"
-    }
-    implementation("org.valkyrienskies.core:api:${rootProject.vscore_version}") {
-        exclude group: 'org.joml', module: ''
-    }
-    implementation("org.valkyrienskies.core:impl:${rootProject.vscore_version}") {
-        exclude group: 'org.joml', module: ''
-    }
-    implementation("org.valkyrienskies.core:internal:${rootProject.vscore_version}") {
-        exclude group: 'org.joml', module: ''
-    }
+    // Architectury API
+    modApi "dev.architectury:architectury:${rootProject.architectury_version}"
 
-    implementation("org.joml:joml-primitives:1.10.0")
-    implementation("org.joml:joml:1.10.4")
+    // Valkyrien Skies 2
+    modApi("org.valkyrienskies:valkyrienskies-120-common:${rootProject.vs2_version}")
 
-    // For unit testing.
-    var kotestVersion = "5.4.1"
-    testImplementation 'org.junit.jupiter:junit-jupiter-api:5.8.1'
-    testRuntimeOnly 'org.junit.jupiter:junit-jupiter-engine:5.8.1'
-    testImplementation("io.kotest:kotest-runner-junit5:$kotestVersion")
-    testImplementation("io.kotest:kotest-property:$kotestVersion")
-    testImplementation("io.kotest:kotest-assertions-core:$kotestVersion")
-    testImplementation("io.mockk:mockk:1.12.5")
+    // VS Core
+    compileOnly("org.valkyrienskies.core:api:${rootProject.vs_core_version}")
+    compileOnly("org.valkyrienskies.core:internal:${rootProject.vs_core_version}")
+    compileOnly("org.valkyrienskies.core:util:${rootProject.vs_core_version}")
+    compileOnly("org.valkyrienskies.core:impl:${rootProject.vs_core_version}")
+
+
+    api "org.jetbrains.kotlin:kotlin-stdlib-jdk8:1.9.10"
+    api "org.jetbrains.kotlin:kotlin-reflect:1.9.10"
 }
+
+//publishing {
+//    publications {
+//        mavenCommon(MavenPublication) {
+//            groupId = "org.valkyrienskies.eureka"
+//            version = project.version
+//            artifactId = rootProject.archives_base_name + "-" + project.name
+//            from components.java
+//        }
+//    }
+//
+//    // See https://docs.gradle.org/current/userguide/publishing_maven.html for information on how to set up publishing.
+//    repositories {
+//        if (project.vs_maven_username && project.vs_maven_password) {
+//            println "Publishing to VS Maven"
+//            maven {
+//                url = project.vs_maven_url
+//                credentials {
+//                    username = project.vs_maven_username
+//                    password = project.vs_maven_password
+//                }
+//            }
+//        }
+//        // Add repositories to publish to here.
+//        if (System.getenv("GITHUB_ACTOR") != null) {
+//            println "Publishing to Github Packages"
+//            maven {
+//                name = "GitHubPackages"
+//                url = uri("https://maven.pkg.github.com/ValkyrienSkies/Eureka")
+//                credentials {
+//                    username = System.getenv("GITHUB_ACTOR")
+//                    password = System.getenv("GITHUB_TOKEN")
+//                }
+//            }
+//        }
+//    }
+//}

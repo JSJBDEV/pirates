@@ -110,8 +110,7 @@ public class FriendlyPirateEntity extends AbstractPirateEntity implements Ranged
     }
 
     public static AttributeSupplier.Builder attributes() {
-        return Monster
-                .createMonsterAttributes()
+        return createMonsterAttributes()
                 .add(Attributes.MOVEMENT_SPEED, 0.3D)
                 .add(Attributes.FOLLOW_RANGE, 100.0D);
     }

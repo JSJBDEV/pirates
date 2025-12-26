@@ -1,42 +1,40 @@
+# gradle
+
+.gradle/
+build/
+out/
+classes/
 
 # eclipse
-bin
+
 *.launch
-.settings
-.metadata
+
+# idea
+
+.idea/
+*.iml
+*.ipr
+*.iws
+
+# vscode
+
+.settings/
+.vscode/
+bin/
 .classpath
 .project
 
-# idea
-out
-*.ipr
-*.iws
-*.iml
-# ignore .idea except
-.idea/*
-# code style
-!.idea/codeStyles/
-# inspection profile
-!.idea/inspectionProfiles/
-# recommended plugins
-!.idea/externalDependencies.xml
+# macos
 
-# vscode
-.vscode
+*.DS_Store
 
-# gradle
-build
-.gradle
+# fabric
 
-# other
-eclipse
-run
-run_server
-logs
+run/
 
-# Files from Forge MDK
-forge*changelog.txt
+# java
 
-# Files generated for Fabric
-/fabric/src/generated/
-/.architectury-transformer/debug.log
+hs_err_*.log
+replay_*.log
+*.hprof
+*.jfr

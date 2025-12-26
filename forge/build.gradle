@@ -4,21 +4,34 @@ buildscript {
     }
     dependencies {
         // Make sure this version matches the one included in Kotlin for Forge
-        classpath 'org.jetbrains.kotlin:kotlin-gradle-plugin:1.9.22'
+        classpath 'org.jetbrains.kotlin:kotlin-gradle-plugin:1.6.10'
         // OPTIONAL Gradle plugin for Kotlin Serialization
-        classpath 'org.jetbrains.kotlin:kotlin-serialization:1.9.22'
+        classpath 'org.jetbrains.kotlin:kotlin-serialization:1.6.10'
     }
 }
 
 plugins {
     id "com.github.johnrengelman.shadow" version "7.1.2"
-    id "com.matthewprenger.cursegradle"
-    id "com.modrinth.minotaur"
+//    id "com.matthewprenger.cursegradle"
+//    id "com.modrinth.minotaur"
 }
+
+//apply from: '../gradle-scripts/publish-curseforge.gradle'
 
 architectury {
     platformSetupLoomIde()
     forge()
+}
+
+loom {
+    accessWidenerPath = project(":common").loom.accessWidenerPath
+
+    forge {
+        convertAccessWideners = true
+        //mixinConfig "vs_sails.mixins.json"
+        mixinConfig "pirates-common.mixins.json"
+        extraAccessWideners.add loom.accessWidenerPath.get().asFile.name
+    }
 }
 
 configurations {
@@ -30,67 +43,67 @@ configurations {
 }
 
 repositories {
-    // Mavens for forge exclusive dependencies
-    maven {
-        name = 'Forge Maven'
-        url = 'https://maven.minecraftforge.net/'
+    // Add repositories to retrieve artifacts from in here.
+    // You should only use this when depending on other mods because
+    // Loom adds the essential maven repositories to download Minecraft and libraries from automatically.
+    // See https://docs.gradle.org/current/userguide/declaring_repositories.html
+    // for more information about repositories.
+    repositories {
+        exclusiveContent {
+            forRepository {
+                maven {
+                    name = "Modrinth"
+                    url = "https://api.modrinth.com/maven"
+                }
+            }
+            filter {
+                includeGroup "maven.modrinth"
+            }
+        }
+        maven {
+            name = "Sinytra"
+            url = "https://maven.su5ed.dev/releases"
+        }
     }
 }
 
 dependencies {
-    forge("net.minecraftforge:forge:${minecraft_version}-${forge_version}")
-    common(project(path: ":common", configuration: "namedElements")) { transitive = false }
+    forge "net.minecraftforge:forge:$forge_version"
+
+    // Architectury API
+    include(modApi "dev.architectury:architectury-forge:${rootProject.architectury_version}")
+
+    // Valkyrien Skies 2
+    //modApi("org.valkyrienskies:valkyrienskies-120-forge:$vs2_version") { transitive = false }
+    modImplementation "maven.modrinth:valkyrien-skies:1.20.1-forge-2.3.0-beta.7"
+
+    // VS Core
+    implementation("org.valkyrienskies.core:api:$vs_core_version")
+    implementation("org.valkyrienskies.core:internal:$vs_core_version")
+    implementation("org.valkyrienskies.core:util:$vs_core_version")
+    implementation("org.valkyrienskies.core:impl:$vs_core_version")
+
+    modImplementation("maven.modrinth:vlib:1.20.1-0.1.0+forge")
+
+    common(project(path: ":common", configuration: "namedElements")) { transitive false }
     shadowCommon(project(path: ":common", configuration: "transformProductionForge")) { transitive = false }
 
-    include(modApi("dev.architectury:architectury-forge:${rootProject.architectury_api_version}"))
-    implementation(include((("io.github.llamalad7:mixinextras-forge:0.4.1"))))
+    // Kotlin for Forge
+    implementation "thedarkcolour:kotlinforforge:$forge_kotlin_version"
 
-    //VS2 Dependencies. The latest VS2 and VSCore versions can be retrieved from the Valkyrien Skies Github repository.
-    //The version tag is usually the major version, followed by the first 10 characters of the git commit hash.
-    //The VSCore version tag can be grabbed directly from the gradle.properties file in the Valkyrien skies repo.
-    modApi("org.valkyrienskies:valkyrienskies-120-forge:${rootProject.vs2_version}") { transitive = false
-        exclude group: 'org.valkyrienskies.core', module: ''
-        exclude group: "com.simibubi"
-        exclude group: "io.github.fabricators_of_create"
-        exclude group: "dev.engine-room"
-        exclude group: "dev.engine_room"
-    }
-    implementation("org.valkyrienskies.core:api:${rootProject.vscore_version}") { transitive = false
-        exclude group: 'org.joml', module: ''
-    }
-    implementation("org.valkyrienskies.core:util:${rootProject.vscore_version}") { transitive = false
-        exclude group: 'org.joml', module: ''
-    }
-    implementation("org.valkyrienskies.core:internal:${rootProject.vscore_version}") { transitive = false
-        exclude group: 'org.joml', module: ''
-    }
-
-    // Kotlin
-    implementation("thedarkcolour:kotlinforforge:${rootProject.kotlin_forge}")
-
-    compileOnly("org.joml:joml:1.10.4")
-    compileOnly("org.joml:joml-primitives:1.10.0")
-
-
+    // Fabric API
+    modApi "dev.su5ed.sinytra.fabric-api:fabric-api:${rootProject.forge_fabric_api_version}"
 }
 
 processResources {
+    inputs.property "version", project.version
+
+    def props = project.properties
+    props['vs2_version'] = project.vs2_version.substring(0, project.vs2_version.indexOf('+'))
+    props['forge_version'] = project.forge_version.substring(project.forge_version.indexOf('.') + 1)
+
     filesMatching("META-INF/mods.toml") {
-        expand "version": version
-    }
-}
-
-loom {
-    //accessWidenerPath = project(":common").loom.accessWidenerPath
-
-    forge {
-        mixinConfig "pirates-common.mixins.json"
-        mixinConfig "pirates.mixins.json"
-        //convertAccessWideners.set(true)
-        //extraAccessWideners.add loom.accessWidenerPath.get().asFile.name
-    }
-    mixin {
-        defaultRefmapName = "pirates-refmap.json"
+        expand props
     }
 }
 
@@ -129,17 +142,39 @@ components.java {
     }
 }
 
-
-publishing {
-    publications {
-        mavenForge(MavenPublication) {
-            artifactId = rootProject.archives_base_name + "-" + project.name
-            from components.java
-        }
-    }
-
-    // See https://docs.gradle.org/current/userguide/publishing_maven.html for information on how to set up publishing.
-    repositories {
-        // Add repositories to publish to here.
-    }
-}
+//publishing {
+//    publications {
+//        mavenCommon(MavenPublication) {
+//            groupId = "org.valkyrienskies.eureka"
+//            version = project.version
+//            artifactId = rootProject.archives_base_name + "-" + project.name
+//            from components.java
+//        }
+//    }
+//
+//    // See https://docs.gradle.org/current/userguide/publishing_maven.html for information on how to set up publishing.
+//    repositories {
+//        if (project.vs_maven_username && project.vs_maven_password) {
+//            println "Publishing to VS Maven"
+//            maven {
+//                url = project.vs_maven_url
+//                credentials {
+//                    username = project.vs_maven_username
+//                    password = project.vs_maven_password
+//                }
+//            }
+//        }
+//        // Add repositories to publish to here.
+//        if (System.getenv("GITHUB_ACTOR") != null) {
+//            println "Publishing to Github Packages"
+//            maven {
+//                name = "GitHubPackages"
+//                url = uri("https://maven.pkg.github.com/ValkyrienSkies/Eureka")
+//                credentials {
+//                    username = System.getenv("GITHUB_ACTOR")
+//                    password = System.getenv("GITHUB_TOKEN")
+//                }
+//            }
+//        }
+//    }
+//}

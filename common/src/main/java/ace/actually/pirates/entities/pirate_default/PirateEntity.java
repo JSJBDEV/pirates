@@ -78,8 +78,7 @@ public class PirateEntity extends AbstractPirateEntity implements RangedAttackMo
     }
 
     public static AttributeSupplier.Builder attributes() {
-        return Monster
-                .createMonsterAttributes()
+        return createMonsterAttributes()
                 .add(Attributes.MOVEMENT_SPEED, 0.3D)
                 .add(Attributes.FOLLOW_RANGE, 100.0D);
     }
