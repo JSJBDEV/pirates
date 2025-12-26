@@ -14,7 +14,6 @@ import ace.actually.pirates.items.TestItem;
 import ace.actually.pirates.util.ConfigUtils;
 import com.google.common.base.Suppliers;
 import dev.architectury.platform.Platform;
-import dev.architectury.registry.ReloadListenerRegistry;
 import dev.architectury.registry.level.entity.EntityAttributeRegistry;
 import dev.architectury.registry.registries.DeferredRegister;
 import dev.architectury.registry.registries.Registrar;
@@ -22,16 +21,10 @@ import dev.architectury.registry.registries.RegistrarManager;
 import dev.architectury.registry.registries.RegistrySupplier;
 import dev.architectury.utils.Env;
 import dev.architectury.utils.EnvExecutor;
-import net.fabricmc.loader.api.FabricLoader;
-import net.fabricmc.loader.api.ModContainer;
 import net.minecraft.core.registries.BuiltInRegistries;
 import net.minecraft.core.registries.Registries;
 import net.minecraft.resources.ResourceKey;
 import net.minecraft.resources.ResourceLocation;
-import net.minecraft.server.MinecraftServer;
-import net.minecraft.server.packs.PackType;
-import net.minecraft.server.packs.resources.PreparableReloadListener;
-import net.minecraft.server.packs.resources.ResourceManager;
 import net.minecraft.sounds.SoundEvents;
 import net.minecraft.world.entity.EntityType;
 import net.minecraft.world.entity.MobCategory;
@@ -48,7 +41,6 @@ import net.minecraft.world.level.block.state.BlockBehaviour;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import java.util.Optional;
 import java.util.function.Supplier;
 
 public class Pirates {
@@ -199,7 +191,6 @@ public class Pirates {
         EntityAttributeRegistry.register(PIRATE_ENTITY_TYPE, PirateEntity::attributes);
         EntityAttributeRegistry.register(FRIENDLY_PIRATE_TYPE, FriendlyPirateEntity::attributes);
     }
-
 
 
 

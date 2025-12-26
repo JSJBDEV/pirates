@@ -3,11 +3,11 @@
   "package": "ace.actually.pirates.mixin",
   "compatibilityLevel": "JAVA_17",
   "mixins": [
+
   ],
   "injectors": {
     "defaultRequire": 1
   },
   "client": [
-
   ]
 }
