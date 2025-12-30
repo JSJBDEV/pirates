@@ -96,7 +96,7 @@ public class CannonPrimingBlockEntity extends BlockEntity {
         BlockHitResult result = world.clip(context);
         if(VSGameUtilsKt.isBlockInShipyard(world, result.getBlockPos()))
         {
-            ServerShip thisShip = VSGameUtilsKt.getShipManagingPos(world,pos);
+            ServerShip thisShip = VSGameUtilsKt.getShipManagingPos(world,result.getBlockPos());
             PlayerTeam team = world.getScoreboard().getPlayersTeam(thisShip.getSlug());
             if(team!=null)
             {

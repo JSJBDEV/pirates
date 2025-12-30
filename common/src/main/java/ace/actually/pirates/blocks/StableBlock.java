@@ -22,11 +22,6 @@ public class StableBlock extends BaseEntityBlock {
         super(settings);
     }
 
-    @Override
-    public RenderShape getRenderShape(BlockState state) {
-        return RenderShape.MODEL;
-    }
-
     @Nullable
     @Override
     public BlockEntity newBlockEntity(BlockPos pos, BlockState state) {
