@@ -33,31 +33,31 @@ public class DispenserCannonBlock extends DispenserBlock {
 
     @Override
     protected DispenseItemBehavior getDispenseMethod(ItemStack stack) {
-        if(stack.getItem() == Pirates.CANNONBALL){
+        if(stack.getItem() == Pirates.CANNONBALL.get()){
             return new CannonDispenserBehavior() {
                 @Override
                 protected Projectile createProjectile(Level world, Position position, ItemStack stack) {
-                    ShotEntity qentity = Util.make(new ShotEntity((EntityType<? extends ThrowableItemProjectile>) Pirates.SHOT_ENTITY_TYPE.get(),world,null,Pirates.CANNONBALL_ENT.get(),6,""), (entity) -> {});
+                    ShotEntity qentity = Util.make(new ShotEntity(Pirates.SHOT_ENTITY_TYPE.get(),world,null,Pirates.CANNONBALL_ENT.get(),6,""), (entity) -> {});
                     qentity.setPos(new Vec3(position.x(),position.y(),position.z()));
                     return qentity;
                 }
             };
         }
-        if(stack.getItem() == Pirates.FIRE_CANNONBALL){
+        if(stack.getItem() == Pirates.FIRE_CANNONBALL.get()){
             return new CannonDispenserBehavior() {
                 @Override
                 protected Projectile createProjectile(Level world, Position position, ItemStack stack) {
-                    ShotEntity qentity = Util.make(new ShotEntity((EntityType<? extends ThrowableItemProjectile>) Pirates.SHOT_ENTITY_TYPE.get(),world,null,Pirates.CANNONBALL_ENT.get(),3,"fire"), (entity) -> {});
+                    ShotEntity qentity = Util.make(new ShotEntity(Pirates.SHOT_ENTITY_TYPE.get(),world,null,Pirates.CANNONBALL_ENT.get(),3,"fire"), (entity) -> {});
                     qentity.setPos(new Vec3(position.x(),position.y(),position.z()));
                     return qentity;
                 }
             };
         }
-        if(stack.getItem() == Pirates.WEIGHTED_CANNONBALL){
+        if(stack.getItem() == Pirates.WEIGHTED_CANNONBALL.get()){
             return new CannonDispenserBehavior() {
                 @Override
                 protected Projectile createProjectile(Level world, Position position, ItemStack stack) {
-                    ShotEntity qentity = Util.make(new ShotEntity((EntityType<? extends ThrowableItemProjectile>) Pirates.SHOT_ENTITY_TYPE.get(),world,null,Pirates.CANNONBALL_ENT.get(),3,"heavy"), (entity) -> {});
+                    ShotEntity qentity = Util.make(new ShotEntity(Pirates.SHOT_ENTITY_TYPE.get(),world,null,Pirates.CANNONBALL_ENT.get(),3,"heavy"), (entity) -> {});
                     qentity.setPos(new Vec3(position.x(),position.y(),position.z()));
                     return qentity;
                 }

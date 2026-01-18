@@ -7,6 +7,7 @@ import net.minecraft.world.DifficultyInstance;
 import net.minecraft.world.entity.EntityType;
 import net.minecraft.world.entity.MobSpawnType;
 import net.minecraft.world.entity.SpawnGroupData;
+import net.minecraft.world.entity.ai.goal.FloatGoal;
 import net.minecraft.world.entity.ai.goal.LookAtPlayerGoal;
 import net.minecraft.world.entity.ai.goal.RandomLookAroundGoal;
 import net.minecraft.world.entity.monster.Monster;
@@ -43,9 +44,10 @@ public abstract class AbstractPirateEntity  extends Monster {
     @Override
     protected void registerGoals() {
         super.registerGoals();
-        this.goalSelector.addGoal(5, new PirateWanderArroundFarGoal(this, 1.0D));
+        //this.goalSelector.addGoal(5, new PirateWanderArroundFarGoal(this, 1.0D));
         this.goalSelector.addGoal(6, new LookAtPlayerGoal(this, Player.class, 200.0F));
         this.goalSelector.addGoal(6, new RandomLookAroundGoal(this));
+        this.goalSelector.addGoal(4,new FloatGoal(this));
 
     }
 

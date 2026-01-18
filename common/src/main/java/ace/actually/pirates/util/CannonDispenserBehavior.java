@@ -1,6 +1,5 @@
 package ace.actually.pirates.util;
 import ace.actually.pirates.Pirates;
-import ace.actually.pirates.sound.ModSounds;
 import net.minecraft.core.BlockSource;
 import net.minecraft.core.Direction;
 import net.minecraft.core.Position;
@@ -58,7 +57,7 @@ public abstract class CannonDispenserBehavior
 
     @Override
     protected void playSound(BlockSource pointer) {
-        pointer.getLevel().playSound(null, pointer.getPos().getX(), pointer.getPos().getY(), pointer.getPos().getZ(), ModSounds.CANNONBALL_SHOT, SoundSource.BLOCKS, 1F, 1F);
+        pointer.getLevel().playSound(null, pointer.getPos().getX(), pointer.getPos().getY(), pointer.getPos().getZ(), Pirates.CANNONBALL_SHOT.get(), SoundSource.BLOCKS, 1F, 1F);
     }
 
 

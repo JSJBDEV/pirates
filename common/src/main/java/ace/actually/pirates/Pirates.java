@@ -11,9 +11,11 @@ import ace.actually.pirates.items.ContractItem;
 import ace.actually.pirates.items.ShipPather;
 import ace.actually.pirates.items.ShipPointer;
 import ace.actually.pirates.items.TestItem;
+import ace.actually.pirates.sound.ModSounds;
 import ace.actually.pirates.util.ConfigUtils;
 import com.google.common.base.Suppliers;
 import dev.architectury.platform.Platform;
+import dev.architectury.registry.CreativeTabRegistry;
 import dev.architectury.registry.level.entity.EntityAttributeRegistry;
 import dev.architectury.registry.registries.DeferredRegister;
 import dev.architectury.registry.registries.Registrar;
@@ -23,8 +25,10 @@ import dev.architectury.utils.Env;
 import dev.architectury.utils.EnvExecutor;
 import net.minecraft.core.registries.BuiltInRegistries;
 import net.minecraft.core.registries.Registries;
+import net.minecraft.network.chat.Component;
 import net.minecraft.resources.ResourceKey;
 import net.minecraft.resources.ResourceLocation;
+import net.minecraft.sounds.SoundEvent;
 import net.minecraft.sounds.SoundEvents;
 import net.minecraft.world.entity.EntityType;
 import net.minecraft.world.entity.MobCategory;
@@ -55,7 +59,6 @@ public class Pirates {
     public static final GameRules.Key<GameRules.BooleanValue> PIRATES_IS_LIVE_WORLD =
             GameRules.register("piratesIsLive", GameRules.Category.MISC, GameRules.BooleanValue.create(true));
 
-    public static final ResourceKey<CreativeModeTab> PIRATES_ITEM_GROUP_KEY = ResourceKey.create(BuiltInRegistries.CREATIVE_MODE_TAB.key(), ResourceLocation.tryBuild(MOD_ID, "item_group"));
 
     public static float baseShotPower;
     public static float cannonRange;
@@ -65,7 +68,12 @@ public class Pirates {
     public static CompatTracker loadedCompats = new CompatTracker();
     private static final SoundType Silent = new SoundType(0, 0, SoundEvents.COD_AMBIENT, SoundEvents.COD_AMBIENT, SoundEvents.COD_AMBIENT, SoundEvents.COD_AMBIENT, SoundEvents.COD_AMBIENT);
 
-
+    public static final DeferredRegister<CreativeModeTab> TABS =
+            DeferredRegister.create("pirates", Registries.CREATIVE_MODE_TAB);
+    public static final RegistrySupplier<CreativeModeTab> TAB = TABS.register(
+            "pirates_tab",
+            ()->CreativeTabRegistry.create(Component.translatable("pirates.tab"),
+            ()->Pirates.CANNONBALL.get().getDefaultInstance()));;
 
     public static void init()
     {
@@ -92,7 +100,8 @@ public class Pirates {
         registerBlockEntities();
         registerItems();
         registerEntities();
-
+        registerSounds();
+        //ModSounds.registerSounds();
         //thank you https://github.com/dayofpi/mob-catalog/blob/master/common/src/main/java/com/dayofpi/mobcatalog/MobCatalog.java
         //it works without this on fabric by default...
         EnvExecutor.runInEnv(Env.CLIENT, () -> PiratesClient::initClientFromMain);
@@ -153,26 +162,35 @@ public class Pirates {
     {
         Registrar<Item> items = MANAGER.get().get(Registries.ITEM);
 
-        CANNONBALL = items.register(new ResourceLocation("pirates","cannonball"),()->new Item(new Item.Properties()));
-        FIRE_CANNONBALL = items.register(new ResourceLocation("pirates","fire_cannonball"),()->new Item(new Item.Properties()));
-        WEIGHTED_CANNONBALL = items.register(new ResourceLocation("pirates","weighted_cannonball"),()->new Item(new Item.Properties()));
-        CANNONBALL_ENT = items.register(new ResourceLocation("util_pirates","util_1"),()->new Item(new Item.Properties()));
-        SHIP_POINTER = items.register(new ResourceLocation("pirates","ship_pointer"),()->new ShipPointer(new Item.Properties()));
+        CANNONBALL = items.register(new ResourceLocation("pirates","cannonball"),()->new Item(new Item.Properties().arch$tab(TAB)));
+        FIRE_CANNONBALL = items.register(new ResourceLocation("pirates","fire_cannonball"),()->new Item(new Item.Properties().arch$tab(TAB)));
+        WEIGHTED_CANNONBALL = items.register(new ResourceLocation("pirates","weighted_cannonball"),()->new Item(new Item.Properties().arch$tab(TAB)));
+        CANNONBALL_ENT = items.register(new ResourceLocation("util_pirates","util_1"),()->new Item(new Item.Properties().arch$tab(TAB)));
+        SHIP_POINTER = items.register(new ResourceLocation("pirates","ship_pointer"),()->new ShipPointer(new Item.Properties().arch$tab(TAB)));
         CANNONEER_ITEM = items.register(new ResourceLocation("pirates","cannoneer"),()->new ContractItem(CANNON_PRIMING_BLOCK.get(),"cannoneer"));
         DOCTOR_ITEM = items.register(new ResourceLocation("pirates","doctor"),()-> new ContractItem(Blocks.GOLD_BLOCK,"doctor"));
-        SHIP_PATHER = items.register(new ResourceLocation("pirates","ship_pather"),()-> new ShipPather(new Item.Properties()));
+        SHIP_PATHER = items.register(new ResourceLocation("pirates","ship_pather"),()-> new ShipPather(new Item.Properties().arch$tab(TAB)));
 
-        items.register(new ResourceLocation("pirates","stable_block"),()->new BlockItem(STABLE_BLOCK.get(),new Item.Properties()));
+        items.register(new ResourceLocation("pirates","stable_block"),()->new BlockItem(STABLE_BLOCK.get(),new Item.Properties().arch$tab(TAB)));
 
-        items.register(new ResourceLocation("pirates","cannon_priming_block"),()->new BlockItem(CANNON_PRIMING_BLOCK.get(),new Item.Properties()));
+        items.register(new ResourceLocation("pirates","cannon_priming_block"),()->new BlockItem(CANNON_PRIMING_BLOCK.get(),new Item.Properties().arch$tab(TAB)));
 
-        TEST_ITEM = items.register(new ResourceLocation("pirates","test"),()->new TestItem(new Item.Properties()));
+        TEST_ITEM = items.register(new ResourceLocation("pirates","test"),()->new TestItem(new Item.Properties().arch$tab(TAB)));
 
-        items.register(new ResourceLocation("pirates","motion_invoking_block"),()->new BlockItem(MOTION_INVOKING_BLOCK.get(),new Item.Properties()));
-        items.register(new ResourceLocation("pirates","crew_spawner_block"),()->new BlockItem(CREW_SPAWNER_BLOCK.get(),new Item.Properties()));
-        items.register(new ResourceLocation("pirates","ship_id_block"),()->new BlockItem(SHIP_ID_BLOCK.get(),new Item.Properties()));
+        items.register(new ResourceLocation("pirates","motion_invoking_block"),()->new BlockItem(MOTION_INVOKING_BLOCK.get(),new Item.Properties().arch$tab(TAB)));
+        items.register(new ResourceLocation("pirates","crew_spawner_block"),()->new BlockItem(CREW_SPAWNER_BLOCK.get(),new Item.Properties().arch$tab(TAB)));
+        items.register(new ResourceLocation("pirates","ship_id_block"),()->new BlockItem(SHIP_ID_BLOCK.get(),new Item.Properties().arch$tab(TAB)));
+
+    }
 
 
+
+    public static RegistrySupplier<SoundEvent> CANNONBALL_SHOT;
+    public static void registerSounds()
+    {
+        Registrar<SoundEvent> sounds = MANAGER.get().get(Registries.SOUND_EVENT);
+        ResourceLocation loc = new ResourceLocation("pirates","cannonball_shot");
+        CANNONBALL_SHOT = sounds.register(loc,()->SoundEvent.createVariableRangeEvent(loc));
     }
 
     public static final DeferredRegister<EntityType<?>> ENTITY_TYPES = DeferredRegister.create(MOD_ID, Registries.ENTITY_TYPE);

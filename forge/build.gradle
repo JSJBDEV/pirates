@@ -99,7 +99,7 @@ processResources {
     inputs.property "version", project.version
 
     def props = project.properties
-    props['vs2_version'] = project.vs2_version.substring(0, project.vs2_version.indexOf('+'))
+    props['vs2_version'] = project.vs2_version
     props['forge_version'] = project.forge_version.substring(project.forge_version.indexOf('.') + 1)
 
     filesMatching("META-INF/mods.toml") {

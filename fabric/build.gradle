@@ -71,7 +71,7 @@ processResources {
 
 
     def props = project.properties
-    props['vs2_version'] = project.vs2_version.substring(0, project.vs2_version.indexOf('+'))
+    props['vs2_version'] = project.vs2_version
 
     filesMatching("fabric.mod.json") {
         expand props

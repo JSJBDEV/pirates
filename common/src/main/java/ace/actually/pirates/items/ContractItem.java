@@ -1,5 +1,6 @@
 package ace.actually.pirates.items;
 
+import ace.actually.pirates.Pirates;
 import ace.actually.pirates.entities.friendly_pirate.FriendlyPirateEntity;
 import ace.actually.pirates.util.DisarmUtils;
 import net.minecraft.core.BlockPos;
@@ -15,7 +16,7 @@ public class ContractItem extends Item {
     Block jobsite;
     String jobname;
     public ContractItem(Block jobsite, String jobname) {
-        super(new Properties());
+        super(new Properties().arch$tab(Pirates.TAB));
         this.jobname=jobname;
         this.jobsite=jobsite;
     }

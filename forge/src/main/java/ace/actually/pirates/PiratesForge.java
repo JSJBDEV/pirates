@@ -6,6 +6,7 @@ import net.minecraftforge.fml.common.Mod;
 import net.minecraftforge.fml.javafmlmod.FMLJavaModLoadingContext;
 
 @Mod(Pirates.MOD_ID)
+@Mod.EventBusSubscriber
 public class PiratesForge {
     public PiratesForge()
     {

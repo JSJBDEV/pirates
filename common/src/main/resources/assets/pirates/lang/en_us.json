@@ -18,5 +18,7 @@
   "text.pirates.target": "The ships target position now is:",
   "text.pirates.paths": "The ships path positions are:",
   "text.pirates.pather.add": "Added a new position to this ships path!",
-  "text.pirates.need_mib": "You need to interact with a motion invoking block first!"
+  "text.pirates.need_mib": "You need to interact with a motion invoking block first!",
+
+  "pirates.tab": "Valkyrien Pirates"
 }
