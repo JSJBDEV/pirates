@@ -8,8 +8,8 @@
   "item.pirates.doctor": "Doctor Contract",
 
   "block.pirates.ship_id_block": "Ship Nameplate",
-  "block.pirates.CANNON_PRIMING_BLOCK.get()": "Cannon Activator",
-  "block.Pirates.MOTION_INVOKING_BLOCK.get()": "Motion Invoker",
+  "block.pirates.cannon_priming_block": "Cannon Activator",
+  "block.Pirates.motion_invoking_block": "Motion Invoker",
   "block.pirates.crew_spawner_block": "Crew Spawner",
 
   "entity.pirates.pirate": "Pirate",

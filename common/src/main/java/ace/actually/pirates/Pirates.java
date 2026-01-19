@@ -101,6 +101,7 @@ public class Pirates {
         registerItems();
         registerEntities();
         registerSounds();
+        TABS.register();
         //ModSounds.registerSounds();
         //thank you https://github.com/dayofpi/mob-catalog/blob/master/common/src/main/java/com/dayofpi/mobcatalog/MobCatalog.java
         //it works without this on fabric by default...
@@ -171,11 +172,11 @@ public class Pirates {
         DOCTOR_ITEM = items.register(new ResourceLocation("pirates","doctor"),()-> new ContractItem(Blocks.GOLD_BLOCK,"doctor"));
         SHIP_PATHER = items.register(new ResourceLocation("pirates","ship_pather"),()-> new ShipPather(new Item.Properties().arch$tab(TAB)));
 
-        items.register(new ResourceLocation("pirates","stable_block"),()->new BlockItem(STABLE_BLOCK.get(),new Item.Properties().arch$tab(TAB)));
+        items.register(new ResourceLocation("pirates","stable_block"),()->new BlockItem(STABLE_BLOCK.get(),new Item.Properties()));
 
         items.register(new ResourceLocation("pirates","cannon_priming_block"),()->new BlockItem(CANNON_PRIMING_BLOCK.get(),new Item.Properties().arch$tab(TAB)));
 
-        TEST_ITEM = items.register(new ResourceLocation("pirates","test"),()->new TestItem(new Item.Properties().arch$tab(TAB)));
+        TEST_ITEM = items.register(new ResourceLocation("pirates","test"),()->new TestItem(new Item.Properties()));
 
         items.register(new ResourceLocation("pirates","motion_invoking_block"),()->new BlockItem(MOTION_INVOKING_BLOCK.get(),new Item.Properties().arch$tab(TAB)));
         items.register(new ResourceLocation("pirates","crew_spawner_block"),()->new BlockItem(CREW_SPAWNER_BLOCK.get(),new Item.Properties().arch$tab(TAB)));
