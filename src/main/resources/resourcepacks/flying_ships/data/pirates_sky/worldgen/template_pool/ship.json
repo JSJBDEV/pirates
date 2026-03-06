@@ -17,7 +17,7 @@
       "element": {
         "element_type": "minecraft:single_pool_element",
         "projection": "rigid",
-        "location": "pirates_sky:ship/finisherapex",
+        "location": "pirates_sky:ship/finisher-apex",
         "processors": "minecraft:empty"
       }
       
