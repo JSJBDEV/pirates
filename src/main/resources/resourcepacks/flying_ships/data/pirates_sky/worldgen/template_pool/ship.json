@@ -10,6 +10,17 @@
         "location": "pirates_sky:ship/wreckerideal",
         "processors": "minecraft:empty"
       }
+      
+    },
+        {
+      "weight": 3,
+      "element": {
+        "element_type": "minecraft:single_pool_element",
+        "projection": "rigid",
+        "location": "pirates_sky:ship/finisher-apex",
+        "processors": "minecraft:empty"
+      }
+      
     }
   ]
 }
