@@ -4,9 +4,7 @@ import ace.actually.pirates.Pirates;
 import ace.actually.pirates.blocks.CannonPrimingBlock;
 import ace.actually.pirates.entities.pirate_abstract.AbstractPirateEntity;
 import ace.actually.pirates.entities.pirate_default.PirateEntity;
-import ace.actually.pirates.entities.pirate_skeleton.SkeletonPirateEntity;
 import ace.actually.pirates.events.IPirateSpawns;
-import ace.actually.pirates.entities.CrewSpawnType;
 import ace.actually.pirates.entities.CrewTypes;
 import ace.actually.pirates.util.ConfigUtils;
 import ewewukek.musketmod.Items;
@@ -22,13 +20,15 @@ import net.minecraft.item.ItemStack;
 //import net.minecraft.item.Items;
 import net.minecraft.nbt.NbtCompound;
 import net.minecraft.server.network.EntityTrackerEntry;
+import net.minecraft.registry.Registries;
 import net.minecraft.server.world.ServerWorld;
 import net.minecraft.state.property.Properties;
+import net.minecraft.util.Identifier;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.village.VillagerType;
-import net.minecraft.world.EntityList;
 import net.minecraft.world.World;
-import org.apache.http.client.entity.EntityBuilder;
+import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 import org.valkyrienskies.core.api.ships.Ship;
 import org.valkyrienskies.mod.common.VSGameUtilsKt;
 import net.minecraft.world.EntityList;
@@ -142,48 +142,58 @@ public class CrewSpawnerBlockEntity extends BlockEntity {
             }
             case CUSTOM_0 ->
             {
-                String id = (ConfigUtils.config.getOrDefault("custom-crew-entity-0","minecraft:zombie"));
-                EntityType<?> j = null;
-                if (EntityType.get(id).isPresent()) {
-                    j = EntityType.get(id).get();
-                }
-                assert j != null;
-                crew = j.create(world);
+                crew = makeCustomCrew(world,0);
             }
             case CUSTOM_1 ->
             {
-                String id = (ConfigUtils.config.getOrDefault("custom-crew-entity-0","minecraft:skeleton"));
-                EntityType<?> j = null;
-                if (EntityType.get(id).isPresent()) {
-                    j = EntityType.get(id).get();
-                }
-                assert j != null;
-                crew = j.create(world);
+                crew = makeCustomCrew(world,1);
             }
             case CUSTOM_2 ->
             {
-                String id = (ConfigUtils.config.getOrDefault("custom-crew-entity-0","minecraft:creeper"));
-                EntityType<?> j = null;
-                if (EntityType.get(id).isPresent()) {
-                    j = EntityType.get(id).get();
-                }
-                assert j != null;
-                crew = j.create(world);
+                crew = makeCustomCrew(world,2);
             }
             case CUSTOM_3 ->
             {
-                String id = (ConfigUtils.config.getOrDefault("custom-crew-entity-0","minecraft:stray"));
-                EntityType<?> j = null;
-                if (EntityType.get(id).isPresent()) {
-                    j = EntityType.get(id).get();
-                }
-                assert j != null;
-                crew = j.create(world);
+                crew = makeCustomCrew(world,3);
             }
         }
 
         //Mixin here to add custom entities
 
+        return crew;
+    }
+
+    public static Entity makeCustomCrew(@NotNull World world, int number)
+    {
+        String id = (ConfigUtils.config.getOrDefault("custom-crew-entity-"+number,"minecraft:zombie"));
+        EntityType<?> j = null;
+        if (EntityType.get(id).isPresent()) {
+            j = EntityType.get(id).get();
+        }
+        assert j != null;
+
+        Entity crew = j.create(world);
+        String equipments = ConfigUtils.config.getOrDefault("custom-crew-equipment-"+number,"0,0,0,0,0,0");
+        String[] parts = equipments.split(",");
+        if(parts.length==6)
+        {
+            for (int i = 0; i < parts.length; i++) {
+                if(!parts[i].equals("0") && !parts[i].equals("null") && !parts[i].isEmpty())
+                {
+                    Item item = Registries.ITEM.get(Identifier.tryParse(parts[i].replace(" ","")));
+                    switch (i)
+                    {
+                        case 0 -> crew.equipStack(EquipmentSlot.MAINHAND,new ItemStack(item));
+                        case 1 -> crew.equipStack(EquipmentSlot.OFFHAND,new ItemStack(item));
+                        case 2 -> crew.equipStack(EquipmentSlot.HEAD,new ItemStack(item));
+                        case 3 -> crew.equipStack(EquipmentSlot.CHEST,new ItemStack(item));
+                        case 4 -> crew.equipStack(EquipmentSlot.LEGS,new ItemStack(item));
+                        case 5 -> crew.equipStack(EquipmentSlot.FEET,new ItemStack(item));
+                    }
+                }
+
+            }
+        }
         return crew;
     }
 

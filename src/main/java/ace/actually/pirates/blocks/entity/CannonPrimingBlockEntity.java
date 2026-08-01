@@ -5,12 +5,15 @@ import ace.actually.pirates.blocks.CannonPrimingBlock;
 import ace.actually.pirates.util.ConfigUtils;
 import net.minecraft.block.*;
 import net.minecraft.block.entity.BlockEntity;
+import net.minecraft.scoreboard.Team;
+import net.minecraft.server.world.ServerWorld;
 import net.minecraft.state.property.Properties;
 import net.minecraft.util.hit.BlockHitResult;
 import net.minecraft.util.math.*;
 import net.minecraft.world.GameRules;
 import net.minecraft.world.RaycastContext;
 import net.minecraft.world.World;
+import org.valkyrienskies.core.api.ships.ServerShip;
 import org.valkyrienskies.mod.common.VSGameUtilsKt;
 
 public class CannonPrimingBlockEntity extends BlockEntity {
@@ -29,12 +32,12 @@ public class CannonPrimingBlockEntity extends BlockEntity {
     public void tick(World world, BlockPos pos, BlockState state, CannonPrimingBlockEntity be) {
 
 
-        if (!world.isClient && cooldown == 0) {
+        if (world instanceof ServerWorld sw && cooldown == 0) {
 
-            if ((checkShouldFire(world, pos, state) && !state.get(CannonPrimingBlock.DISARMED))){
+            if ((checkShouldFire(sw, pos, state) && !state.get(CannonPrimingBlock.DISARMED))){
 
 
-                fire(world, pos, state);
+                fire(sw, pos, state);
             } else {
                 cooldown = 3;
             }
@@ -63,7 +66,7 @@ public class CannonPrimingBlockEntity extends BlockEntity {
         }
     }
 
-    public void fire(World world, BlockPos pos, BlockState state) {
+    public void fire(ServerWorld world, BlockPos pos, BlockState state) {
         if(cooldownConfig==-5)
         {
             cooldownConfig = Integer.parseInt(ConfigUtils.config.getOrDefault("cannon-firing-pause","40"));
@@ -74,7 +77,7 @@ public class CannonPrimingBlockEntity extends BlockEntity {
     }
 
 
-    private static boolean checkShouldFire(World world, BlockPos pos, BlockState state) {
+    private static boolean checkShouldFire(ServerWorld world, BlockPos pos, BlockState state) {
         Vec3i raycastStart = state.get(Properties.FACING).getVector();
         if(!(world.getBlockState(pos.add(raycastStart)).getBlock() instanceof DispenserBlock)|| world.getBlockState(pos.add(raycastStart)).get(Properties.FACING) != state.get(Properties.FACING)){
             return false;
@@ -89,7 +92,22 @@ public class CannonPrimingBlockEntity extends BlockEntity {
                 null);
 
         BlockHitResult result = world.raycast(context);
-        return  (VSGameUtilsKt.isBlockInShipyard(world, result.getBlockPos()));
+        ServerShip thisShip = VSGameUtilsKt.getShipManagingPos(world,result.getBlockPos());
+        if(thisShip!=null)
+        {
+            Team team = world.getScoreboard().getPlayerTeam(thisShip.getSlug());
+            if(team!=null)
+            {
+                ServerShip otherShip = VSGameUtilsKt.getShipManagingPos(world,result.getBlockPos());
+                Team otherTeam = world.getScoreboard().getPlayerTeam(otherShip.getSlug());
+                if(otherTeam!=null)
+                {
+                    return !team.isEqual(otherTeam);
+                }
+            }
+            return true;
+        }
+        return false;
     }
 
 }

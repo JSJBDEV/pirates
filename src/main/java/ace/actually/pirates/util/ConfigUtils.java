@@ -90,6 +90,12 @@ public class ConfigUtils {
         defaults.add("custom-crew-entity-2=minecraft:creeper");
         defaults.add("custom-crew-entity-3=minecraft:stray");
         defaults.add("");
+        defaults.add("#Custom crew equipments- mainhand,offhand,helmet,chest,leggings,boots");
+        defaults.add("custom-crew-equipment-0=0,0,0,0,0,0");
+        defaults.add("custom-crew-equipment-1=0,0,0,0,0,0");
+        defaults.add("custom-crew-equipment-2=0,0,0,0,0,0");
+        defaults.add("custom-crew-equipment-3=0,0,0,0,0,0");
+        defaults.add("");
         defaults.add("#Whether flying pirates should spawn in the world or not (default true) BETA!");
         defaults.add("should-enable-flying-pirates=false");
         defaults.add("");
