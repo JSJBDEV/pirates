@@ -21,7 +21,8 @@ import org.valkyrienskies.core.api.ships.LoadedServerShip;
 import org.valkyrienskies.core.api.ships.Ship;
 import org.valkyrienskies.mod.api.SeatedControllingPlayer;
 import org.valkyrienskies.mod.common.VSGameUtilsKt;
-import org.valkyrienskies.mod.common.util.GameTickForceApplier;
+import org.valkyrienskies.mod.common.ValkyrienSkiesMod;
+import org.valkyrienskies.mod.common.util.GameToPhysicsAdapter;
 
 import java.util.List;
 
@@ -214,16 +215,16 @@ public class MotionInvokingBlockEntity extends BlockEntity {
         double mass = ship.getInertiaData().getMass();
         Vector3d qdc = ship.getTransform().getShipToWorldRotation().getEulerAnglesZXY(new Vector3d()).normalize().mul(mass*10);
         qdc = new Vector3d(-qdc.x,0,-qdc.z);
-        GameTickForceApplier gtfa = ship.getAttachment(GameTickForceApplier.class);
+        GameToPhysicsAdapter gtpa = ValkyrienSkiesMod.getOrCreateGTPA(getWorld().getRegistryKey().getValue().toString());
 
-        if(gtfa!=null) {
+        if(gtpa!=null) {
             Vector3dc v3dc = ship.getInertiaData().getCenterOfMassInShip();
             Vector3d loc = new Vector3d(v3dc.x()+1,v3dc.y(),v3dc.z()+1);
             //if(world instanceof ServerWorld serverWorld)
             //{
             //    serverWorld.spawnParticles(ParticleTypes.BUBBLE,loc.x,loc.y,loc.z,1,0,0,0,0);
             //}
-            gtfa.applyInvariantForceToPos(qdc,loc.sub(ship.getTransform().getPositionInShip()));
+            gtpa.applyInvariantForceToPos(ship.getId(), qdc, loc.sub(ship.getTransform().getPositionInShip()));
         }
     }
 }

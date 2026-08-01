@@ -1,11 +1,13 @@
 package ace.actually.pirates.blocks.entity;
 
 import ace.actually.pirates.Pirates;
+import ace.actually.pirates.blocks.CannonPrimingBlock;
 import ace.actually.pirates.entities.pirate_abstract.AbstractPirateEntity;
 import ace.actually.pirates.entities.pirate_default.PirateEntity;
 import ace.actually.pirates.events.IPirateSpawns;
 import ace.actually.pirates.entities.CrewTypes;
 import ace.actually.pirates.util.ConfigUtils;
+import ace.actually.pirates.compat.MusketModCompat;
 import net.minecraft.block.BlockState;
 import net.minecraft.block.entity.BlockEntity;
 import net.minecraft.enchantment.Enchantments;
@@ -15,7 +17,9 @@ import net.minecraft.entity.EquipmentSlot;
 import net.minecraft.entity.passive.VillagerEntity;
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
-import net.minecraft.item.Items;
+//import net.minecraft.item.Items;
+import net.minecraft.nbt.NbtCompound;
+import net.minecraft.server.network.EntityTrackerEntry;
 import net.minecraft.registry.Registries;
 import net.minecraft.server.world.ServerWorld;
 import net.minecraft.state.property.Properties;
@@ -27,6 +31,10 @@ import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 import org.valkyrienskies.core.api.ships.Ship;
 import org.valkyrienskies.mod.common.VSGameUtilsKt;
+import net.minecraft.world.EntityList;
+
+import java.util.Optional;
+
 
 public class CrewSpawnerBlockEntity extends BlockEntity {
 
@@ -108,19 +116,21 @@ public class CrewSpawnerBlockEntity extends BlockEntity {
 
     private static Entity getEntityFromState(World world, BlockEntity be) {
         Entity crew = null;
+
         switch (be.getCachedState().get(CrewTypes.CREW_SPAWN_TYPE))
         {
             case PIRATE ->
             {
                 crew = new PirateEntity(world, checkForBlocksToCrew(world, be.getPos()));
-                crew.equipStack(EquipmentSlot.MAINHAND, new ItemStack(Items.BOW));
+                MusketModCompat.equipRandomGunOrBow((AbstractPirateEntity) crew, world.random);
             }
             case VILLAGER ->  crew = new VillagerEntity(EntityType.VILLAGER, world, VillagerType.forBiome(world.getBiome(be.getPos())));
             case SKELETON_PIRATE ->
             {
                 BlockPos blockToCrew = checkForBlocksToCrew(world, be.getPos());
                 crew = new PirateEntity(world, blockToCrew);
-                ItemStack itemStack = new ItemStack(Items.BOW);
+                Item randomGun = MusketModCompat.randomGun(world.random);
+                ItemStack itemStack = new ItemStack(randomGun == null ? net.minecraft.item.Items.BOW : randomGun);
                 if (world.getBlockState(blockToCrew).isOf(Pirates.MOTION_INVOKING_BLOCK)) {
                     itemStack.addEnchantment(Enchantments.POWER, 2);
                 }

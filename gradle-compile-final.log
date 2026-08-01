@@ -1,0 +1,30 @@
+To honour the JVM settings for this build a single-use Daemon process will be forked. For more on this, please refer to https://docs.gradle.org/8.7/userguide/gradle_daemon.html#sec:disabling_the_daemon in the Gradle documentation.
+Daemon will be stopped at the end of the build 
+
+> Configure project :
+Fabric Loom: 1.6.12
+Refresh dependencies is in use, loom will be significantly slower.
+"Lock for cache='C:\Users\Admin\.gradle\caches\fabric-loom', project=':'" is currently held by pid '2264'.
+Run with --info or --debug to show arguments, may reveal sensitive info
+- pid: 2264
+- command: C:\Users\Admin\.jdks\ms-21.0.12\bin\java.exe
+- started at: 2026-08-01T08:08:25.670Z
+- user: ADMIN-PC\Admin
+- parent:
+	- title: 'pirates – build.gradle (pirates)'
+	- pid: 21876
+	- command: D:\IntelliJ IDEA 2026.2.0.1\bin\idea64.exe
+	- started at: 2026-08-01T08:05:14.989Z
+	- user: ADMIN-PC\Admin
+Waiting for lock to be released...
+:remapping 60 mods from modImplementation (java-api)
+:remapping 60 mods from modImplementation (java-runtime)
+:remapping 1 mods from modCompileOnly (java-api)
+
+> Task :checkKotlinGradlePluginConfigurationErrors
+> Task :compileKotlin NO-SOURCE
+
+> Task :compileJava
+
+> Task :compileJava FAILED
+2 actionable tasks: 2 executed

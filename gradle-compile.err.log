@@ -1,0 +1,44 @@
+
+FAILURE: Build completed with 2 failures.
+
+1: Task failed with an exception.
+-----------
+* What went wrong:
+A problem occurred configuring root project 'pirates'.
+> Could not resolve all files for configuration ':modImplementation'.
+   > Could not find maven.modrinth:vlib:1.20.1-0.1.1+fabric.
+     Searched in the following locations:
+       - https://api.modrinth.com/maven/maven/modrinth/vlib/1.20.1-0.1.1+fabric/vlib-1.20.1-0.1.1+fabric.pom
+     Required by:
+         project :
+
+* Try:
+> If the artifact you are trying to retrieve can be found in the repository but without metadata in 'Maven POM' format, you need to adjust the 'metadataSources { ... }' of the repository declaration.
+> Run with --stacktrace option to get the stack trace.
+> Run with --info or --debug option to get more log output.
+> Run with --scan to get full insights.
+> Get more help at https://help.gradle.org.
+==============================================================================
+
+2: Task failed with an exception.
+-----------
+* What went wrong:
+Failed to query the value of property 'buildFlowServiceProperty'.
+> Could not isolate value org.jetbrains.kotlin.gradle.plugin.statistics.BuildFlowService$Parameters_Decorated@2dad279 of type BuildFlowService.Parameters
+   > A problem occurred configuring root project 'pirates'.
+      > Could not resolve all files for configuration ':modImplementation'.
+         > Could not find maven.modrinth:vlib:1.20.1-0.1.1+fabric.
+           Searched in the following locations:
+             - https://api.modrinth.com/maven/maven/modrinth/vlib/1.20.1-0.1.1+fabric/vlib-1.20.1-0.1.1+fabric.pom
+           Required by:
+               project :
+
+* Try:
+> If the artifact you are trying to retrieve can be found in the repository but without metadata in 'Maven POM' format, you need to adjust the 'metadataSources { ... }' of the repository declaration.
+> Run with --stacktrace option to get the stack trace.
+> Run with --info or --debug option to get more log output.
+> Run with --scan to get full insights.
+> Get more help at https://help.gradle.org.
+==============================================================================
+
+BUILD FAILED in 47s

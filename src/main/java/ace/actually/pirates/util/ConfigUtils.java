@@ -66,8 +66,8 @@ public class ConfigUtils {
         defaults.add("#The minimum rate the pirates will fire their cannons at");
         defaults.add("cannon-firing-pause=40");
         defaults.add("");
-        defaults.add("#The speed the cannonballs will fire at, default=1.7");
-        defaults.add("cannon-range=1.7");
+        defaults.add("#The speed the cannonballs will fire at, default=3.2 (about 80 blocks on level ground)");
+        defaults.add("cannon-range=3.2");
         defaults.add("");
         defaults.add("#The max amount of blocks for the new ship builder, set to -1 to use the Eureka/VS version");
         defaults.add("max-ship-blocks=-1");

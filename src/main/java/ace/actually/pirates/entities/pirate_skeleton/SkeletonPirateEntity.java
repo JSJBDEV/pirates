@@ -3,7 +3,9 @@ package ace.actually.pirates.entities.pirate_skeleton;
 import ace.actually.pirates.Pirates;
 import ace.actually.pirates.entities.pirate_abstract.AbstractPirateEntity;
 import ace.actually.pirates.entities.pirate_abstract.PirateBowAttackGoal;
+import ace.actually.pirates.entities.pirate_abstract.PirateGunAttackGoal;
 import ace.actually.pirates.entities.pirate_abstract.PirateWanderArroundFarGoal;
+import ace.actually.pirates.compat.MusketModCompat;
 import net.minecraft.enchantment.Enchantment;
 import net.minecraft.enchantment.Enchantments;
 import net.minecraft.entity.*;
@@ -53,28 +55,30 @@ public class SkeletonPirateEntity extends AbstractPirateEntity implements Ranged
     @Override
     protected void initGoals() {
         super.initGoals();
-        this.goalSelector.add(3, new PirateBowAttackGoal<>(this, 1.0D, 20, 20.0F));
+//        this.goalSelector.add(3, new PirateBowAttackGoal<>(this, 1.0D, 20, 20.0F));
+        this.goalSelector.add(3, MusketModCompat.createRangedGoal(this));
     }
 
     @Override
     protected void initEquipment(Random random, LocalDifficulty localDifficulty) {
         super.initEquipment(random, localDifficulty);
-        this.equipStack(EquipmentSlot.MAINHAND, new ItemStack(Items.BOW));
+//        this.equipStack(EquipmentSlot.MAINHAND, new ItemStack(Items.BOW));
+        MusketModCompat.equipRandomGunOrBow(this, random);
     }
 
     @Override
     public void attack(LivingEntity target, float pullProgress) {
 
-        ItemStack itemStack = this.getStackInHand(ProjectileUtil.getHandPossiblyHolding(this, Items.BOW));
-        PersistentProjectileEntity persistentProjectileEntity = this.createArrowProjectile(itemStack, pullProgress);
-        double d = target.getX() - this.getX();
-        double e = target.getBodyY(0.3333333333333333) - persistentProjectileEntity.getY();
-        double f = target.getZ() - this.getZ();
-        double g = Math.sqrt(d * d + f * f);
-        persistentProjectileEntity.setVelocity(d, e + g * 0.20000000298023224, f, 1.6F, (float) (14 - this.getEntityWorld().getDifficulty().getId() * 4));
-        this.playSound(SoundEvents.ENTITY_SKELETON_SHOOT, 1.0F, 1.0F / (this.getRandom().nextFloat() * 0.4F + 0.8F));
-        persistentProjectileEntity.setPierceLevel((byte)2);
-        this.getEntityWorld().spawnEntity(persistentProjectileEntity);
+//        ItemStack itemStack = this.getStackInHand(ProjectileUtil.getHandPossiblyHolding(this, Items.BOW));
+//        PersistentProjectileEntity persistentProjectileEntity = this.createArrowProjectile(itemStack, pullProgress);
+//        double d = target.getX() - this.getX();
+//        double e = target.getBodyY(0.3333333333333333) - persistentProjectileEntity.getY();
+//        double f = target.getZ() - this.getZ();
+//        double g = Math.sqrt(d * d + f * f);
+//        persistentProjectileEntity.setVelocity(d, e + g * 0.20000000298023224, f, 1.6F, (float) (14 - this.getEntityWorld().getDifficulty().getId() * 4));
+//        this.playSound(SoundEvents.ENTITY_SKELETON_SHOOT, 1.0F, 1.0F / (this.getRandom().nextFloat() * 0.4F + 0.8F));
+//        persistentProjectileEntity.setPierceLevel((byte)2);
+//        this.getEntityWorld().spawnEntity(persistentProjectileEntity);
 
     }
 

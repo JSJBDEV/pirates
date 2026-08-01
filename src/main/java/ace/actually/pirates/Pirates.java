@@ -57,7 +57,7 @@ public class Pirates implements ModInitializer {
 	// That way, it's clear which mod wrote info, warnings, and errors.
 	public static final String MOD_ID = "pirates";
     public static final Logger LOGGER = LoggerFactory.getLogger("pirates");
-
+	public static final Identifier CANNON_SMOKE_PACKET_ID = new Identifier(MOD_ID, "cannon_smoke");
 	public static final GameRules.Key<GameRules.BooleanRule> PIRATES_IS_LIVE_WORLD =
 			GameRuleRegistry.register("piratesIsLive", GameRules.Category.MISC, GameRuleFactory.createBooleanRule(true));
 
@@ -133,7 +133,7 @@ public class Pirates implements ModInitializer {
 
 		ConfigUtils.checkConfigs();
 		baseShotPower = Float.parseFloat(ConfigUtils.config.getOrDefault("base-shot-power","2.2"));
-		cannonRange = Float.parseFloat(ConfigUtils.config.getOrDefault("cannon-range","1.7"));
+		cannonRange = Float.parseFloat(ConfigUtils.config.getOrDefault("cannon-range","3.2"));
 		pursuitDistance = Integer.parseInt(ConfigUtils.config.getOrDefault("pursuit-distance","10000"));
 		shouldEnableFlyingPirates = ConfigUtils.config.getOrDefault("should-enable-flying-pirates","false").equals("true");
 
@@ -193,6 +193,18 @@ public class Pirates implements ModInitializer {
 	public static final StableBlock STABLE_BLOCK = new StableBlock(AbstractBlock.Settings.create());
 	public static final ShipIdBlock SHIP_ID_BLOCK = new ShipIdBlock(AbstractBlock.Settings.create());
 	public static final Block HEAVY_BLOCK = new Block(AbstractBlock.Settings.copy(Blocks.OBSIDIAN));
+	public static final DamagedHullBlock DAMAGED_HULL_BLOCK = new DamagedHullBlock(
+			AbstractBlock.Settings.copy(Blocks.NETHERITE_BLOCK)
+					.strength(0.5f, 1200.0f)
+					.noBlockBreakParticles()
+					.noCollision()
+					.dropsNothing()
+	);
+	public static final BlockEntityType<DamagedHullBlockEntity> DAMAGED_HULL_BLOCK_ENTITY = Registry.register(
+			Registries.BLOCK_ENTITY_TYPE,
+			new Identifier("pirates", "damaged_hull_block_entity"),
+			FabricBlockEntityTypeBuilder.create(DamagedHullBlockEntity::new, DAMAGED_HULL_BLOCK).build()
+	);
 	private void registerBlocks()
 	{
 		Registry.register(Registries.BLOCK,new Identifier("pirates","cannon_priming_block"),CANNON_PRIMING_BLOCK);
@@ -203,6 +215,8 @@ public class Pirates implements ModInitializer {
 		Registry.register(Registries.BLOCK,new Identifier("pirates","ship_id_block"),SHIP_ID_BLOCK);
 		Registry.register(Registries.BLOCK,new Identifier("pirates","heavy_block"),HEAVY_BLOCK);
 
+		// my custom blocks
+		Registry.register(Registries.BLOCK, new Identifier("pirates", "damaged_hull_block"), DAMAGED_HULL_BLOCK);
 	}
 
 
@@ -236,6 +250,9 @@ public class Pirates implements ModInitializer {
 		Registry.register(Registries.ITEM,new Identifier("pirates","crew_spawner_block"),new BlockItem(CREW_SPAWNER_BLOCK,new Item.Settings()));
 		Registry.register(Registries.ITEM,new Identifier("pirates","ship_id_block"),new BlockItem(SHIP_ID_BLOCK,new Item.Settings()));
 
+		// my custom blocks
+		Registry.register(Registries.ITEM, new Identifier("pirates", "damaged_hull_block"),
+				new BlockItem(DAMAGED_HULL_BLOCK, new Item.Settings()));
 	}
 
 

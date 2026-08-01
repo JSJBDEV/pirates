@@ -11,7 +11,8 @@ import net.minecraft.world.World;
 import org.joml.Vector3d;
 import org.valkyrienskies.core.api.ships.LoadedServerShip;
 import org.valkyrienskies.mod.common.VSGameUtilsKt;
-import org.valkyrienskies.mod.common.util.GameTickForceApplier;
+import org.valkyrienskies.mod.common.ValkyrienSkiesMod;
+import org.valkyrienskies.mod.common.util.GameToPhysicsAdapter;
 import org.valkyrienskies.mod.common.util.VectorConversionsMCKt;
 
 public class StableBlockEntity extends BlockEntity {
@@ -47,15 +48,15 @@ public class StableBlockEntity extends BlockEntity {
                 LoadedServerShip ship = VSGameUtilsKt.getShipObjectManagingPos(serverWorld,pos);
                 if(ship!=null)
                 {
-                    GameTickForceApplier gtfa = ship.getAttachment(GameTickForceApplier.class);
+                    GameToPhysicsAdapter gtpa = ValkyrienSkiesMod.getOrCreateGTPA(serverWorld.getRegistryKey().getValue().toString());
 
-                    if(gtfa!=null)
+                    if(gtpa!=null)
                     {
                         Vec3i vec3i = Vec3i.ZERO.up();
 
                         Vector3d v3d = VectorConversionsMCKt.toJOMLD(vec3i).mul(be.multiplier*ship.getInertiaData().getMass());
                         Vector3d loc = new Vector3d(pos.getX(),pos.getY(),pos.getZ()).sub(ship.getTransform().getPositionInShip());
-                        gtfa.applyInvariantForceToPos(v3d,loc);
+                        gtpa.applyInvariantForceToPos(ship.getId(), v3d, loc);
                         //gtfa.applyInvariantForce(v3d);
                     }
 

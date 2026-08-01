@@ -33,6 +33,37 @@ public class ClientPirates implements ClientModInitializer {
 
         //EntityModelLayerRegistry.registerModelLayer(SKELETON_PIRATE, SkeletonPirateModel::getTexturedModelData);
 
-    }
 
+        net.fabricmc.fabric.api.client.networking.v1.ClientPlayNetworking.registerGlobalReceiver(
+                Pirates.CANNON_SMOKE_PACKET_ID,
+                (client, handler, buf, sender) -> {
+                    double x = buf.readDouble();
+                    double y = buf.readDouble();
+                    double z = buf.readDouble();
+                    int dirId = buf.readInt();
+
+                    client.execute(() -> {
+                        var world = client.world;
+                        if (world == null) return;
+
+                        var direction = net.minecraft.util.math.Direction.byId(dirId);
+                        for (int i = 0; i < 40; ++i) {
+                            world.addParticle(net.minecraft.particle.ParticleTypes.FLAME,
+                                    x + direction.getOffsetX() * (0.5 + world.random.nextDouble() * 1.5),
+                                    y + direction.getOffsetY() + (world.random.nextDouble() * 1.0) - 0.5,
+                                    z + direction.getOffsetZ() * (0.5 + world.random.nextDouble() * 1.5),
+                                    (world.random.nextDouble() * 0.3) - 0.15,
+                                    (world.random.nextDouble() * 0.1) - 0.05,
+                                    (world.random.nextDouble() * 0.3) - 0.15);
+
+                            world.addParticle(net.minecraft.particle.ParticleTypes.CLOUD,
+                                    x + direction.getOffsetX() * (3.5 + world.random.nextDouble() * 2) + (4 * world.random.nextDouble()) - 2,
+                                    y + (world.random.nextDouble() * 3.0) - 1.0,
+                                    z + direction.getOffsetZ() * (3.5 + world.random.nextDouble() * 2) + (4 * world.random.nextDouble()) - 2,
+                                    0.0, 0.0, 0.0);
+                        }
+                    });
+                }
+        );
+    }
 }

@@ -15,6 +15,7 @@ import net.minecraft.world.World;
 import org.valkyrienskies.core.api.ships.Ship;
 import org.valkyrienskies.mod.common.VSGameUtilsKt;
 import org.valkyrienskies.mod.common.util.VectorConversionsMCKt;
+import net.minecraft.particle.DustParticleEffect;
 
 /**
  * A dispenser behavior that spawns a projectile with velocity in front of the dispenser.
@@ -35,23 +36,19 @@ public abstract class CannonDispenserBehavior
             projectileEntity.addVelocity(VectorConversionsMCKt.toMinecraft(ship.getVelocity()).multiply(1/60.0));
         }
 
-        if (!world.isClient) {
-            int xmod = 0;
-            int ymod = 0;
-            int zmod = 0;
+        if (!world.isClient()) {
+            net.minecraft.network.PacketByteBuf buf = net.fabricmc.fabric.api.networking.v1.PacketByteBufs.create();
+            buf.writeDouble(position.getX());
+            buf.writeDouble(position.getY());
+            buf.writeDouble(position.getZ());
+            buf.writeInt(direction.getId());
 
-            switch (direction) {
-                case NORTH -> zmod = -1;
-                case EAST -> xmod = 1;
-                case SOUTH -> zmod = 1;
-                case WEST -> xmod = -1;
-                case UP -> ymod = 1;
-                case DOWN -> ymod = -1;
-            }
-            for(int i = 0; i < 40; ++i) {
-                world.spawnParticles(ParticleTypes.CLOUD, position.getX() + xmod + (2 * world.random.nextDouble()) - 1, position.getY() + ymod + (2 * world.random.nextDouble()) - 0.8, position.getZ() + zmod + (2 * world.random.nextDouble()) - 1, 1, 0.0, 0.0, 0.0, 0.005);
+            for (net.minecraft.server.network.ServerPlayerEntity player :
+                    net.fabricmc.fabric.api.networking.v1.PlayerLookup.tracking(world, pointer.getPos())) {
+                net.fabricmc.fabric.api.networking.v1.ServerPlayNetworking.send(player, Pirates.CANNON_SMOKE_PACKET_ID, buf);
             }
         }
+
         stack.decrement(1);
         return stack;
     }
