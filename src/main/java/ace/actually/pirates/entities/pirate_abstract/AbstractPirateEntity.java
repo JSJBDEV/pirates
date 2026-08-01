@@ -6,8 +6,7 @@ import ace.actually.pirates.blocks.MotionInvokingBlock;
 import ace.actually.pirates.entities.friendly_pirate.FriendlyPirateEntity;
 import ace.actually.pirates.events.IPirateDies;
 import ace.actually.pirates.util.DisarmUtils;
-import ewewukek.musketmod.GunItem;
-import ewewukek.musketmod.Items;
+import ace.actually.pirates.compat.MusketModCompat;
 import net.minecraft.entity.EntityData;
 import net.minecraft.entity.EntityType;
 import net.minecraft.entity.SpawnReason;
@@ -101,13 +100,6 @@ public abstract class AbstractPirateEntity extends IllagerEntity {
         }
     }
     // for musket mod with reloading and firing
-    public static final Item[] guns = {
-            Items.MUSKET,
-            Items.MUSKET_WITH_BAYONET,
-            Items.BLUNDERBUSS,
-            Items.PISTOL,
-            Items.MUSKET_WITH_SCOPE
-    };
     protected static final TrackedData<Boolean> CHARGING =
             DataTracker.registerData(FriendlyPirateEntity.class, TrackedDataHandlerRegistry.BOOLEAN);
     @Override
@@ -125,10 +117,10 @@ public abstract class AbstractPirateEntity extends IllagerEntity {
     public IllagerEntity.State getState() {
         if (this.isCharging()) {
             return State.CROSSBOW_CHARGE;
-        } else if (GunItem.isHoldingGun(this)) {
+        } else if (MusketModCompat.isHoldingGun(this)) {
             if (this.isAttacking())
                 return State.CROSSBOW_HOLD;
-            return ((this.isHolding(Items.PISTOL)) ? State.NEUTRAL : State.CROSSBOW_CHARGE);
+            return (MusketModCompat.isHoldingPistol(this) ? State.NEUTRAL : State.CROSSBOW_CHARGE);
         }
         return State.CROSSBOW_CHARGE; // almost never reach this state
     }

@@ -57,7 +57,7 @@ public class ShotEntity extends ThrownItemEntity implements FlyingItemEntity {
     public void tick () {
         if (this.tickAge > 500) {
             if (!this.getWorld().isClient()) {
-                explode();
+                explode(null);
             }
         } else {
             this.tickAge++;
@@ -73,7 +73,10 @@ public class ShotEntity extends ThrownItemEntity implements FlyingItemEntity {
     protected void onCollision(HitResult hitResult) {
         super.onCollision(hitResult);
         if (!this.getWorld().isClient) {
-            explode();
+            BlockPos impactPos = hitResult instanceof BlockHitResult blockHitResult
+                    ? blockHitResult.getBlockPos()
+                    : null;
+            explode(impactPos);
         }
     }
 
@@ -82,9 +85,7 @@ public class ShotEntity extends ThrownItemEntity implements FlyingItemEntity {
         super.onEntityHit(entityHitResult);
         Entity entity = entityHitResult.getEntity();
         entity.damage(this.getDamageSources().explosion(null), damage);
-        if (!this.getWorld().isClient) {
-            explode();
-        }
+
     }
     private BlockPos getCollisionBlock() {
         HitResult hitResult = this.getWorld().raycast(new RaycastContext(
@@ -216,85 +217,20 @@ public class ShotEntity extends ThrownItemEntity implements FlyingItemEntity {
 
     }
 
-    private void explode() {
+    private void explode(BlockPos exactImpactPos) {
         World world = this.getWorld();
-        BlockPos impactPos = this.getCollisionBlock(); // ✅ Get exact impact block
-        if (impactPos == null) {
-            impactPos = this.getBlockPos(); // Fallback in case collision is null
+        BlockPos impactPos = exactImpactPos != null ? exactImpactPos : this.getBlockPos();
+        BlockState state = world.getBlockState(impactPos);
+
+        // Destroy only the exact block reported by the collision result.
+        if (!state.isAir() && state.getHardness(world, impactPos) >= 0) {
+            world.breakBlock(impactPos, true);
         }
 
-        // 🔹 Shot direction (normalize for precision)
-        Vec3d shotDirection = this.getVelocity().normalize();
-        Vec3d currentPos = new Vec3d(impactPos.getX() + 0.5, impactPos.getY() + 0.5, impactPos.getZ() + 0.5); // Center on block
-
-        int penetrationPower = 3; // 🔹 2 blocks will be pierced
-        double stepSize = 1; // 🔹 Move forward 1 block per step
-
-        boolean isShipBlock = VSGameUtilsKt.isBlockInShipyard(world, impactPos);
-
-        if (!isShipBlock) {
-            Consumer<BlockPos> breakAndExplode = pos -> {
-                BlockState state = world.getBlockState(pos);
-                if (!state.isAir() && state.getHardness(world, pos) >= 0) {
-                    world.breakBlock(pos, true);
-                }
-                applyExplosionEffects(world, pos);
-            };
-
-            // 🔹 Ensure first block is destroyed
-            breakAndExplode.accept(impactPos);
-            // ✅ Handle Non-Ship Blocks (Piercing Shot with Breakable Blocks)
-            for (int i = 0; i < penetrationPower; i++) {
-                currentPos = currentPos.add(shotDirection.multiply(stepSize)); // Move forward in exact trajectory
-                BlockPos blockToBreak = new BlockPos((int) Math.floor(currentPos.x),
-                        (int) Math.floor(currentPos.y),
-                        (int) Math.floor(currentPos.z));
-                breakAndExplode.accept(blockToBreak);
-            }
-        } else {
-            // ✅ Handle Ship Blocks (Check if Below Waterline or Not)
-            Ship ship = VSGameUtilsKt.getShipManagingPos(world, impactPos);
-            if (ship == null)
-                return;
-
-            boolean isBelowWater = isBelowWaterLine(impactPos, ship, shotDirection);
-            // lambda
-            Consumer<BlockPos> breakAndExplodeHull = blockToAffect -> {
-                BlockState blockStateNext = world.getBlockState(blockToAffect);
-                if (!blockStateNext.isAir() && blockStateNext.getHardness(world, blockToAffect) >= 0) {
-                    if (isBelowWater) {
-                        // 🌊 Below Waterline: Replace Blocks with Netherite for Sinking Effect
-//                        world.setBlockState(blockToAffect, Pirates.HEAVY_BLOCK.getDefaultState());
-                    } else {
-                        // 🚢 Above Waterline: Apply Visual Damage & Splash Damage
-                        if (!blockStateNext.isAir() && blockStateNext.getHardness(world, blockToAffect) >= 0) {
-                            world.breakBlock(blockToAffect, true);
-                        }
-
-                        damageBlockVisual(world, blockToAffect);
-                        applyExplosionEffects(world, blockToAffect);
-                    }
-                } else {
-                    // 🛠️ If the block is NOT breakable, just apply knockback & explosion effects
-                    applyExplosionEffects(world, blockToAffect);
-                }
-            };
-
-            // 🔹 Ensure first block is affected
-            breakAndExplodeHull.accept(impactPos);
-//            // just for sinking
-//            penetrationPower = 2; // make water sink this ship in a sensible way :33
-//            for (int i = 0; i < penetrationPower; i++) {
-//                currentPos = currentPos.add(shotDirection.multiply(stepSize)); // Move forward in exact trajectory
-//                BlockPos blockToAffect = new BlockPos((int) Math.floor(currentPos.x),
-//                        (int) Math.floor(currentPos.y),
-//                        (int) Math.floor(currentPos.z));
-//                breakAndExplodeHull.accept(blockToAffect);
-//            }
-        }
-
+        applyExplosionEffects(world, impactPos);
         this.discard();
     }
+
     @Override
     protected Item getDefaultItem() {
         return Pirates.CANNONBALL_ENT;

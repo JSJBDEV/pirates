@@ -5,6 +5,7 @@ import ace.actually.pirates.entities.pirate_abstract.AbstractPirateEntity;
 import ace.actually.pirates.entities.pirate_abstract.PirateBowAttackGoal;
 import ace.actually.pirates.entities.pirate_abstract.PirateGunAttackGoal;
 import ace.actually.pirates.entities.pirate_abstract.PirateWanderArroundFarGoal;
+import ace.actually.pirates.compat.MusketModCompat;
 import net.minecraft.enchantment.Enchantment;
 import net.minecraft.enchantment.Enchantments;
 import net.minecraft.entity.*;
@@ -55,14 +56,14 @@ public class SkeletonPirateEntity extends AbstractPirateEntity implements Ranged
     protected void initGoals() {
         super.initGoals();
 //        this.goalSelector.add(3, new PirateBowAttackGoal<>(this, 1.0D, 20, 20.0F));
-        this.goalSelector.add(3, new PirateGunAttackGoal<>(this, 1.0D, 20, 20.0F));
+        this.goalSelector.add(3, MusketModCompat.createRangedGoal(this));
     }
 
     @Override
     protected void initEquipment(Random random, LocalDifficulty localDifficulty) {
         super.initEquipment(random, localDifficulty);
 //        this.equipStack(EquipmentSlot.MAINHAND, new ItemStack(Items.BOW));
-        this.equipStack(EquipmentSlot.MAINHAND, new ItemStack(guns[random.nextInt(guns.length)]));
+        MusketModCompat.equipRandomGunOrBow(this, random);
     }
 
     @Override

@@ -133,7 +133,7 @@ public class Pirates implements ModInitializer {
 
 		ConfigUtils.checkConfigs();
 		baseShotPower = Float.parseFloat(ConfigUtils.config.getOrDefault("base-shot-power","2.2"));
-		cannonRange = Float.parseFloat(ConfigUtils.config.getOrDefault("cannon-range","1.7"));
+		cannonRange = Float.parseFloat(ConfigUtils.config.getOrDefault("cannon-range","3.2"));
 		pursuitDistance = Integer.parseInt(ConfigUtils.config.getOrDefault("pursuit-distance","10000"));
 		shouldEnableFlyingPirates = ConfigUtils.config.getOrDefault("should-enable-flying-pirates","false").equals("true");
 

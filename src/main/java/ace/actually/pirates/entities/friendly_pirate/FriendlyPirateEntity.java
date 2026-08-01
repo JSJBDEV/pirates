@@ -7,8 +7,7 @@ import ace.actually.pirates.entities.pirate_abstract.PirateGunAttackGoal;
 import ace.actually.pirates.entities.pirate_abstract.PirateWanderArroundFarGoal;
 import ace.actually.pirates.entities.pirate_default.PirateEntity;
 import ace.actually.pirates.util.DisarmUtils;
-import ewewukek.musketmod.GunItem;
-import ewewukek.musketmod.MusketItem;
+import ace.actually.pirates.compat.MusketModCompat;
 import net.minecraft.entity.*;
 import net.minecraft.entity.ai.RangedAttackMob;
 import net.minecraft.entity.ai.goal.ActiveTargetGoal;
@@ -29,7 +28,6 @@ import net.minecraft.entity.projectile.PersistentProjectileEntity;
 import net.minecraft.entity.projectile.ProjectileUtil;
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
-import ewewukek.musketmod.Items;
 import net.minecraft.nbt.NbtCompound;
 import net.minecraft.sound.SoundEvents;
 import net.minecraft.text.Text;
@@ -98,7 +96,7 @@ public class FriendlyPirateEntity extends AbstractPirateEntity implements Ranged
     protected void initGoals() {
         super.initGoals();
 //        this.goalSelector.add(3, new PirateBowAttackGoal<>(this, 1.0D, 20, 20.0F));
-        this.goalSelector.add(3, new PirateGunAttackGoal<>(this, 1.0D, 20, 20.0F));
+        this.goalSelector.add(3, MusketModCompat.createRangedGoal(this));
         this.targetSelector.add(3, new ActiveTargetGoal(this, PirateEntity.class, true));
         this.targetSelector.add(3, new ActiveTargetGoal(this, PillagerEntity.class, true));
 //        this.targetSelector.add(1, new RevengeGoal(this));
@@ -128,10 +126,7 @@ public class FriendlyPirateEntity extends AbstractPirateEntity implements Ranged
     @Override
     protected void initEquipment(Random random, LocalDifficulty localDifficulty) {
         super.initEquipment(random, localDifficulty);
-        Item rand = guns[random.nextInt(guns.length)];
-        this.equipStack(EquipmentSlot.MAINHAND, new ItemStack(rand));
-        if (rand == Items.PISTOL)
-            this.equipStack(EquipmentSlot.OFFHAND, new ItemStack(Items.PISTOL));
+        MusketModCompat.equipRandomGunOrBow(this, random);
     }
 
     @Override
